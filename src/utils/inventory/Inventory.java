@@ -12,7 +12,7 @@ public class Inventory {
 	}
 	
 	public void update() {
-		
+		  
 	}
 	
 	public void render(Graphics g) {
