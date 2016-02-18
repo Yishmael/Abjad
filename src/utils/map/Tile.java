@@ -1,8 +1,8 @@
 package utils.map;
 
 public class Tile {
-	private float x, y;
 	private TileType tileType;
+	private float x, y;
 	
 	public Tile(int x, int y, TileType tileType) {
 		// TODO Auto-generated constructor stub
@@ -11,28 +11,28 @@ public class Tile {
 		this.tileType = tileType;
 	}
 
-	public float getX() {
-		return x;
+	public TileType getTileType() {
+		return tileType;
 	}
 
-	public void setX(float x) {
-		this.x = x;
+	public float getX() {
+		return x;
 	}
 
 	public float getY() {
 		return y;
 	}
 
-	public void setY(float y) {
-		this.y = y;
-	}
-
-	public TileType getTileType() {
-		return tileType;
-	}
-
 	public void setTileType(TileType tileType) {
 		this.tileType = tileType;
+	}
+
+	public void setX(float x) {
+		this.x = x;
+	}
+
+	public void setY(float y) {
+		this.y = y;
 	}
 	
 	

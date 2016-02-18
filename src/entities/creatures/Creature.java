@@ -8,12 +8,19 @@ import entities.Entity;
 public abstract class Creature extends Entity {
 	protected int health;
 
-	public Creature(Image image, float xPos, float yPos) throws SlickException {
+	public Creature(Image image, float xPos, float yPos, int health) throws SlickException {
 		super(image, xPos, yPos);
-		health = 100;
-		// TODO Auto-generated constructor stub
+		this.health = health;
 	}
-	
+
+	public int getHealth() {
+		return health;
+	}
+
 	public abstract void move(float x, float y);
+	
+	public void setHealth(int health) {
+		this.health = health;
+	}
 
 }

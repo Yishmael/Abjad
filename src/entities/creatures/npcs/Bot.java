@@ -1,19 +1,34 @@
-package entities.creatures;
+package entities.creatures.npcs;
 
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
 import data.MainGame;
+import entities.creatures.Creature;
 import utils.map.MapTile;
 
 public class Bot extends Creature {
 	private MapTile mapTile;
 
-	public Bot(Image image, int xPos, int yPos, MapTile mapTile) throws SlickException {
-		super(image, xPos, yPos);
+	public Bot(Image image, int xPos, int yPos, int health, MapTile mapTile) throws SlickException {
+		super(image, xPos, yPos, health);
 		// TODO Auto-generated constructor stub
 		this.mapTile = mapTile;
+	}
+
+	@Override
+	public void move(float x, float y) {
+		// TODO Auto-generated method stub
+		xPos += x;
+		yPos += y;
+	}
+
+	@Override
+	public void render(Graphics g) {
+		g.drawImage(image, xPos, yPos);
+		// TODO Auto-generated method stub
+
 	}
 
 	@Override
@@ -30,20 +45,6 @@ public class Bot extends Creature {
 		xPos %= MainGame.SCREEN_WIDTH - 90;
 		yPos %= MainGame.SCREEN_HEIGHT - 90;
 
-	}
-
-	@Override
-	public void render(Graphics g) {
-		g.drawImage(image, xPos, yPos);
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void move(float x, float y) {
-		// TODO Auto-generated method stub
-		xPos += x;
-		yPos += y;
 	}
 
 }

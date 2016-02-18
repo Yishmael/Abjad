@@ -18,12 +18,14 @@ public abstract class Entity {
 		return xPos;
 	}
 
-	public void setxPos(float xPos) {
-		this.xPos = xPos;
-	}
-
 	public float getyPos() {
 		return yPos;
+	}
+
+	public abstract void render(Graphics g);
+
+	public void setxPos(float xPos) {
+		this.xPos = xPos;
 	}
 
 	public void setyPos(float yPos) {
@@ -31,7 +33,5 @@ public abstract class Entity {
 	}
 
 	public abstract void update();
-
-	public abstract void render(Graphics g);
 
 }

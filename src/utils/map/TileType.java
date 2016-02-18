@@ -2,7 +2,7 @@ package utils.map;
 
 public enum TileType {
 
-	Grass("grass", true), Dirt("dirt", true), Water("water", false), Sand("sand", true), Rock("rock", false);
+	Dirt("dirt", true), Grass("grass", true), Rock("rock", false), Sand("sand", true), Water("water", false);
 
 	private String tileName;
 	public boolean walkable;
