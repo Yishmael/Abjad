@@ -1,37 +1,36 @@
 package entities;
 
-import org.newdawn.slick.Graphics;
-import org.newdawn.slick.Image;
-import org.newdawn.slick.SlickException;
+import java.util.ArrayList;
 
-public abstract class Entity {
-	protected Image image;
-	protected float xPos, yPos;
+import components.Component;
 
-	public Entity(Image image, float xPos, float yPos) throws SlickException {
-		this.image = image;
-		this.xPos = xPos;
-		this.yPos = yPos;
+public class Entity {
+	ArrayList<Component> comps = new ArrayList<Component>();
+	private int id;
+
+	public Entity(int id) {
+		this.id = id;
 	}
 
-	public float getxPos() {
-		return xPos;
+	public int getID() {
+		return id;
 	}
 
-	public float getyPos() {
-		return yPos;
+	public void addComponent(Component comp) {
+		comps.add(comp);
 	}
 
-	public abstract void render(Graphics g);
-
-	public void setxPos(float xPos) {
-		this.xPos = xPos;
+	public void removeComponent(Component comp) {
+		if (hasComponent(comp)) {
+			comps.remove(comp);
+		}
+	}
+	
+	public ArrayList<Component> getComponents() {
+	    return comps;
 	}
 
-	public void setyPos(float yPos) {
-		this.yPos = yPos;
+	public boolean hasComponent(Component comp) {
+		return comps.contains(comp);
 	}
-
-	public abstract void update();
-
 }
