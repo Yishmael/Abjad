@@ -53,19 +53,19 @@ public class MapTile {
 
         return image;
     }
-    
-    public int getTileX(int x) {
-        return (int) Math.floor((x) / (64 + 1)); // +1 cause padding
-    }
-    
-    public int getTileY(int y) {
-        return (int) Math.floor((y) / (64 + 1)); // padding
-    }
 
     public TileType getTileType(int xTile, int yTile) {
         if (xTile < 0 || xTile >= xMax || yTile < 0 || yTile >= yMax)
             return TileType.Null;
         return TileType.values()[matrix[xTile][yTile]];
+    }
+
+    public int getTileX(int x) {
+        return (int) Math.floor((x) / (64 + 1)); // +1 cause padding
+    }
+
+    public int getTileY(int y) {
+        return (int) Math.floor((y) / (64 + 1)); // padding
     }
 
     public void render(Graphics g) throws SlickException {

@@ -1,39 +1,38 @@
 package data;
 
 public class Tile {
-	private TileType tileType;
-	private float x, y;
-	
-	public Tile(int x, int y, TileType tileType) {
-		// TODO Auto-generated constructor stub
-		this.x = x;
-		this.y = y;
-		this.tileType = tileType;
-	}
+    private TileType tileType;
+    private float x, y;
 
-	public TileType getTileType() {
-		return tileType;
-	}
+    public Tile(int x, int y, TileType tileType) {
+        // TODO Auto-generated constructor stub
+        this.x = x;
+        this.y = y;
+        this.tileType = tileType;
+    }
 
-	public float getX() {
-		return x;
-	}
+    public TileType getTileType() {
+        return tileType;
+    }
 
-	public float getY() {
-		return y;
-	}
+    public float getX() {
+        return x;
+    }
 
-	public void setTileType(TileType tileType) {
-		this.tileType = tileType;
-	}
+    public float getY() {
+        return y;
+    }
 
-	public void setX(float x) {
-		this.x = x;
-	}
+    public void setTileType(TileType tileType) {
+        this.tileType = tileType;
+    }
 
-	public void setY(float y) {
-		this.y = y;
-	}
-	
-	
+    public void setX(float x) {
+        this.x = x;
+    }
+
+    public void setY(float y) {
+        this.y = y;
+    }
+
 }

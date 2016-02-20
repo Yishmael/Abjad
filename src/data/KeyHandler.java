@@ -42,20 +42,17 @@ public class KeyHandler {
         if (input.isKeyPressed(Input.KEY_P)) {
             // player.getMapTile().setTile(xTile, yTile,
             // TileType.values()[player.tileIndex]);
-            player.addItem(new Boulder(new Image("images/boulder1.png"),
-                    "Boulder1", 0, 0, 1, 30, 0.1f));
+            player.addItem(new Boulder(new Image("images/boulder1.png"), "Boulder1", 0, 0, 1, 30, 0.1f));
 
         }
         // change tile on mouse location
-        if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)
-                && !player.showMenu) {
+        if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && !player.showMenu) {
             int x = input.getMouseX();
             int y = input.getMouseY();
             int xTile = player.getMapTile().getTileX(x);
             int yTile = player.getMapTile().getTileY(y);
-            //System.out.println(xTile + " " + yTile);
-            player.getMapTile().setTile(xTile, yTile,
-                    TileType.values()[player.tileIndex]);
+            // System.out.println(xTile + " " + yTile);
+            player.getMapTile().setTile(xTile, yTile, TileType.values()[player.tileIndex]);
         }
         // open/close menu or close inventory
         if (input.isKeyPressed(Input.KEY_ESCAPE)) {
@@ -67,25 +64,21 @@ public class KeyHandler {
                 c++;
                 if (c == 42) {
                     c = 0;
-                    player.addItem(new Boulder(new Image("images/boulder1.png"),
-                            "Boulder1", 0, 0, 1000, 30, 0.2f));
+                    player.addItem(new Boulder(new Image("images/boulder1.png"), "Boulder1", 0, 0, 1000, 30, 0.2f));
                 }
             }
         }
         // add item
-        if (!input.isKeyDown(Input.KEY_LSHIFT)
-                && input.isKeyPressed(Input.KEY_SPACE)) {
+        if (!input.isKeyDown(Input.KEY_LSHIFT) && input.isKeyPressed(Input.KEY_SPACE)) {
             if (!player.inventoryFull()) {
                 // player.addItem(ic.getAxes().get(0), 2, 4);
-                player.addItem(new Axe(new Image("images/axe2.png"), "Axe1", 0,
-                        0, 100, 10, 0.33f));
+                player.addItem(new Axe(new Image("images/axe2.png"), "Axe1", 0, 0, 100, 10, 0.33f));
             } else {
                 System.out.println("Inventory full!");
             }
         }
         // remove item
-        if (input.isKeyDown(Input.KEY_LSHIFT)
-                && input.isKeyPressed(Input.KEY_SPACE)) {
+        if (input.isKeyDown(Input.KEY_LSHIFT) && input.isKeyPressed(Input.KEY_SPACE)) {
             if (player.getItems().length > 0) {
                 player.removeItem(index++);
                 index %= 30;
@@ -101,8 +94,7 @@ public class KeyHandler {
         if (input.isMousePressed(Input.MOUSE_RIGHT_BUTTON)) {
             player.tileIndex++;
             player.tileIndex %= TileType.values().length;
-            System.out.println(
-                    "Brush changed to " + TileType.values()[player.tileIndex]);
+            System.out.println("Brush changed to " + TileType.values()[player.tileIndex]);
         }
 
         if (input.isKeyPressed(Input.KEY_I)) {

@@ -14,11 +14,12 @@ public class Player extends Creature implements KeyListener {
     public boolean showInventory, showMenu;
     public int tileIndex;
     public int[] direction;
-    public int[] matrix = { 101, 0, 202, 0, 501, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, };
+    private int itemsCount;
+    public int[] matrix = { 0, 0, 202, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, };
 
-    public Player(Image image, String name, float xPos, float yPos, int health,
-            float speed, MapTile mapTile) throws SlickException {
+    public Player(Image image, String name, float xPos, float yPos, int health, float speed, MapTile mapTile)
+            throws SlickException {
         super(image, name, xPos, yPos, health, speed, mapTile);
         showInventory = false;
         showMenu = false;
@@ -28,12 +29,14 @@ public class Player extends Creature implements KeyListener {
         // pass strings to inventory instead of <item>;
         inventory = new Inventory(new Image("images/inventory.png"), matrix);
         menu = new Menu(new Image("images/menu.png"));
+        itemsCount = 1;
     }
 
     public void addItem(Item item) {
         for (int i = 0; i < matrix.length; i++) {
             if (matrix[i] == 0) {
                 matrix[i] = getItemID(item);
+                itemsCount++;
                 break;
             }
         }
@@ -82,11 +85,7 @@ public class Player extends Creature implements KeyListener {
     }
 
     public boolean inventoryFull() {
-        for (int i = 0; i < matrix.length; i++) {
-            if (matrix[i] == 0)
-                return false;
-        }
-        return true;
+        return itemsCount >= 30;
         // return items.size() >= 30;
     }
 
@@ -118,6 +117,7 @@ public class Player extends Creature implements KeyListener {
         // items.get(slot).visible = false;
         // items.remove(slot);
         matrix[slot] = 0;
+        itemsCount--;
     }
 
     @Override
@@ -138,10 +138,8 @@ public class Player extends Creature implements KeyListener {
         int xDir = direction[0];
         int yDir = direction[1];
 
-        int x = (int) (xPos - (image.getWidth() / 2) * xDir
-                + image.getWidth() / 2);
-        int y = (int) (yPos - (image.getHeight() / 2) * yDir
-                + image.getHeight() / 2);
+        int x = (int) (xPos - (image.getWidth() / 2) * xDir + image.getWidth() / 2);
+        int y = (int) (yPos - (image.getHeight() / 2) * yDir + image.getHeight() / 2);
 
         int xTile = mapTile.getTileX(x);
         int yTile = mapTile.getTileY(y);
@@ -155,13 +153,11 @@ public class Player extends Creature implements KeyListener {
         if (direction[0] != 0 && direction[1] != 0) {
             if (mapTile.getTileType(xTile + xDir, yTile).isWalkable())
                 if (mapTile.getTileType(xTile, yTile + yDir).isWalkable())
-                    if (mapTile.getTileType(xTile + xDir, yTile + yDir)
-                            .isWalkable()) {
+                    if (mapTile.getTileType(xTile + xDir, yTile + yDir).isWalkable()) {
                         xPos += xDir * (speed * delta);
                         yPos += yDir * (speed * delta);
                     }
-        } else
-            if (mapTile.getTileType(xTile + xDir, yTile + yDir).isWalkable()) {
+        } else if (mapTile.getTileType(xTile + xDir, yTile + yDir).isWalkable()) {
             xPos += xDir * (speed * delta);
             yPos += yDir * (speed * delta);
         }
