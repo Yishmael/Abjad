@@ -6,7 +6,7 @@ public class DefendComponent implements Component {
     public static int bit = 2;
 
     public void defend(String name, int def) {
-
+        System.out.println("defended " + def + " by " + name);
     }
 
     @Override
@@ -16,11 +16,12 @@ public class DefendComponent implements Component {
 
     @Override
     public void process(MessageChannel channel) {
+        if (channel.getSender() == null) {
+            return;
+        }
         String str = channel.getCommand();
-        if (str.length() >= 8) {
-            if (str.substring(0, 6).equals("defend")) {
-                defend(channel.getSender().getName(), Integer.parseInt(str.substring(7)));
-            }
+        if (str.matches("defend")) {
+            defend(channel.getSender().getName(), Integer.parseInt(str.substring(7)));
         }
     }
 

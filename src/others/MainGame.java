@@ -13,7 +13,6 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 
 import components.AttackComponent;
-import components.DefendComponent;
 import components.HealthComponent;
 import components.InputComponent;
 import components.InventoryComponent;
@@ -27,29 +26,15 @@ import data.Player;
 
 public class MainGame extends BasicGame {
 
-    public static final int SCREEN_WIDTH = 640; // 16 : 9
-    public static final int SCREEN_HEIGHT = 512;
-    public static final int TILE_HEIGHT = 64;
-    public static final int TILE_WIDTH = 64;
-
-    private static final int ATTACK = AttackComponent.bit;
-    private static final int DEFEND = DefendComponent.bit;
-    private static final int INPUT = InputComponent.bit;
-    private static final int INVENTORY = InventoryComponent.bit;
-    private static final int TRANSFORM = TransformComponent.bit;
-    private static final int SPRITE = SpriteComponent.bit;
-    private static final int MOVEMENT = MovementComponent.bit;
-    private static final int HEALTH = HealthComponent.bit;
-    private static final int MANA = ManaComponent.bit;
-
     public static void main(String[] args) {
         try {
             AppGameContainer appgc;
             appgc = new AppGameContainer(new MainGame("Stars are falling"));
-            appgc.setDisplayMode(SCREEN_WIDTH, SCREEN_HEIGHT, false);
-            appgc.setTargetFrameRate(2000);
+            appgc.setDisplayMode(Consts.SCREEN_WIDTH, Consts.SCREEN_HEIGHT, false);
+            appgc.setTargetFrameRate(200);
             appgc.setIcon("images/icon.png");
             // appgc.setAlwaysRender(true);
+            // appgc.setClearEachFrame(false);
             appgc.start();
         } catch (SlickException ex) {
             Logger.getLogger(MainGame.class.getName()).log(Level.SEVERE, null, ex);
@@ -61,6 +46,7 @@ public class MainGame extends BasicGame {
     private Player player;
     private ArrayList<others.Entity> ents;
     private MessageChannel channel;
+    private Input input;
 
     public MainGame(String gamename) {
         super(gamename);
@@ -68,39 +54,41 @@ public class MainGame extends BasicGame {
 
     @Override
     public void init(GameContainer gc) throws SlickException {
-        mapTile = new MapTile(SCREEN_WIDTH, SCREEN_HEIGHT);
-        player = new Player(new Image("images/ifrit.png"), "Ifrit", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 100, 200f,
-                mapTile);
+        mapTile = new MapTile(Consts.SCREEN_WIDTH, Consts.SCREEN_HEIGHT);
+        player = new Player(new Image("images/ifrit.png"), "Ifrit", Consts.SCREEN_WIDTH / 2, Consts.SCREEN_HEIGHT / 2,
+                100, 200f, mapTile);
         keyHandler = new KeyHandler(gc, player);
+        ents = new ArrayList<Entity>();
 
-        ents = new ArrayList<>();
-        ents.add(new Entity("Player"));
-        ents.get(0).addComponent(new AttackComponent(16, 4));
-        ents.get(0).addComponent(new HealthComponent(100, 200));
-        ents.get(0).addComponent(new InputComponent());
-        // ents.get(0).addComponent(new MovementComponent(25f));
-        // ents.get(0)
-        // .addComponent(new TransformationComponent(0f, 0f, 0f, 1.25f));
-        // ents.get(0).addComponent(
-        // new SpriteComponent("images/bahamut.png", "Enemy"));
+        // Entity player = new Entity("Player");
+        // player.addComponent(...);
+        Entity player1 = new Entity("Player");
+        player1.addComponent(new AttackComponent(16, 4));
+        player1.addComponent(new HealthComponent(100, 200));
+        player1.addComponent(new InputComponent());
+        int[] matrix = { 0, 0, 102, 0 };
+        player1.addComponent(new InventoryComponent("images/inventory.png", matrix));
+        player1.addComponent(new SpriteComponent("images/ifrit.png"));
+        player1.addComponent(new TransformComponent(220, 300 - 100, 0f, 1f));
 
-        ents.add(new Entity("Enemy bot"));
-        ents.get(1).addComponent(new HealthComponent(35, 100));
-        ents.get(1).addComponent(new ManaComponent(0, 1000));
-        ents.get(1).addComponent(new SpriteComponent("images/boulder1.png"));
-        ents.get(1).addComponent(new TransformComponent(200, 200, 0f, 1f));
+        Entity enemy1 = new Entity("Enemy bot");
+        enemy1.addComponent(new AttackComponent(36, 1));
+        enemy1.addComponent(new MovementComponent(50));
+        enemy1.addComponent(new HealthComponent(78, 100));
+        enemy1.addComponent(new ManaComponent(0, 1000));
+        enemy1.addComponent(new TransformComponent(300, 200, 0f, 1f));
+        enemy1.addComponent(new SpriteComponent("images/bahamut.png"));
+        enemy1.addComponent(new InventoryComponent("images/shield1.png", new int[0]));
 
-        // ents.get(1).addComponent(new HealthComponent(100, 120));
-        // ents.get(1)
-        // .addComponent(new TransformationComponent(20f, 200f, 30f, .5f));
-
+        ents.add(player1);
+        ents.add(enemy1);
     }
 
     @Override
     public void render(GameContainer gc, Graphics g) throws SlickException {
-        Input input = gc.getInput();
 
-         mapTile.render(g);
+        input = gc.getInput();
+        mapTile.render(g);
         player.render(g);
 
         if (player.showInventory) {
@@ -111,64 +99,49 @@ public class MainGame extends BasicGame {
             player.menu.render(g);
         }
 
-        if (input.isKeyDown(Input.KEY_LSHIFT)) {
-            if (input.isKeyPressed(Input.KEY_4)) {
-                for (Entity ent1: ents) {
-                    if (ent1.hasComponent(INPUT)) {
-                        if (ent1.hasComponent(ATTACK)) {
-                            for (Entity ent2: ents) {
-                                if (ent2 != ent1) {
-                                    if (ent2.hasComponent(HEALTH)) {
-                                        channel = new MessageChannel(ent1, "heal 7");
-                                        ent2.process(channel);
-                                    }
-                                }
-                            }
-                        }
-                    }
+        for (Entity ent1: ents) {
+            if (ent1.hasComponent(Consts.INPUT)) {
+                if (input.isKeyDown(Input.KEY_UP)) {
+                    ent1.process(new MessageChannel(ent1, "handleKey KEY_UP"));
                 }
-            } else if (input.isKeyPressed(Input.KEY_1)) {
-                for (Entity ent1: ents) {
-                    if (ent1.hasComponent(INPUT)) {
-                        if (ent1.hasComponent(ATTACK)) {
-                            for (Entity ent2: ents) {
-                                if (ent2 != ent1) {
-                                    if (ent2.hasComponent(HEALTH)) {
-                                        channel = new MessageChannel(ent1, "heal 7");
-                                        ent2.process(channel);
-                                    }
-                                }
-                            }
-                        }
-                    }
+                if (input.isKeyDown(Input.KEY_DOWN)) {
+                    ent1.process(new MessageChannel(ent1, "handleKey KEY_DOWN"));
                 }
-            } else if (input.isKeyPressed(Input.KEY_2)) {
-                for (Entity ent1: ents) {
-                    if (ent1.hasComponent(INPUT)) {
-                        if (ent1.hasComponent(ATTACK)) {
-                            for (Entity ent2: ents) {
-                                if (ent2 != ent1) {
-                                    if (ent2.hasComponent(TRANSFORM)) {
-                                        channel = new MessageChannel(ent1, "move 11 20");
-                                        ent2.process(channel);
-                                    }
-                                }
-                            }
-                        }
-                    }
+                if (input.isKeyDown(Input.KEY_LEFT)) {
+                    ent1.process(new MessageChannel(ent1, "handleKey KEY_LEFT"));
                 }
-            } else if (input.isKeyDown(Input.KEY_3)) {
-                for (Entity ent1: ents) {
-                    if (ent1.hasComponent(INPUT)) {
-                        if (ent1.hasComponent(ATTACK)) {
-                            for (Entity ent2: ents) {
-                                if (ent2 != ent1) {
-                                    if (ent2.hasComponent(SPRITE)) {
-                                        channel = new MessageChannel(ent1, "draw 12 444");
-                                        ent2.process(channel);
-                                    }
-                                }
-                            }
+                if (input.isKeyDown(Input.KEY_RIGHT)) {
+                    ent1.process(new MessageChannel(ent1, "handleKey KEY_RIGHT"));
+                }
+                if (input.isKeyPressed(Input.KEY_I)) {
+                    ent1.process(new MessageChannel(ent1, "handleKey KEY_I"));
+                }
+            }
+        }
+        if (!input.isKeyDown(Input.KEY_LSHIFT) && input.isKeyDown(Input.KEY_2)) {
+            for (Entity ent1: ents) {
+                if (!ent1.hasComponent(Consts.INPUT) && ent1.hasComponent(Consts.TRANSFORM)
+                        && ent1.hasComponent(Consts.SPRITE)) {
+                    channel = new MessageChannel(ent1, "move 0.001 0 0 0.99");
+                    ent1.process(channel);
+                }
+            }
+        }
+        if (input.isKeyDown(Input.KEY_LSHIFT) && input.isKeyDown(Input.KEY_2)) {
+            for (Entity ent1: ents) {
+                if (!ent1.hasComponent(Consts.INPUT) && ent1.hasComponent(Consts.TRANSFORM)
+                        && ent1.hasComponent(Consts.SPRITE)) {
+                    channel = new MessageChannel(ent1, "move 0.001 0 0 1.01");
+                    ent1.process(channel);
+                }
+            }
+        } else if (input.isKeyPressed(Input.KEY_1)) {
+            for (Entity ent1: ents) {
+                if (ent1.hasComponent(Consts.INPUT) && ent1.hasComponent(Consts.ATTACK)) {
+                    for (Entity ent2: ents) {
+                        if (ent2 != ent1 && ent2.hasComponent(Consts.HEALTH)) {
+                            channel = new MessageChannel(ent1, "heal 7");
+                            ent2.process(channel);
                         }
                     }
                 }
@@ -177,6 +150,14 @@ public class MainGame extends BasicGame {
 
         input.clearKeyPressedRecord();
 
+        for (Entity ent1: ents) {
+            if (ent1.hasComponent(Consts.SPRITE) && ent1.hasComponent(Consts.TRANSFORM)) {
+                ent1.process(new MessageChannel(ent1, "move"));
+            }
+            if (ent1.hasComponent(Consts.INVENTORY)) {
+                ent1.process(new MessageChannel(ent1, "drawI"));
+            }
+        }
         // bit 0 reserved
         // long mask = 2;
         //
@@ -276,6 +257,7 @@ public class MainGame extends BasicGame {
 
     }
 
+    @Override
     public void update(GameContainer gc, int dt) throws SlickException {
         keyHandler.update();
         player.update(dt);

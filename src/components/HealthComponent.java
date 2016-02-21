@@ -46,6 +46,9 @@ public class HealthComponent implements Component {
 
     @Override
     public void process(MessageChannel channel) {
+        if (channel.getSender() == null) {
+            return;
+        }
         String str = channel.getCommand();
         if (str.length() >= 6) {
             if (str.substring(0, 4).equals("heal")) {

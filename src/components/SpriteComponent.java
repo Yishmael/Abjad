@@ -9,32 +9,48 @@ import others.MessageChannel;
 public class SpriteComponent implements Component {
     public static int bit = 7;
     private Image image;
+    private float width, height;
     private Graphics g;
 
     public SpriteComponent(String imagePath) throws SlickException {
-        image = new Image(imagePath);
+        if (imagePath != null && imagePath.length() >= 12) {
+            image = new Image(imagePath);
+        } else {
+            image = null;
+        }
+        this.width = image.getWidth();
+        this.height = image.getHeight();
         g = new Graphics();
+    }
+
+    public void draw(float x, float y, float rotation, float scale) {
+        if (image != null) {
+            g.drawImage(image, x, y, x + width * scale, y + height * scale, 0, 0, width, height);
+            // g.rotate(x + image.getWidth(), y + image.getHeight(), rotation);
+        }
     }
 
     @Override
     public int getBit() {
         return bit;
     }
-    
+
     @Override
     public void process(MessageChannel channel) {
+        if (channel.getSender() == null) {
+            return;
+        }
+        String[] list = null;
         String str = channel.getCommand();
-        if (str.length() >= 6) {
-            if (str.substring(0, 4).equals("draw")) { // use startsWith()
-                draw(Integer.parseInt(str.split(" ")[1]), Integer.parseInt(str.split(" ")[2]));
-            }
+        if (str.matches("draw [-]?[0-9]+[.]?[0-9]* [-]?[0-9]+[.]?[0-9]* [-]?[0-9]+[.]?[0-9]* [-]?[0-9]+[.]?[0-9]*")) {
+            str = str.substring(5);
+            list = str.split(" ");
+            draw(Float.parseFloat(list[0]), Float.parseFloat(list[1]), Float.parseFloat(list[2]),
+                    Float.parseFloat(list[3]));
         }
     }
-    
-    public void draw(int x, int y) {
-        g.drawImage(image, x, y, x + image.getWidth(), y + image.getHeight(), 0, 0, 64, 64);
-    }
 
+    @Override
     public void update() {
         // if (image != null) {
         // g.drawImage(image, x, y, (x + image.getWidth() * scale),

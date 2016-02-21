@@ -28,6 +28,9 @@ public class AttackComponent implements Component {
 
     @Override
     public void process(MessageChannel channel) {
+        if (channel == null) {
+
+        }
         String str = channel.getCommand();
         if (str.length() >= 8) {
             if (str.substring(0, 6).equals("strike")) {

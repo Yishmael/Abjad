@@ -6,7 +6,7 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.KeyListener;
 import org.newdawn.slick.SlickException;
 
-public class Player extends Creature implements KeyListener {
+public class Player extends Creature {
 
     public Inventory inventory;
     public Menu menu;
@@ -72,39 +72,9 @@ public class Player extends Creature implements KeyListener {
         return items;
     }
 
-    @Override
-    public void inputEnded() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void inputStarted() {
-        // TODO Auto-generated method stub
-
-    }
-
     public boolean inventoryFull() {
         return itemsCount >= 30;
         // return items.size() >= 30;
-    }
-
-    @Override
-    public boolean isAcceptingInput() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Override
-    public void keyPressed(int key, char c) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Override
-    public void keyReleased(int key, char c) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -123,12 +93,6 @@ public class Player extends Creature implements KeyListener {
     @Override
     public void render(Graphics g) {
         g.drawImage(image, xPos, yPos);
-    }
-
-    @Override
-    public void setInput(Input input) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override

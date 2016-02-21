@@ -2,8 +2,8 @@ package data;
 
 public enum TileType {
 
-    Dirt("dirt", true), Grass("grass", true), Null("null", false), Rock("rock", false), Sand("sand",
-            true), Water("water", false);
+    Dirt("dirt", true), Grass("grass", true), Sand("sand", true), Rock("rock", false), Water("water",
+            false), Null("null", false);
 
     private String tileName;
     private boolean walkable;

@@ -22,6 +22,9 @@ public class ManaComponent implements Component {
 
     @Override
     public void process(MessageChannel channel) {
+        if (channel.getSender() == null) {
+            return;
+        }
         String str = channel.getCommand();
         if (str.length() >= 11) {
             if (str.substring(0, 9).equals("replenish")) {

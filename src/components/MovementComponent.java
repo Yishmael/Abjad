@@ -25,7 +25,9 @@ public class MovementComponent implements Component {
 
     @Override
     public void process(MessageChannel channel) {
-
+        if (channel.getSender() == null) {
+            return;
+        }
     }
 
     public void setSpeed(float speed) {

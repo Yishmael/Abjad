@@ -21,25 +21,25 @@ public class KeyHandler {
         input = gc.getInput();
         player.direction[0] = 0;
         player.direction[1] = 0;
-        // TODO TRIBA MAKNIT OVO U KLASU KEYLISTENER
+        // TODO GOTTA MOVE THIS TO CLASS KEYLISTENER
         // move up
-        if (input.isKeyDown(Input.KEY_COMMA)) {
+        if (input.isKeyDown(Input.KEY_NUMPAD5)) {
             player.direction[1] = -1;
         }
         // move down
-        if (input.isKeyDown(Input.KEY_O)) {
+        if (input.isKeyDown(Input.KEY_NUMPAD2)) {
             player.direction[1] = 1;
         }
         // move left
-        if (input.isKeyDown(Input.KEY_A)) {
+        if (input.isKeyDown(Input.KEY_NUMPAD1)) {
             player.direction[0] = -1;
         }
         // move right
-        if (input.isKeyDown(Input.KEY_E)) {
+        if (input.isKeyDown(Input.KEY_NUMPAD3)) {
             player.direction[0] = 1;
         }
         // get current tile name
-        if (input.isKeyPressed(Input.KEY_P)) {
+        if (input.isKeyPressed(Input.KEY_NUMPAD7)) {
             // player.getMapTile().setTile(xTile, yTile,
             // TileType.values()[player.tileIndex]);
             player.addItem(new Boulder(new Image("images/boulder1.png"), "Boulder1", 0, 0, 1, 30, 0.1f));
@@ -78,14 +78,14 @@ public class KeyHandler {
             }
         }
         // remove item
-        if (input.isKeyDown(Input.KEY_LSHIFT) && input.isKeyPressed(Input.KEY_SPACE)) {
+        if (input.isKeyDown(Input.KEY_MINUS)) {
             if (player.getItems().length > 0) {
                 player.removeItem(index++);
                 index %= 30;
             }
         }
         // clear inventory
-        if (input.isKeyDown(Input.KEY_F)) {
+        if (input.isKeyDown(Input.KEY_NUMPAD9)) {
             for (int i = 0; i < player.matrix.length; i++) {
                 player.removeItem(i);
             }
@@ -94,10 +94,14 @@ public class KeyHandler {
         if (input.isMousePressed(Input.MOUSE_RIGHT_BUTTON)) {
             player.tileIndex++;
             player.tileIndex %= TileType.values().length;
+            if (TileType.values()[player.tileIndex] == TileType.Null) {
+                player.tileIndex++;
+                player.tileIndex %= TileType.values().length;
+            }
             System.out.println("Brush changed to " + TileType.values()[player.tileIndex]);
         }
 
-        if (input.isKeyPressed(Input.KEY_I)) {
+        if (input.isKeyPressed(Input.KEY_NUMPAD8)) {
             if (!player.showMenu) {
                 player.showInventory = !player.showInventory;
             }

@@ -4,7 +4,7 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
-import others.MainGame;
+import others.Consts;
 
 public class Bot extends Creature {
     private MapTile mapTile;
@@ -38,13 +38,13 @@ public class Bot extends Creature {
         int yTile = (int) Math.floor((yPos + 64) / 64);
 
         // can right and wants right
-        if (xPos + 90 < MainGame.SCREEN_WIDTH) {
+        if (xPos + 90 < Consts.SCREEN_WIDTH) {
 
             if (mapTile.getTileType(xTile, yTile).isWalkable())
                 xPos += speed * delta;
         }
-        xPos %= MainGame.SCREEN_WIDTH - 90;
-        yPos %= MainGame.SCREEN_HEIGHT - 90;
+        xPos %= Consts.SCREEN_WIDTH - 90;
+        yPos %= Consts.SCREEN_HEIGHT - 90;
     }
 
 }

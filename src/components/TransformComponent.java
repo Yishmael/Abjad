@@ -2,6 +2,7 @@ package components;
 
 import org.newdawn.slick.SlickException;
 
+import others.Entity;
 import others.MessageChannel;
 
 public class TransformComponent implements Component {
@@ -14,48 +15,6 @@ public class TransformComponent implements Component {
         this.y = y;
         this.rotation = rotation;
         this.scale = scale;
-    }
-
-    @Override
-    public void process(MessageChannel channel) {
-        String str = channel.getCommand();
-        if (str.length() >= 8) {
-            if (str.substring(0, 6).equals("resize")) { // use startsWith()
-                resize(Integer.parseInt(str.split(" ")[1]));
-                return;
-            } else {
-                if (str.substring(0, 6).equals("rotate")) { // use startsWith()
-                    rotate(Integer.parseInt(str.split(" ")[1]));
-                    return;
-                }
-            }
-        }
-        if (str.length() >= 6) {
-            if (str.substring(0, 4).equals("move")) { // use startsWith()
-                move(Integer.parseInt(str.split(" ")[1]), Integer.parseInt(str.split(" ")[2]));
-            }
-        }
-
-    }
-
-    public void rotate(int rotation) {
-
-        this.rotation += rotation;
-        this.rotation %= 360;
-    }
-
-    public void resize(int scale) {
-        this.scale = scale;
-    }
-
-    public void move(int x, int y) {
-        this.x = x;
-        this.y = y;
-        System.out.println("Moved to " + x + ":" + y);
-    }
-
-    public void setRotation(float rotation) {
-        this.rotation = rotation;
     }
 
     @Override
@@ -79,6 +38,87 @@ public class TransformComponent implements Component {
         return y;
     }
 
+    public void move(Entity sender, float x, float y, float rotation, float scale) {
+        if (x == 0 && y == 0) {
+            this.scale = scale;
+        } else {
+            this.scale *= scale;
+        }
+        this.x += x;
+        this.y += y;
+        this.rotation += rotation;
+        // System.out.println("Moved by " + x + ":" + y + " rotation " +
+        // rotation + ", scale " + scale);
+        sender.process(
+                new MessageChannel(sender, "draw " + this.x + " " + this.y + " " + this.rotation + " " + this.scale));
+
+    }
+
+    public void moveA(Entity sender, float x, float y) {
+        this.x = x;
+        this.y = y;
+        // System.out.println("Moved to " + x + ":" + y);
+        sender.process(new MessageChannel(sender, "draw " + this.x + " " + this.y + " " + 0 + " " + 1));
+
+    }
+
+    @Override
+    public void process(MessageChannel channel) {
+        if (channel.getSender() == null) {
+            return;
+        }
+        String str = channel.getCommand();
+        String[] list = null;
+        if (str.matches("rescale [-]?[0-9]+[.]?[0-9]*")) {
+            str = str.substring(7);
+            list = str.split(" ");
+            rescale(Integer.parseInt(list[1]));
+            return;
+        }
+        if (str.matches("rotate [-]?[0-9]+[.]?[0-9]*")) {
+            str = str.substring(7);
+            list = str.split(" ");
+            rotate(Float.parseFloat(list[1]));
+            return;
+        }
+        if (str.matches("moveA [-]?[0-9]+[.]?[0-9]* [-]?[0-9]+[.]?[0-9]*")) {
+            str = str.substring(6);
+            list = str.split(" ");
+            moveA(channel.getSender(), Float.parseFloat(list[0]), Float.parseFloat(list[1]));
+            return;
+        }
+        if (str.matches("move [-]?[0-9]+[.]?[0-9]* [-]?[0-9]+[.]?[0-9]* [-]?[0-9]+[.]?[0-9]* [-]?[0-9]+[.]?[0-9]*")) {
+            str = str.substring(5);
+            list = str.split(" ");
+            move(channel.getSender(), Float.parseFloat(list[0]), Float.parseFloat(list[1]), Float.parseFloat(list[2]),
+                    Float.parseFloat(list[3]));
+            return;
+        }
+        if (str.matches("move")) {
+            move(channel.getSender(), 0, 0, rotation, scale);
+            return;
+        }
+    }
+
+    @Override
+    public void update() {
+
+    }
+
+    public void rescale(int scale) {
+        this.scale = scale;
+    }
+
+    public void rotate(float rotation) {
+
+        this.rotation += rotation;
+        this.rotation %= 360;
+    }
+
+    public void setRotation(float rotation) {
+        this.rotation = rotation;
+    }
+
     public void setScale(float scale) {
         this.scale = scale;
     }
@@ -89,10 +129,6 @@ public class TransformComponent implements Component {
 
     public void setY(float y) {
         this.y = y;
-    }
-
-    @Override
-    public void update() {
     }
 
 }
