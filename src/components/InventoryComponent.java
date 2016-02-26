@@ -5,17 +5,21 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
+import others.Consts;
+import others.Entity;
 import others.MessageChannel;
 
 public class InventoryComponent implements Component {
-    public static int bit = 5;
+    private int bit = Consts.INVENTORY;
     private Image image;
     private float width, height;
     private Graphics g;
     private boolean shown = false;
     private int[] matrix;
+    private Entity self;
 
-    public InventoryComponent(String imagePath, int[] matrix) throws SlickException {
+    public InventoryComponent(Entity self, String imagePath, int[] matrix) throws SlickException {
+        this.self = self;
         this.image = new Image(imagePath);
         this.width = image.getWidth();
         this.height = image.getHeight();
@@ -59,11 +63,13 @@ public class InventoryComponent implements Component {
 
     @Override
     public void process(MessageChannel channel) {
-        if (channel.getSender() == null) {
-            return;
-        }
-        String str = channel.getCommand();
-        if (str.matches("drawI")) {
+
+    }
+
+    @Override
+    public void receive(String command) {
+        String str = command;
+        if (str.matches("drawInv")) {
             if (shown) {
                 try {
                     draw();
@@ -75,10 +81,15 @@ public class InventoryComponent implements Component {
             }
 
         }
-        if (str.matches("drawIT")) {
+        if (str.matches("toggleInv")) {
             shown = !shown;
             return;
         }
+        if (str.matches("invOff")) {
+            shown = false;
+            return;
+        }
+
     }
 
     @Override

@@ -15,8 +15,17 @@ public class Entity {
 
     public void addComponent(Component comp) {
         comps.add(comp);
+        broadcast("added " + comp.getBit());
         id = id | (long) Math.pow(2, comp.getBit());
-        // System.out.println(Long.toString(id, 2));
+    }
+
+    public void broadcast(String command) {
+        if (command == null) {
+            return;
+        }
+        for (Component component: comps) {
+            component.receive(command);
+        }
     }
 
     public Component getComponent(int bit) {
@@ -31,10 +40,6 @@ public class Entity {
         return comps;
     }
 
-    public long getID() {
-        return id;
-    }
-
     public String getName() {
         return name;
     }
@@ -44,6 +49,9 @@ public class Entity {
     }
 
     public void process(MessageChannel channel) {
+        if (channel.getCommand() == null) {
+            return;
+        }
         for (Component component: comps) {
             component.process(channel);
         }
@@ -52,6 +60,7 @@ public class Entity {
     public void removeComponent(int bit) {
         if (this.hasComponent(bit)) {
             comps.remove(bit);
+            broadcast("removed " + bit);
             id ^= bit;
         }
     }

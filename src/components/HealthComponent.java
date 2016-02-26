@@ -1,24 +1,40 @@
 package components;
 
+import others.Consts;
+import others.Entity;
+import others.MainGame;
 import others.MessageChannel;
 
 public class HealthComponent implements Component {
-    public static int bit = 3;
-    private int health, maxHealth;
+    private int bit = Consts.HEALTH;
+    private float health, maxHealth, healthRegen;
     private boolean alive;
+    private Entity self;
+    private float dt;
 
-    public HealthComponent(int health, int maxHealth) {
+    public HealthComponent(Entity self, float health, float maxHealth, float healthRegen) {
+        this.self = self;
         this.health = Math.min(health, maxHealth);
         this.maxHealth = maxHealth;
+        this.healthRegen = healthRegen;
         this.alive = health > 0;
     }
 
-    public void damage(String name, int dmg) {
+    public void damage(float dmg) {
         if (dmg <= 0 || !alive) {
             return;
         }
         health = Math.max(health - dmg, 0);
-        System.out.println("Damaged to " + health + "/" + maxHealth + " by " + name + "!");
+        // System.out.println("Damaged to " + health + "/" + maxHealth + "!");
+        update();
+    }
+
+    public void damage(String name, float dmg) {
+        if (dmg <= 0 || !alive) {
+            return;
+        }
+        health = Math.max(health - dmg, 0);
+//        System.out.println("Damaged to " + health + "/" + maxHealth + " by " + name + "!");
         update();
     }
 
@@ -27,16 +43,21 @@ public class HealthComponent implements Component {
         return bit;
     }
 
-    public int getMaxHealth() {
-        return maxHealth;
-    }
-
-    public void heal(String name, int bonus) {
-        if (bonus <= 0 || !alive) {
+    public void heal(float change) {
+        if (change <= 0 || !alive) {
             return;
         }
-        health = Math.min(health + bonus, maxHealth);
-        System.out.println("Healed to " + health + "/" + maxHealth + " by " + name + "!");
+        health = Math.min(health + change, maxHealth);
+        // System.out.println("Healed to " + health + "/" + maxHealth + "!");
+        update();
+    }
+
+    public void heal(String name, float change) {
+        if (change <= 0 || !alive) {
+            return;
+        }
+        health = Math.min(health + change, maxHealth);
+//        System.out.println("Healed to " + health + "/" + maxHealth + " by " + name + "!");
         update();
     }
 
@@ -50,27 +71,53 @@ public class HealthComponent implements Component {
             return;
         }
         String str = channel.getCommand();
-        if (str.length() >= 6) {
-            if (str.substring(0, 4).equals("heal")) {
-                heal(channel.getSender().getName(), Integer.parseInt(str.substring(5)));
-                return;
-            }
+        if (str.matches("heal [0-9]+[.]?[0-9]*")) {
+            str = str.substring(5);
+            heal(channel.getSender().getName(), Float.parseFloat(str));
+            return;
         }
-        if (str.length() >= 8) {
-            if (str.substring(0, 6).equals("damage")) { // ???
-                damage(channel.getSender().getName(), Integer.parseInt(str.substring(7)));
-                return;
-            }
+        if (str.matches("damage [0-9]+[.]?[0-9]*")) {
+            str = str.substring(7);
+            damage(channel.getSender().getName(), Float.parseFloat(str));
+            return;
+        }
+    }
+
+    @Override
+    public void receive(String command) {
+        String str = command;
+        if (str.matches("heal [0-9]+[.]?[0-9]*")) {
+            str = str.substring(5);
+            heal(Float.parseFloat(str));
+            return;
+        }
+        if (str.matches("damage [0-9]+[.]?[0-9]*")) {
+            str = str.substring(7);
+            damage(Float.parseFloat(str));
+            return;
+        }
+        if (str.matches("requestHP")) {
+            update();
+            return;
         }
     }
 
     @Override
     public void update() {
+        dt += MainGame.dt;
+        if (dt >= 100) {
+            dt = 0;
+            if (health < maxHealth) {
+                heal(healthRegen/10);
+            }
+        }
         if (health > 0) {
             // System.out.println("I'm alive!");
         } else {
             alive = false;
-            System.out.println("You died!");
+            healthRegen = 0;
+            self.broadcast("died");
         }
+        self.broadcast("updateHP " + health + " " + maxHealth);
     }
 }

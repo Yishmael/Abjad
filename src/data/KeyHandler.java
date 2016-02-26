@@ -55,7 +55,7 @@ public class KeyHandler {
             player.getMapTile().setTile(xTile, yTile, TileType.values()[player.tileIndex]);
         }
         // open/close menu or close inventory
-        if (input.isKeyPressed(Input.KEY_ESCAPE)) {
+        if (input.isKeyPressed(Input.KEY_SUBTRACT)) {
             if (player.showInventory) {
                 player.showInventory = false;
             } else {
@@ -69,21 +69,23 @@ public class KeyHandler {
             }
         }
         // add item
-        if (!input.isKeyDown(Input.KEY_LSHIFT) && input.isKeyPressed(Input.KEY_SPACE)) {
-            if (!player.inventoryFull()) {
-                // player.addItem(ic.getAxes().get(0), 2, 4);
-                player.addItem(new Axe(new Image("images/axe2.png"), "Axe1", 0, 0, 100, 10, 0.33f));
-            } else {
-                System.out.println("Inventory full!");
-            }
-        }
-        // remove item
-        if (input.isKeyDown(Input.KEY_MINUS)) {
-            if (player.getItems().length > 0) {
-                player.removeItem(index++);
-                index %= 30;
-            }
-        }
+        // if (!input.isKeyDown(Input.KEY_LSHIFT) &&
+        // input.isKeyPressed(Input.KEY_SPACE)) {
+        // if (!player.inventoryFull()) {
+        // // player.addItem(ic.getAxes().get(0), 2, 4);
+        // player.addItem(new Axe(new Image("images/axe2.png"), "Axe1", 0, 0,
+        // 100, 10, 0.33f));
+        // } else {
+        // System.out.println("Inventory full!");
+        // }
+        // }
+        // // remove item
+        // if (input.isKeyDown(Input.KEY_MINUS)) {
+        // if (player.getItems().length > 0) {
+        // player.removeItem(index++);
+        // index %= 30;
+        // }
+        // }
         // clear inventory
         if (input.isKeyDown(Input.KEY_NUMPAD9)) {
             for (int i = 0; i < player.matrix.length; i++) {

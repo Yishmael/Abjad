@@ -1,12 +1,22 @@
 package components;
 
+import java.util.Date;
+
+import others.Consts;
+import others.Entity;
+import others.MainGame;
 import others.MessageChannel;
 
 public class MovementComponent implements Component {
-    public static int bit = 6;
+    private int bit = Consts.MOVEMENT;
     private float speed;
+    private Entity self;
+    private Date date = new Date();
+    private long lastTime = 0;
+    private float dt = 0;
 
-    public MovementComponent(float speed) {
+    public MovementComponent(Entity self, float speed) {
+        this.self = self;
         this.speed = speed;
     }
 
@@ -15,12 +25,9 @@ public class MovementComponent implements Component {
         return bit;
     }
 
-    public float getSpeed() {
-        return speed;
-    }
-
-    public boolean isRunning() {
-        return speed >= 5;
+    public void move(float x, float y) {
+        self.broadcast("move " + MainGame.dt / 1000.0 * x * speed * Consts.TILE_SIZE + " "
+                + MainGame.dt / 1000.0 * y * speed * Consts.TILE_SIZE);
     }
 
     @Override
@@ -30,8 +37,19 @@ public class MovementComponent implements Component {
         }
     }
 
-    public void setSpeed(float speed) {
-        this.speed = speed;
+    @Override
+    public void receive(String command) {
+        String str = command;
+        if (str.matches("move UP")) {
+            move(0, -1);
+        } else if (str.matches("move DOWN")) {
+            move(0, 1);
+        }
+        if (str.matches("move LEFT")) {
+            move(-1, 0);
+        } else if (str.matches("move RIGHT")) {
+            move(1, 0);
+        }
     }
 
     @Override
