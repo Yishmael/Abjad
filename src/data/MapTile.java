@@ -6,6 +6,8 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
+import others.Consts;
+
 public class MapTile {
     private int[][] matrix;
     // {{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
@@ -24,10 +26,11 @@ public class MapTile {
     // { 0, 1, 0, 0, 0, 1, 0, 0, 0, 0 },
     // { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }};
     private int xMax, yMax;
+    private boolean changed = true;
 
     public MapTile(final int WIDTH, final int HEIGHT) {
-        xMax = WIDTH / 64;
-        yMax = HEIGHT / 64;
+        xMax = WIDTH / Consts.TILE_SIZE;
+        yMax = HEIGHT / Consts.TILE_SIZE;
         Random dice = new Random();
         matrix = new int[xMax][yMax];
         for (int i = 0; i < xMax; i++) {
@@ -40,9 +43,10 @@ public class MapTile {
                 else if (rand >= 66 && rand < 95)
                     matrix[i][j] = TileType.Dirt.ordinal();
                 else
-                    matrix[i][j] = TileType.Rock.ordinal();
+                    matrix[i][j] = TileType.Stone.ordinal();
             }
         }
+
     }
 
     private Image getImage(int tileIndex) throws SlickException {
@@ -61,18 +65,24 @@ public class MapTile {
     }
 
     public int getTileX(int x) {
-        return (int) Math.floor((x) / (64 + 1)); // +1 cause padding
+        return (int) Math.floor((x) / (Consts.TILE_SIZE + 1)); // +1 cause
+                                                               // padding
     }
 
     public int getTileY(int y) {
-        return (int) Math.floor((y) / (64 + 1)); // padding
+        return (int) Math.floor((y) / (Consts.TILE_SIZE + 1)); // padding
     }
 
     public void render(Graphics g) throws SlickException {
-        for (int i = 0; i < xMax; i++) {
-            for (int j = 0; j < yMax; j++) {
-                g.drawImage(getImage(matrix[i][j]), 64 * i + i, 64 * j + j);
+        if (!changed) {
+            g.fillRect(0, 0, Consts.SCREEN_WIDTH, Consts.SCREEN_HEIGHT, new Image("images/map.png"), 0, 0);
+        } else {
+            for (int i = 0; i < xMax; i++) {
+                for (int j = 0; j < yMax; j++) {
+                    g.drawImage(getImage(matrix[i][j]), Consts.TILE_SIZE * i + i, Consts.TILE_SIZE * j + j);
+                }
             }
+            changed = false;
         }
     }
 

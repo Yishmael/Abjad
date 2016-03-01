@@ -7,15 +7,24 @@ import others.MessageChannel;
 
 public class ManaComponent implements Component {
     private int bit = Consts.MANA;
-    private float mana, maxMana, manaRegen, manaOnDeath = 0;
+    private float mana, baseMaxMana, maxMana, manaRegen, manaOnDeath = 0;
     private Entity self;
     private float dt = 0;
 
-    public ManaComponent(Entity self, float mana, float maxMana, float manaRegen) {
+    public ManaComponent(Entity self, float mana, float baseMaxMana, float manaRegen) {
+        this.self = self;
+        this.mana = Math.min(mana, baseMaxMana);
+        this.baseMaxMana = baseMaxMana;
+        this.maxMana = baseMaxMana;
+        this.manaRegen = manaRegen;
+    }
+
+    public ManaComponent(Entity self, float mana, float baseMaxMana) {
         this.self = self;
         this.mana = Math.min(mana, maxMana);
-        this.maxMana = maxMana;
-        this.manaRegen = manaRegen;
+        this.baseMaxMana = baseMaxMana;
+        this.maxMana = baseMaxMana;
+        this.manaRegen = 0;
     }
 
     public void drain(float change) {
@@ -26,9 +35,17 @@ public class ManaComponent implements Component {
         update();
     }
 
-    @Override
-    public int getBit() {
-        return bit;
+    public void replenish(float change) {
+        if (change > 0) {
+            mana = Math.min(mana + change, maxMana);
+            // System.out.println("Replenished to " + mana + "/" + maxMana +
+            // "!");
+        }
+        self.broadcast("updateMP " + mana + " " + maxMana);
+    }
+
+    public float getManaOnDeath() {
+        return manaOnDeath;
     }
 
     @Override
@@ -44,14 +61,12 @@ public class ManaComponent implements Component {
             // System.out.println("Mana on death: " + manaOnDeath);
             return;
         }
-        if (str.matches("requestMP")) {
-            update();
-        }
     }
 
     @Override
     public void receive(String command) {
         String str = command;
+        String[] list = null;
         if (str.matches("drain [0-9]+[.]?[0-9]*")) {
             str = str.substring(6);
             drain(Float.parseFloat(str));
@@ -64,28 +79,38 @@ public class ManaComponent implements Component {
             return;
         }
         if (str.matches("requestMP")) {
-            update();
+            self.broadcast("updateMP " + mana + " " + maxMana);
+            return;
         }
-    }
-
-    public void replenish(float change) {
-        if (change > 0) {
-            mana = Math.min(mana + change, maxMana);
-            // System.out.println("Replenished to " + mana + "/" + maxMana +
-            // "!");
+        if (str.matches("STATS [0-9]+[.]?[0-9]* [0-9]+[.]?[0-9]* [0-9]+[.]?[0-9]*")) {
+            str = str.substring(6);
+            list = str.split(" ");
+            float intelligence = Float.parseFloat(list[2]);
+            if (intelligence != 0) {
+                maxMana = intelligence * 10 + baseMaxMana + Math.min(10000, (float) Math.pow(1.25f, intelligence));
+                self.broadcast("updateMP " + mana + " " + maxMana);
+            }
+            return;
         }
-        update();
     }
 
     @Override
     public void update() {
         dt += MainGame.dt;
-        if (dt >= 100) {
+        if (dt >= 500) {
             dt = 0;
-            if (mana < maxMana) {
-                replenish(manaRegen / 10);
+            if (manaRegen > 0 && mana < maxMana) {
+                replenish(manaRegen / 2);
+                self.broadcast("updateMP " + mana + " " + maxMana);
+            } else if (manaRegen < 0) {
+                drain(-manaRegen / 2);
+                self.broadcast("updateMP " + mana + " " + maxMana);
             }
         }
-        self.broadcast("updateMP " + mana + " " + maxMana);
+    }
+
+    @Override
+    public int getBit() {
+        return bit;
     }
 }

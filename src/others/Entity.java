@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import components.Component;
 
 public class Entity {
-    ArrayList<Component> comps = new ArrayList<Component>();
+    private ArrayList<Component> comps = new ArrayList<Component>();
     private long id = 0l;
     private String name;
 
@@ -20,6 +20,7 @@ public class Entity {
     }
 
     public void broadcast(String command) {
+        // System.out.println(command);
         if (command == null) {
             return;
         }
@@ -28,7 +29,31 @@ public class Entity {
         }
     }
 
+    // TODO make components pass lists of commands for more complex actions
+    public void broadcast(String[] commands) {
+        // System.out.println(commands);
+        if (commands == null) {
+            return;
+        }
+        for (String command: commands) {
+            for (Component component: comps) {
+                component.receive(command);
+            }
+        }
+    }
+
+    public void process(MessageChannel channel) {
+        // System.out.println(channel.getCommand());
+        if (channel.getCommand() == null) {
+            return;
+        }
+        for (Component component: comps) {
+            component.process(channel);
+        }
+    }
+
     public Component getComponent(int bit) {
+        // System.out.println(bit);
         for (Component comp: comps) {
             if (comp.getBit() == bit)
                 return comp;
@@ -46,15 +71,6 @@ public class Entity {
 
     public boolean hasComponent(int bit) {
         return id == (id | (long) Math.pow(2, bit));
-    }
-
-    public void process(MessageChannel channel) {
-        if (channel.getCommand() == null) {
-            return;
-        }
-        for (Component component: comps) {
-            component.process(channel);
-        }
     }
 
     public void removeComponent(int bit) {

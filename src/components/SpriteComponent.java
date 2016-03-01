@@ -5,6 +5,7 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.Sound;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Ellipse;
 
@@ -17,9 +18,16 @@ public class SpriteComponent implements Component {
     private int bit = Consts.SPRITE;
     private Image image;
     private SpriteSheet sheet = null;
-    private Animation animation = null;
+    private Animation standAnimation = null;
+    private boolean standing = true;
+    private Animation walkAnimation = null;
+    private boolean walking = false;
+    private boolean right = true;
     private Animation attackAnimation = null;
+    private boolean attacking = false;
     private Animation castAnimation = null;
+    private boolean casting = false;
+    private int duration = 0;
     private float width, height;
     private Graphics gT, gHP, gMP;
     private Entity self;
@@ -36,6 +44,8 @@ public class SpriteComponent implements Component {
     private Ellipse ellipse = null;
     private Text font = new Text("fonts/verdana.ttf", java.awt.Color.white);
 
+    private Sound snd = null;
+
     public SpriteComponent(Entity self, String imagePath) throws SlickException {
         image = new Image(imagePath);
         this.self = self;
@@ -47,67 +57,107 @@ public class SpriteComponent implements Component {
         ellipse = new Ellipse(0, 0, 0, 0);
     }
 
-    public SpriteComponent(Entity self, SpriteSheet sheet) throws SlickException {
+    public SpriteComponent(Entity self, SpriteSheet sheet, int duration, boolean pingPong) throws SlickException {
         this.self = self;
         this.sheet = sheet;
         image = sheet.getSubImage(0, 0);
-        animation = new Animation(sheet, 150);
-        animation.setPingPong(true);
-        this.width = 64;
-        this.height = 64;
+        this.width = image.getWidth();
+        this.height = image.getHeight();
+        this.duration = duration;
+        standAnimation = new Animation();
+        for (int i = 0; i < sheet.getHorizontalCount(); i++) {
+            standAnimation.addFrame(sheet.getSubImage(i, 0), duration);
+        }
+        standAnimation.setPingPong(pingPong);
         gT = new Graphics();
         gHP = new Graphics();
         gMP = new Graphics();
         ellipse = new Ellipse(0, 0, 0, 0);
     }
 
+    @SuppressWarnings("deprecation")
     public void draw() {
-        if (sheet != null) {
-            animation.draw(lastX, lastY, width * lastScale, height * lastScale);
-            image = animation.getCurrentFrame();
+        if (lastHealth == 0 && lastMaxHealth > 0) {
+            gT.drawImage(image, lastX, lastY, lastX + width * lastScale, lastY + height * lastScale, 0, 0, width,
+                    height);
+        } else if (sheet != null) {
+            if (standing) {
+                standAnimation.getCurrentFrame().getFlippedCopy(!right, false).draw(lastX, lastY, width * lastScale,
+                        height * lastScale);
+                standAnimation.updateNoDraw();
+                image = standAnimation.getCurrentFrame();
+            }
         } else {
             // gT.rotate(lastX + image.getWidth() / 2, lastY + image.getHeight()
             // / 2, lastRotation);
+
             gT.drawImage(image, lastX, lastY, lastX + width * lastScale, lastY + height * lastScale, 0, 0, width,
                     height);
         }
         if (hasHealth) {
-            gHP.drawRect(lastX, lastY - 31, lastScale * image.getWidth(), 10);
-            gHP.fillRect(lastX, lastY - 31, lastScale * image.getWidth() * lastHealth / lastMaxHealth, 10);
-            gHP.setColor(Color.red);
-            font.draw(lastX + lastScale * image.getWidth() / 2 - 20, lastY - 31,
-                    (int) lastHealth + "/" + (int) lastMaxHealth);
+            gHP.drawRect(lastX, lastY - 31, lastScale * width, 10);
+            gHP.fillRect(lastX, lastY - 31, lastScale * width * lastHealth / lastMaxHealth, 10);
+            gHP.setColor(new Color((int) (((1.0f - lastHealth / lastMaxHealth) * 255) % 255),
+                    (int) ((lastHealth / lastMaxHealth) * 255), 122));
+            font.draw(lastX + lastScale * width / 2 - 20, lastY - 31, (int) lastHealth + "/" + (int) lastMaxHealth);
         }
         if (hasMana) {
-            gMP.drawRect(lastX, lastY - 20, lastScale * image.getWidth(), 10);
-            gMP.fillRect(lastX, lastY - 20, lastScale * image.getWidth() * lastMana / lastMaxMana, 10);
+            gMP.drawRect(lastX, lastY - 20, lastScale * width, 10);
+            gMP.fillRect(lastX, lastY - 20, lastScale * width * lastMana / lastMaxMana, 10);
             gMP.setColor(Color.blue);
-            font.draw(lastX + lastScale * image.getWidth() / 2 - 20, lastY - 20,
-                    (int) lastMana + "/" + (int) lastMaxMana);
+            font.draw(lastX + lastScale * width / 2 - 20, lastY - 20, (int) lastMana + "/" + (int) lastMaxMana);
         }
         ellipse.setLocation(lastX, lastY);
-        ellipse.setRadii(lastScale * image.getWidth() / 2, lastScale * image.getHeight() / 2);
+        ellipse.setRadii(lastScale * width / 2, lastScale * height / 2);
 
         gT.draw(ellipse);
 
-        if (attackAnimation != null) {
-            attackAnimation.draw(lastX++, lastY, width, height);
-            if (attackAnimation.getFrame() == attackAnimation.getFrameCount() - 1) {
-                attackAnimation = null;
+        if (sheet != null) {
+            if (attacking && attackAnimation != null) {
+                walking = false;
+                standing = false;
+                casting = false;
+                attackAnimation.getCurrentFrame().getFlippedCopy(!right, false).draw(lastX, lastY, width, height);
+                attackAnimation.updateNoDraw();
+                if (attackAnimation.getFrame() == attackAnimation.getFrameCount() - 1) {
+                    attacking = false;
+                }
+            } else if (casting && castAnimation != null) {
+                attacking = false;
+                standing = false;
+                walking = false;
+                castAnimation.getCurrentFrame().getFlippedCopy(!right, false).draw(lastX, lastY, width, height);
+                castAnimation.updateNoDraw();
+                if (castAnimation.getFrame() == castAnimation.getFrameCount() - 1) {
+                    casting = false;
+                }
+            } else if (walking && walkAnimation != null) {
+                attacking = false;
+                standing = false;
+                casting = false;
+                walkAnimation.getCurrentFrame().getFlippedCopy(!right, false).draw(lastX, lastY, width, height);
+                walkAnimation.updateNoDraw();
+                if (walkAnimation.getFrame() == walkAnimation.getFrameCount() - 1) {
+                    walking = false;
+                }
+            } else {
+                standing = true;
             }
         }
     }
 
     public void draw(float x, float y, float rotation, float scale) {
+        if (x > lastX && !right) {
+            right = true;
+            // System.out.println("facing right");
+        } else if (x < lastX && right) {
+            right = false;
+            // System.out.println("facing left");
+        }
         lastX = x;
         lastY = y;
         lastRotation = rotation;
         lastScale = scale;
-    }
-
-    @Override
-    public int getBit() {
-        return bit;
     }
 
     @Override
@@ -145,17 +195,15 @@ public class SpriteComponent implements Component {
             return;
         }
         if (str.matches("removed " + Consts.HEALTH)) {
+            hasHealth = false;
             return;
         }
         if (str.matches("removed " + Consts.MANA)) {
             hasMana = false;
             return;
         }
-        if (str.matches("removed " + Consts.TRANSFORM)) {
-            hasHealth = false;
-            return;
-        }
         if (str.matches("updateHP [0-9]+[.]?[0-9]* [0-9]+[.]?[0-9]*")) {
+            // System.out.println("health update arrived" + LocalTime.now());
             str = str.substring(9);
             list = str.split(" ");
             updateHP(Float.parseFloat(list[0]), Float.parseFloat(list[1]));
@@ -167,18 +215,109 @@ public class SpriteComponent implements Component {
             updateMP(Float.parseFloat(list[0]), Float.parseFloat(list[1]));
             return;
         }
-        if (str.matches("attacked")) {
+        if (str.matches("animateAttack")) {
             animateAttack();
+            return;
+        }
+        if (str.matches("animateWalk")) {
+            animateWalk();
+            return;
+        }
+        if (str.matches("animateFireball")) {
+            animateFireball();
+            return;
+        }
+        if (str.matches("animateNourish")) {
+            animateNourish();
+            return;
+        }
+        if (str.matches("animateExplosion")) {
+            animateExplosion();
+            return;
+        }
+        if (str.matches("died")) {
+            lastHealth = 0;
+            return;
         }
     }
 
-    private void animateAttack() {
-        try {
-            attackAnimation = new Animation(new SpriteSheet("images/campfire1.png", 64, 64), 70);
-            attackAnimation.setLooping(false);
-        } catch (SlickException e) {
-            e.printStackTrace();
+    private void animateExplosion() {
+        if (sheet != null) {
+            if (sheet.getHorizontalCount() < 10) {
+                return;
+            }
+            castAnimation = new Animation();
+            SpriteSheet ss = null;
+            try {
+                ss = new SpriteSheet("images/exp.png", 160, 160);
+            } catch (SlickException e1) {
+                e1.printStackTrace();
+            }
+
+            for (int i = 0; i < ss.getVerticalCount(); i++) {
+                for (int j = 0; j < ss.getHorizontalCount(); j++) {
+                    castAnimation.addFrame(ss.getSubImage(j, i), 150);
+                }
+            }
+            castAnimation.setLooping(false);
         }
+        casting = true;
+
+        if (snd == null) {
+            try {
+                snd = new Sound("sounds/aa.ogg");
+                snd.play();
+            } catch (SlickException e) {
+                e.printStackTrace();
+            }
+        } else if (!snd.playing()) {
+            snd.play();
+        }
+    }
+
+    private void animateFireball() {
+        if (sheet != null) {
+            castAnimation = new Animation();
+            for (int i = 0; i < sheet.getHorizontalCount(); i++) {
+                castAnimation.addFrame(sheet.getSubImage(i, 4), 100);
+            }
+            castAnimation.setLooping(true);
+        }
+        casting = true;
+    }
+
+    private void animateNourish() {
+        if (sheet != null) {
+            castAnimation = new Animation();
+            for (int i = 0; i < sheet.getHorizontalCount(); i++) {
+                castAnimation.addFrame(sheet.getSubImage(i, 2), 120);
+            }
+            castAnimation.setLooping(true);
+        }
+        casting = true;
+    }
+
+    private void animateAttack() {
+        if (sheet != null && attackAnimation == null) {
+            attackAnimation = new Animation();
+
+            for (int i = 0; i < sheet.getHorizontalCount(); i++) {
+                attackAnimation.addFrame(sheet.getSubImage(i, 3), 100);
+            }
+            attackAnimation.setLooping(true);
+        }
+        attacking = true;
+    }
+
+    private void animateWalk() {
+        if (sheet != null && walkAnimation == null) {
+            walkAnimation = new Animation();
+            for (int i = 0; i < sheet.getHorizontalCount(); i++) {
+                walkAnimation.addFrame(sheet.getSubImage(i, 1), duration);
+            }
+            walkAnimation.setLooping(true);
+        }
+        walking = true;
     }
 
     @Override
@@ -194,5 +333,10 @@ public class SpriteComponent implements Component {
     public void updateMP(float mana, float maxMana) {
         lastMana = mana;
         lastMaxMana = maxMana;
+    }
+
+    @Override
+    public int getBit() {
+        return bit;
     }
 }

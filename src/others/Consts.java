@@ -20,7 +20,9 @@ public final class Consts {
     public static final int COLLISION = 10;
     public static final int SPELL = 11;
     public static final int CAMERA = 12;
-
+    public static final int ATTRIBUTES = 13;
+    public static final int LEVEL = 14;
+    
     public Consts() {
         throw new AssertionError("Can't instantiate this object!");
     }

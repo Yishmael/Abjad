@@ -14,8 +14,7 @@ public class CameraComponent implements Component {
 
     @Override
     public int getBit() {
-        // TODO Auto-generated method stub
-        return 0;
+        return bit;
     }
 
     @Override

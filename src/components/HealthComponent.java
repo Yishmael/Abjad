@@ -7,16 +7,26 @@ import others.MessageChannel;
 
 public class HealthComponent implements Component {
     private int bit = Consts.HEALTH;
-    private float health, maxHealth, healthRegen;
+    private float health, baseMaxHealth, maxHealth, healthRegen;
     private boolean alive;
     private Entity self;
     private float dt;
 
-    public HealthComponent(Entity self, float health, float maxHealth, float healthRegen) {
+    public HealthComponent(Entity self, float health, float baseMaxHealth, float healthRegen) {
         this.self = self;
-        this.health = Math.min(health, maxHealth);
-        this.maxHealth = maxHealth;
+        this.health = Math.min(health, baseMaxHealth);
+        this.maxHealth = baseMaxHealth;
+        this.baseMaxHealth = baseMaxHealth;
         this.healthRegen = healthRegen;
+        this.alive = health > 0;
+    }
+
+    public HealthComponent(Entity self, float health, float baseMaxHealth) {
+        this.self = self;
+        this.health = Math.min(health, baseMaxHealth);
+        this.maxHealth = baseMaxHealth;
+        this.maxHealth = baseMaxHealth;
+        this.healthRegen = 0;
         this.alive = health > 0;
     }
 
@@ -26,7 +36,7 @@ public class HealthComponent implements Component {
         }
         health = Math.max(health - dmg, 0);
         // System.out.println("Damaged to " + health + "/" + maxHealth + "!");
-        update();
+        self.broadcast("updateHP " + health + " " + maxHealth);
     }
 
     public void damage(String name, float dmg) {
@@ -34,8 +44,9 @@ public class HealthComponent implements Component {
             return;
         }
         health = Math.max(health - dmg, 0);
-//        System.out.println("Damaged to " + health + "/" + maxHealth + " by " + name + "!");
-        update();
+        // System.out.println("Damaged to " + health + "/" + maxHealth + " by "
+        // + name + "!");
+        self.broadcast("updateHP " + health + " " + maxHealth);
     }
 
     @Override
@@ -49,7 +60,7 @@ public class HealthComponent implements Component {
         }
         health = Math.min(health + change, maxHealth);
         // System.out.println("Healed to " + health + "/" + maxHealth + "!");
-        update();
+        self.broadcast("updateHP " + health + " " + maxHealth);
     }
 
     public void heal(String name, float change) {
@@ -57,8 +68,9 @@ public class HealthComponent implements Component {
             return;
         }
         health = Math.min(health + change, maxHealth);
-//        System.out.println("Healed to " + health + "/" + maxHealth + " by " + name + "!");
-        update();
+        // System.out.println("Healed to " + health + "/" + maxHealth + " by " +
+        // name + "!");
+        self.broadcast("updateHP " + health + " " + maxHealth);
     }
 
     public boolean isAlive() {
@@ -70,6 +82,7 @@ public class HealthComponent implements Component {
         if (channel.getSender() == null) {
             return;
         }
+
         String str = channel.getCommand();
         if (str.matches("heal [0-9]+[.]?[0-9]*")) {
             str = str.substring(5);
@@ -86,6 +99,7 @@ public class HealthComponent implements Component {
     @Override
     public void receive(String command) {
         String str = command;
+        String[] list = null;
         if (str.matches("heal [0-9]+[.]?[0-9]*")) {
             str = str.substring(5);
             heal(Float.parseFloat(str));
@@ -97,27 +111,42 @@ public class HealthComponent implements Component {
             return;
         }
         if (str.matches("requestHP")) {
-            update();
+            self.broadcast("updateHP " + health + " " + maxHealth);
+            return;
+        }
+        if (str.matches("STATS [0-9]+[.]?[0-9]* [0-9]+[.]?[0-9]* [0-9]+[.]?[0-9]*")) {
+            str = str.substring(6);
+            list = str.split(" ");
+            float strength = Float.parseFloat(list[0]);
+            if (strength != 0) {
+                maxHealth = strength * 10 + baseMaxHealth + Math.min(10000, (float) Math.pow(1.17f, strength));
+                self.broadcast("updateHP " + health + " " + maxHealth);
+            }
             return;
         }
     }
 
     @Override
     public void update() {
-        dt += MainGame.dt;
-        if (dt >= 100) {
-            dt = 0;
-            if (health < maxHealth) {
-                heal(healthRegen/10);
-            }
-        }
         if (health > 0) {
+            dt += MainGame.dt;
+            if (dt >= 500) {
+                dt = 0;
+                if (healthRegen > 0 && health < maxHealth) {
+                    heal(healthRegen / 2);
+                    self.broadcast("updateHP " + health + " " + maxHealth);
+                } else if (healthRegen < 0) {
+                    damage(-healthRegen / 2);
+                    self.broadcast("updateHP " + health + " " + maxHealth);
+                }
+            }
             // System.out.println("I'm alive!");
         } else {
-            alive = false;
-            healthRegen = 0;
-            self.broadcast("died");
+            if (alive) {
+                alive = false;
+                self.broadcast("died");
+                healthRegen = 0;
+            }
         }
-        self.broadcast("updateHP " + health + " " + maxHealth);
     }
 }

@@ -2,7 +2,7 @@ package data;
 
 public enum TileType {
 
-    Dirt("dirt", true), Grass("grass", true), Sand("sand", true), Rock("rock", false), Water("water",
+    Dirt("dirt", true), Grass("grass", true), Sand("sand", true), Stone("stone", false), Water("water",
             false), Null("null", false);
 
     private String tileName;

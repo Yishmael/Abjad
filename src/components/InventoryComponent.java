@@ -7,6 +7,7 @@ import org.newdawn.slick.SlickException;
 
 import others.Consts;
 import others.Entity;
+import others.ItemType;
 import others.MessageChannel;
 
 public class InventoryComponent implements Component {
@@ -15,45 +16,58 @@ public class InventoryComponent implements Component {
     private float width, height;
     private Graphics g;
     private boolean shown = false;
-    private int[] matrix;
+    private ItemType[] items;
+    private ItemType currentItem;
+    private int currentIndex;
     private Entity self;
 
-    public InventoryComponent(Entity self, String imagePath, int[] matrix) throws SlickException {
+    public InventoryComponent(Entity self, String imagePath, ItemType[] startingItems) throws SlickException {
         this.self = self;
         this.image = new Image(imagePath);
         this.width = image.getWidth();
         this.height = image.getHeight();
-        this.matrix = matrix;
+        items = new ItemType[30];
+        for (int i = 0; i < startingItems.length; i++) {
+            items[i] = startingItems[i];
+        }
+        for (int i = startingItems.length; i < 30; i++) {
+            items[i] = ItemType.Null;
+        }
+        g = new Graphics();
+    }
+
+    public InventoryComponent(Entity self, String imagePath) throws SlickException {
+        this.self = self;
+        this.image = new Image(imagePath);
+        this.width = image.getWidth();
+        this.height = image.getHeight();
+        items = new ItemType[30];
+        for (int i = 0; i < 30; i++) {
+            items[i] = ItemType.Null;
+        }
         g = new Graphics();
     }
 
     private void draw() throws SlickException {
         g.drawImage(image, 0, 320, 640, 512, 0, 0, width, height, new Color(255, 150, 150, 150));
-        for (int i = 0, j = 0; i < matrix.length; i++) {
+        for (int i = 0, j = 0; i < 30; i++) {
             if (i == 10 || i == 20) {
                 j++;
             }
-            switch (matrix[i]) {
-            case 101:
-                g.drawImage(new Image("images/axe1.png"), 64 * (i - 10 * j), 320 + 64 * j);
-                break;
-            case 102:
-                g.drawImage(new Image("images/axe2.png"), 64 * (i - 10 * j), 320 + 64 * j);
-                break;
-            case 201:
-                g.drawImage(new Image("images/shield1.png"), 64 * (i - 10 * j), 320 + 64 * j);
-                break;
-            case 202:
-                g.drawImage(new Image("images/shield2.png"), 64 * (i - 10 * j), 320 + 64 * j);
-                break;
-            case 501:
-                g.drawImage(new Image("images/boulder1.png"), 64 * (i - 10 * j), 320 + 64 * j);
-                break;
-            default:
-                break;
-
+            if (items[i] != ItemType.Null) {
+                g.drawImage(new Image(items[i].getImagePath()), 64 * (i - 10 * j), 320 + 64 * j);
             }
         }
+    }
+
+    public int getItemsCount() {
+        int count = 0;
+        for (int i = 0; i < items.length; i++) {
+            if (items[i] != ItemType.Null) {
+                count++;
+            }
+        }
+        return count;
     }
 
     @Override
@@ -74,12 +88,10 @@ public class InventoryComponent implements Component {
                 try {
                     draw();
                 } catch (SlickException e) {
-                    // TODO Auto-generated catch block
                     e.printStackTrace();
                 }
-                return;
             }
-
+            return;
         }
         if (str.matches("toggleInv")) {
             shown = !shown;
@@ -89,12 +101,21 @@ public class InventoryComponent implements Component {
             shown = false;
             return;
         }
-
+        if (str.matches("next item")) {
+            currentIndex++;
+            currentIndex %= 30;
+            while (items[currentIndex] == ItemType.Null) { // first while!                
+                currentIndex++;
+                currentIndex %= 30;
+            }
+            currentItem = items[currentIndex];
+            self.broadcast("equipped " + currentItem.ordinal());
+            return;
+        }
     }
 
     @Override
     public void update() {
-        // TODO Auto-generated method stub
 
     }
 

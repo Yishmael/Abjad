@@ -15,6 +15,7 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.SpriteSheet;
 
+import components.AttributesComponent;
 import components.CollisionComponent;
 import components.CombatComponent;
 import components.HealthComponent;
@@ -28,8 +29,9 @@ import components.TransformComponent;
 import data.KeyHandler;
 import data.MapTile;
 import data.Player;
+import net.java.games.input.Keyboard;
 
-public class MainGame extends BasicGame {
+public class MainGame extends BasicGame { // add states
 
     public static int dt = 0;
 
@@ -38,9 +40,10 @@ public class MainGame extends BasicGame {
             AppGameContainer appgc;
             appgc = new AppGameContainer(new MainGame("Stars are falling"));
             appgc.setDisplayMode(Consts.SCREEN_WIDTH, Consts.SCREEN_HEIGHT, false);
-            appgc.setTargetFrameRate(5005);
+            appgc.setTargetFrameRate(1500);
             appgc.setIcon("images/icon.png");
-            appgc.setClearEachFrame(false);
+            // appgc.setClearEachFrame(false);
+            // appgc.setFullscreen(true);
             appgc.setAlwaysRender(true);
             appgc.start();
         } catch (SlickException ex) {
@@ -54,6 +57,7 @@ public class MainGame extends BasicGame {
     private ArrayList<others.Entity> ents;
     private MessageChannel channel;
     private Input input;
+    private EntityFactory factory;
 
     private Graphics g;
     private long lastTime = 0;
@@ -81,59 +85,43 @@ public class MainGame extends BasicGame {
         keyHandler = new KeyHandler(gc, player);
         ents = new ArrayList<Entity>();
         g = new Graphics();
-        
+        factory = new EntityFactory();
+
         Entity player1 = new Entity("Player");
-        player1.addComponent(new CombatComponent(player1, 25, 5, 0.75f));
-        player1.addComponent(new MovementComponent(player1, 3));
-        player1.addComponent(new SpriteComponent(player1, "images/ifrit.png"));
-        player1.addComponent(new HealthComponent(player1, 250, 300, 2));
-        player1.addComponent(new ManaComponent(player1, 500, 500, 11));
-        int[] invMatrix = { 0, 0, 102, 0 };
-        player1.addComponent(new InventoryComponent(player1, "images/inventory1.png", invMatrix));
+        player1.addComponent(new SpriteComponent(player1, new SpriteSheet("images/player1.png", 64, 64), 220, false));
+        player1.addComponent(new CombatComponent(player1, 25, 0.75f));
+        player1.addComponent(new MovementComponent(player1, 2.2f));
+        player1.addComponent(new HealthComponent(player1, 300, 300, 3.2f));
+        player1.addComponent(new ManaComponent(player1, 150, 150, 9.1f));
+        ItemType[] inventory = { ItemType.Axe, ItemType.Sword };
+        player1.addComponent(new InventoryComponent(player1, "images/inventory1.png", inventory));
         player1.addComponent(new InputComponent(player1));
-        player1.addComponent(new TransformComponent(player1, 220, 200, 10f, 1f));
-        player1.addComponent(new SpellComponent(player1, 75, 40, 0.3f));
+        player1.addComponent(new TransformComponent(player1, 220, 200));
+        player1.addComponent(new SpellComponent(player1, 75, 40, 1));
+        player1.addComponent(new AttributesComponent(player1, 0, 0, 0));
         player1.addComponent(new CollisionComponent(player1));
-
-        Entity enemy1 = new Entity("Enemy bot");
-        enemy1.addComponent(new SpriteComponent(enemy1, "images/bahamut.png"));
-        enemy1.addComponent(new HealthComponent(enemy1, 200, 500, 7));
-        enemy1.addComponent(new MovementComponent(enemy1, 1));
-        enemy1.addComponent(new ManaComponent(enemy1, 700, 700, 10));
-        enemy1.addComponent(new InventoryComponent(enemy1, "images/inventory2.png", new int[0]));
-        enemy1.addComponent(new TransformComponent(enemy1, 110, 200, 0f, 1.2f));
-        enemy1.addComponent(new CollisionComponent(enemy1));
-
-        Entity prop1 = new Entity("Prop1");
-        prop1.addComponent(new SpriteComponent(prop1, "images/barrel.png"));
-        prop1.addComponent(new HealthComponent(prop1, 100, 100, 0));
-        prop1.addComponent(new TransformComponent(prop1, 550, 400, 0f, 0.6f));
-
-        Entity campfire1 = new Entity("Campfire1");
-        campfire1.addComponent(new SpriteComponent(campfire1, new SpriteSheet("images/campfire1.png", 64, 64)));
-        campfire1.addComponent(new CombatComponent(campfire1, 1, 10, 1));
-        campfire1.addComponent(new HealthComponent(campfire1, 100, 100, 0));
-        campfire1.addComponent(new TransformComponent(campfire1, 320, 100, 0f, 1f));
-
         ents.add(player1);
-        ents.add(enemy1);
-        ents.add(prop1);
-        ents.add(campfire1);
 
+        ents.add(factory.getEnemyBlueprint());
+        ents.add(factory.getBarrelBlueprint());
+        ents.add(factory.getBarrelBlueprint());
+        ents.add(factory.getBarrelBlueprint());
+        ents.add(factory.getBarrelBlueprint());
+        ents.add(factory.getBarrelBlueprint());
+        ents.add(factory.getCampfireBlueprint());
+        ents.add(factory.getBirdBlueprint());
     }
 
     @Override
     public void update(GameContainer gc, int unusedDelta) throws SlickException {
+        input = gc.getInput();
+
         dt = getDelta();
-        if (dt > 30) {
-            dt = 0;
+
+        if (dt > 25) {
+            dt = 25;
         }
         update(dt);
-        g.fillRect(0, 0, Consts.SCREEN_WIDTH, Consts.SCREEN_HEIGHT);
-        g.setColor(Color.black);
-        input = gc.getInput();
-        mapTile.render(g);
-        player.render(g);
 
         for (Entity ent1: ents) {
             if (ent1.hasComponent(Consts.INPUT)) {
@@ -150,62 +138,63 @@ public class MainGame extends BasicGame {
                 if (input.isKeyPressed(Input.KEY_I)) {
                     ent1.broadcast("KEY " + Input.KEY_I);
                 }
-                if (input.isKeyPressed(Input.KEY_SPACE)) {
-                    ent1.broadcast("KEY " + Input.KEY_SPACE);
+                if (input.isKeyPressed(Input.KEY_ESCAPE)) {
+                    ent1.broadcast("KEY " + Input.KEY_ESCAPE);
                 }
-                if (input.isKeyPressed(Input.KEY_C)) {
-                    ent1.broadcast("KEY " + Input.KEY_C);
+                if (input.isKeyPressed(Input.KEY_1)) {
+                    ent1.broadcast("KEY " + Input.KEY_1);
                 }
-            }
-        }
-
-        if (input.isKeyPressed(Input.KEY_E))
-            for (Entity ent1: ents) {
-                for (Entity ent2: ents) {
-                    if (colliding(ent1, ent2)) {
-                        if (ent1.hasComponent(Consts.COMBAT) && ent2.hasComponent(Consts.HEALTH)) {
-                            CombatComponent combat = (CombatComponent) ent1.getComponent(Consts.COMBAT);
-                            ent2.process(new MessageChannel(ent1, combat.attack()));
+                if (input.isKeyPressed(Input.KEY_2)) {
+                    ent1.broadcast("KEY " + Input.KEY_2);
+                }
+                if (input.isKeyPressed(Input.KEY_3)) {
+                    ent1.broadcast("KEY " + Input.KEY_3);
+                }
+                if (input.isKeyPressed(Input.KEY_4)) {
+                    ent1.broadcast("KEY " + Input.KEY_4);
+                }
+                if (input.isKeyPressed(Input.KEY_A)) {
+                    if (ent1.hasComponent(Consts.COMBAT)) {
+                        CombatComponent combat = (CombatComponent) ent1.getComponent(Consts.COMBAT);
+                        String action = combat.attack();
+                        for (Entity ent2: ents) {
+                            if (ent2.hasComponent(Consts.HEALTH)) {
+                                if (colliding(ent1, ent2, Consts.TILE_SIZE)) {
+                                    ent2.process(new MessageChannel(ent1, action));
+                                }
+                            }
                         }
                     }
                 }
-            }
-        if (input.isKeyPressed(Input.KEY_A)) {
-            for (Entity ent1: ents) {
-                if (ent1.hasComponent(Consts.TRANSFORM) && ent1.hasComponent(Consts.INPUT)
-                        && ent1.hasComponent(Consts.COMBAT)) {
-                    CombatComponent combat = (CombatComponent) (ent1.getComponent(Consts.COMBAT));
-                    TransformComponent trans1 = (TransformComponent) (ent1.getComponent(Consts.TRANSFORM));
-                    for (Entity ent2: ents) {
-                        if (ent2 != ent1 && ent2.hasComponent(Consts.HEALTH) && ent2.hasComponent(Consts.TRANSFORM)) {
-                            TransformComponent trans2 = (TransformComponent) (ent2.getComponent(Consts.TRANSFORM));
-                            float dx = trans1.getX() - trans2.getX();
-                            float dy = trans1.getY() - trans2.getY();
-                            float distance = (float) Math.sqrt(dx * dx + dy * dy);
-                            if (distance < Consts.TILE_SIZE) {
-                                channel = new MessageChannel(ent1, combat.attack());
-                                ent2.process(channel);
+                if (input.isKeyPressed(Input.KEY_E)) {
+                    if (ent1.hasComponent(Consts.SPELL)) {
+                        SpellComponent spell = (SpellComponent) (ent1.getComponent(Consts.SPELL));
+                        String action = spell.cast();
+                        for (Entity ent2: ents) {
+                            if (ent2.hasComponent(Consts.HEALTH)) {
+                                if (colliding(ent1, ent2, Consts.TILE_SIZE + 25)) {
+                                    ent2.process(new MessageChannel(ent1, action));
+                                }
                             }
                         }
                     }
                 }
             }
         }
-        if (input.isKeyPressed(Input.KEY_K)) {
-            for (Entity ent1: ents) {
-                if (ent1.hasComponent(Consts.INPUT) && ent1.hasComponent(Consts.SPELL)) {
-                    SpellComponent spell = (SpellComponent) (ent1.getComponent(Consts.SPELL));
-                    for (Entity ent2: ents) {
-                        if (ent2 != ent1 && ent2.hasComponent(Consts.HEALTH)) {
-                            channel = new MessageChannel(ent1, spell.fireball());
-                            ent2.process(channel);
-                            break;
+
+        for (Entity ent1: ents) {
+            if (!ent1.hasComponent(Consts.INPUT) && ent1.hasComponent(Consts.COMBAT)) {
+                CombatComponent combat = (CombatComponent) ent1.getComponent(Consts.COMBAT);
+                for (Entity ent2: ents) {
+                    if (ent2.hasComponent(Consts.INPUT) && ent2.hasComponent(Consts.HEALTH)) {
+                        if (colliding(ent1, ent2, Consts.TILE_SIZE)) {
+                            ent2.process(new MessageChannel(ent1, combat.attack()));
                         }
                     }
-                    break;
                 }
             }
         }
+
         // if (!input.isKeyDown(Input.KEY_LSHIFT) &&
         // input.isKeyDown(Input.KEY_2)) {
         // for (Entity ent1: ents) {
@@ -239,32 +228,6 @@ public class MainGame extends BasicGame {
 
         input.clearKeyPressedRecord();
 
-        for (Entity ent1: ents) {
-            if (ent1.hasComponent(Consts.MANA)) {
-                ent1.getComponent(Consts.MANA).update();
-            }
-            if (ent1.hasComponent(Consts.HEALTH)) {
-                ent1.getComponent(Consts.HEALTH).update();
-            }
-
-            if (ent1.hasComponent(Consts.SPRITE)) {
-                ent1.broadcast("draw");
-            }
-        }
-
-        for (Entity ent1: ents) {
-            if (ent1.hasComponent(Consts.INVENTORY)) {
-                ent1.broadcast("drawInv");
-            }
-        }
-
-        if (player.showInventory) {
-            player.inventory.render(g);
-        }
-
-        if (player.showMenu) {
-            player.menu.render(g);
-        }
         // bit 0 reserved
         // long mask = 2;
         //
@@ -364,8 +327,8 @@ public class MainGame extends BasicGame {
 
     }
 
-    private boolean colliding(Entity ent1, Entity ent2) {
-        if (ent1 == ent2) {
+    private boolean colliding(Entity ent1, Entity ent2, int treshold) {
+        if (ent1.equals(ent2)) {
             return false;
         }
         if (ent1.hasComponent(Consts.TRANSFORM) && ent2.hasComponent(Consts.TRANSFORM)) {
@@ -374,7 +337,7 @@ public class MainGame extends BasicGame {
             float dx = trans1.getX() - trans2.getX();
             float dy = trans1.getY() - trans2.getY();
             float distance = (float) Math.sqrt(dx * dx + dy * dy);
-            if (distance < Consts.TILE_SIZE) {
+            if (distance <= treshold) {
                 return true;
             }
         }
@@ -392,13 +355,45 @@ public class MainGame extends BasicGame {
         if (player.showMenu) {
             player.menu.update();
         }
-
     }
 
     @Override
     public void render(GameContainer container, Graphics g) throws SlickException {
-        // TODO Auto-generated method stub
-        
+
+        g.setBackground(Color.black);
+        mapTile.render(g);
+
+        for (Entity ent1: ents) {
+            if (ent1.hasComponent(Consts.MANA)) {
+                ent1.getComponent(Consts.MANA).update();
+            }
+            if (ent1.hasComponent(Consts.HEALTH)) {
+                ent1.getComponent(Consts.HEALTH).update();
+            }
+            if (ent1.hasComponent(Consts.SPRITE)) {
+                SpriteComponent sprite = (SpriteComponent) ent1.getComponent(Consts.SPRITE);
+                sprite.draw();
+                // ent1.broadcast("draw");
+            }
+            if (ent1.hasComponent(Consts.INVENTORY)) {
+                InventoryComponent inv = (InventoryComponent) ent1.getComponent(Consts.INVENTORY);
+                inv.receive("drawInv");
+            }
+        }
+        player.render(g);
+        g.drawString("Sup, dawg?", player.getxPos(), player.getyPos() - 20);
+
+        if (player.showInventory) {
+            player.inventory.render(g);
+        }
+
+        if (player.showMenu) {
+            player.menu.render(g);
+        }
+
+        TransformComponent trans = (TransformComponent) (ents.get(0).getComponent(Consts.TRANSFORM));
+        g.drawString("(" + (int) trans.getX() + ":" + (int) trans.getY() + ")", Consts.SCREEN_WIDTH - 150,
+                Consts.SCREEN_HEIGHT - 50);
     }
 
 }

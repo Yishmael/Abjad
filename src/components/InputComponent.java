@@ -44,11 +44,17 @@ public class InputComponent implements Component {
         case Input.KEY_A:
             command = "attack";
             break;
-        case Input.KEY_C:
-            command = "cast fireball";
+        case Input.KEY_1:
+            command = "next item";
             break;
-        case Input.KEY_H:
-            command = "cast heal";
+        case Input.KEY_2:
+            command = "next spell";
+            break;
+        case Input.KEY_3:
+            command = "STR++";
+            break;
+        case Input.KEY_4:
+            command = "lvlup";
             break;
         default:
             return;

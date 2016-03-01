@@ -20,6 +20,22 @@ public class TransformComponent implements Component {
         this.scale = scale;
     }
 
+    public TransformComponent(Entity self, float x, float y) throws SlickException {
+        this.self = self;
+        this.x = x;
+        this.y = y;
+        this.rotation = 0;
+        this.scale = 1;
+    }
+
+    public TransformComponent(Entity self, float x, float y, float scale) throws SlickException {
+        this.self = self;
+        this.x = x;
+        this.y = y;
+        this.rotation = 0;
+        this.scale = scale;
+    }
+
     @Override
     public int getBit() {
         return bit;
@@ -40,13 +56,12 @@ public class TransformComponent implements Component {
             this.x += x;
             this.y += y;
         }
-        // System.out.println("Moved by " + x + ":" + y);
+//        System.out.println("Moved by " + x + ":" + y);
         update();
     }
 
     @Override
     public void process(MessageChannel channel) {
-        // TODO Auto-generated method stub
 
     }
 
