@@ -1,11 +1,10 @@
 package others;
 
 public final class Consts {
-
-    public static final int SCREEN_WIDTH = 640; // 16 : 9
-    public static final int SCREEN_HEIGHT = 512;
-
     public static final int TILE_SIZE = 64;
+
+    public static final int SCREEN_WIDTH = TILE_SIZE * 10; // 16 : 9
+    public static final int SCREEN_HEIGHT = TILE_SIZE * 8;
 
     // TODO make them enums
     public static final int COMBAT = 1;
@@ -22,7 +21,7 @@ public final class Consts {
     public static final int CAMERA = 12;
     public static final int ATTRIBUTES = 13;
     public static final int LEVEL = 14;
-    
+
     public Consts() {
         throw new AssertionError("Can't instantiate this object!");
     }

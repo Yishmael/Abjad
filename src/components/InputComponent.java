@@ -53,8 +53,8 @@ public class InputComponent implements Component {
         case Input.KEY_3:
             command = "STR++";
             break;
-        case Input.KEY_4:
-            command = "lvlup";
+        case Input.KEY_ENTER:
+            command = "exp 150";
             break;
         default:
             return;

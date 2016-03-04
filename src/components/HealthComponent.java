@@ -7,7 +7,7 @@ import others.MessageChannel;
 
 public class HealthComponent implements Component {
     private int bit = Consts.HEALTH;
-    private float health, baseMaxHealth, maxHealth, healthRegen;
+    private float health, baseMaxHealth, maxHealth, healthRegen, percentage;
     private boolean alive;
     private Entity self;
     private float dt;
@@ -30,23 +30,25 @@ public class HealthComponent implements Component {
         this.alive = health > 0;
     }
 
-    public void damage(float dmg) {
-        if (dmg <= 0 || !alive) {
+    public void damage(float amount) {
+        if (amount <= 0 || !alive) {
             return;
         }
-        health = Math.max(health - dmg, 0);
+        health = Math.max(health - amount, 0);
         // System.out.println("Damaged to " + health + "/" + maxHealth + "!");
         self.broadcast("updateHP " + health + " " + maxHealth);
+        update();
     }
 
-    public void damage(String name, float dmg) {
-        if (dmg <= 0 || !alive) {
+    public void damage(String name, float amount) {
+        if (amount <= 0 || !alive) {
             return;
         }
-        health = Math.max(health - dmg, 0);
+        health = Math.max(health - amount, 0);
         // System.out.println("Damaged to " + health + "/" + maxHealth + " by "
         // + name + "!");
         self.broadcast("updateHP " + health + " " + maxHealth);
+        update();
     }
 
     @Override
@@ -54,20 +56,20 @@ public class HealthComponent implements Component {
         return bit;
     }
 
-    public void heal(float change) {
-        if (change <= 0 || !alive) {
+    public void heal(float amount) {
+        if (amount <= 0 || !alive) {
             return;
         }
-        health = Math.min(health + change, maxHealth);
+        health = Math.min(health + amount, maxHealth);
         // System.out.println("Healed to " + health + "/" + maxHealth + "!");
         self.broadcast("updateHP " + health + " " + maxHealth);
     }
 
-    public void heal(String name, float change) {
-        if (change <= 0 || !alive) {
+    public void heal(String name, float amount) {
+        if (amount <= 0 || !alive) {
             return;
         }
-        health = Math.min(health + change, maxHealth);
+        health = Math.min(health + amount, maxHealth);
         // System.out.println("Healed to " + health + "/" + maxHealth + " by " +
         // name + "!");
         self.broadcast("updateHP " + health + " " + maxHealth);
@@ -83,17 +85,7 @@ public class HealthComponent implements Component {
             return;
         }
 
-        String str = channel.getCommand();
-        if (str.matches("heal [0-9]+[.]?[0-9]*")) {
-            str = str.substring(5);
-            heal(channel.getSender().getName(), Float.parseFloat(str));
-            return;
-        }
-        if (str.matches("damage [0-9]+[.]?[0-9]*")) {
-            str = str.substring(7);
-            damage(channel.getSender().getName(), Float.parseFloat(str));
-            return;
-        }
+        receive(channel.getCommand());
     }
 
     @Override
@@ -118,10 +110,10 @@ public class HealthComponent implements Component {
             str = str.substring(6);
             list = str.split(" ");
             float strength = Float.parseFloat(list[0]);
-            if (strength != 0) {
-                maxHealth = strength * 10 + baseMaxHealth + Math.min(10000, (float) Math.pow(1.17f, strength));
-                self.broadcast("updateHP " + health + " " + maxHealth);
-            }
+            percentage = health / maxHealth;
+            maxHealth = Math.min(999, strength * 10 + baseMaxHealth + (float) Math.pow(1.17f, strength) - 1);
+            health = percentage * maxHealth;
+            self.broadcast("updateHP " + health + " " + maxHealth);
             return;
         }
     }
@@ -134,10 +126,8 @@ public class HealthComponent implements Component {
                 dt = 0;
                 if (healthRegen > 0 && health < maxHealth) {
                     heal(healthRegen / 2);
-                    self.broadcast("updateHP " + health + " " + maxHealth);
                 } else if (healthRegen < 0) {
                     damage(-healthRegen / 2);
-                    self.broadcast("updateHP " + health + " " + maxHealth);
                 }
             }
             // System.out.println("I'm alive!");
@@ -145,7 +135,6 @@ public class HealthComponent implements Component {
             if (alive) {
                 alive = false;
                 self.broadcast("died");
-                healthRegen = 0;
             }
         }
     }

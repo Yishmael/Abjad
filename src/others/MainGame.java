@@ -1,6 +1,7 @@
 package others;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -13,6 +14,7 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.Sound;
 import org.newdawn.slick.SpriteSheet;
 
 import components.AttributesComponent;
@@ -21,6 +23,7 @@ import components.CombatComponent;
 import components.HealthComponent;
 import components.InputComponent;
 import components.InventoryComponent;
+import components.LevelComponent;
 import components.ManaComponent;
 import components.MovementComponent;
 import components.SpellComponent;
@@ -29,7 +32,8 @@ import components.TransformComponent;
 import data.KeyHandler;
 import data.MapTile;
 import data.Player;
-import net.java.games.input.Keyboard;
+import enums.PassiveType;
+import enums.SpellType;
 
 public class MainGame extends BasicGame { // add states
 
@@ -41,7 +45,7 @@ public class MainGame extends BasicGame { // add states
             appgc = new AppGameContainer(new MainGame("Stars are falling"));
             appgc.setDisplayMode(Consts.SCREEN_WIDTH, Consts.SCREEN_HEIGHT, false);
             appgc.setTargetFrameRate(1500);
-            appgc.setIcon("images/icon.png");
+            appgc.setIcon("images/ui/icon.png");
             // appgc.setClearEachFrame(false);
             // appgc.setFullscreen(true);
             appgc.setAlwaysRender(true);
@@ -54,12 +58,13 @@ public class MainGame extends BasicGame { // add states
     private KeyHandler keyHandler;
     private MapTile mapTile;
     private Player player;
-    private ArrayList<others.Entity> ents;
-    private MessageChannel channel;
+    private ArrayList<Entity> ents;
     private Input input;
     private EntityFactory factory;
+    private ArrayList<Entity> entityQueue;
+    private SpellType currentSpell = SpellType.Fireball;
+    private Sound sound;
 
-    private Graphics g;
     private long lastTime = 0;
 
     public MainGame(String gamename) {
@@ -79,32 +84,34 @@ public class MainGame extends BasicGame { // add states
 
     @Override
     public void init(GameContainer gc) throws SlickException {
+        gc.setMouseCursor(new Image("images/ui/cursor.png"), 0, 0);
         mapTile = new MapTile(Consts.SCREEN_WIDTH, Consts.SCREEN_HEIGHT);
         player = new Player(new Image("images/ifrit.png"), "Ifrit", Consts.SCREEN_WIDTH / 2, Consts.SCREEN_HEIGHT / 2,
                 100, 200f, mapTile);
         keyHandler = new KeyHandler(gc, player);
         ents = new ArrayList<Entity>();
-        g = new Graphics();
         factory = new EntityFactory();
+        entityQueue = new ArrayList<Entity>();
+        Entity entity = new Entity("Player");
+        entity.addComponent(new SpriteComponent(entity, new SpriteSheet("images/player1.png", 64, 64), 220, false));
+        entity.addComponent(new CombatComponent(entity, 25, 0.75f));
+        entity.addComponent(new MovementComponent(entity, 2.2f));
+        entity.addComponent(new HealthComponent(entity, 300, 300, 3.2f));
+        entity.addComponent(new ManaComponent(entity, 150, 150, 9.1f));
+        ItemType[] inventory = { ItemType.Sword, ItemType.Axe };
+        entity.addComponent(new InventoryComponent(entity, "images/ui/inventory2.png", inventory));
+        entity.addComponent(new InputComponent(entity));
+        entity.addComponent(new TransformComponent(entity, 220, 200));
+        entity.addComponent(new SpellComponent(entity, 75, 40, 1));
+        entity.addComponent(new AttributesComponent(entity, 0, 0, 0));
+        entity.addComponent(new LevelComponent(entity, 1));
+        entity.addComponent(new CollisionComponent(entity));
+        ents.add(entity);
 
-        Entity player1 = new Entity("Player");
-        player1.addComponent(new SpriteComponent(player1, new SpriteSheet("images/player1.png", 64, 64), 220, false));
-        player1.addComponent(new CombatComponent(player1, 25, 0.75f));
-        player1.addComponent(new MovementComponent(player1, 2.2f));
-        player1.addComponent(new HealthComponent(player1, 300, 300, 3.2f));
-        player1.addComponent(new ManaComponent(player1, 150, 150, 9.1f));
-        ItemType[] inventory = { ItemType.Axe, ItemType.Sword };
-        player1.addComponent(new InventoryComponent(player1, "images/inventory1.png", inventory));
-        player1.addComponent(new InputComponent(player1));
-        player1.addComponent(new TransformComponent(player1, 220, 200));
-        player1.addComponent(new SpellComponent(player1, 75, 40, 1));
-        player1.addComponent(new AttributesComponent(player1, 0, 0, 0));
-        player1.addComponent(new CollisionComponent(player1));
-        ents.add(player1);
-
-        ents.add(factory.getEnemyBlueprint());
-        ents.add(factory.getBarrelBlueprint());
-        ents.add(factory.getBarrelBlueprint());
+        ents.add(factory.getEnemyBlueprint(20, 300));
+        ents.add(factory.getEnemyBlueprint(100, 400));
+        ents.add(factory.getEnemyBlueprint(250, 400));
+        ents.add(factory.getEnemyBlueprint(300, 100));
         ents.add(factory.getBarrelBlueprint());
         ents.add(factory.getBarrelBlueprint());
         ents.add(factory.getBarrelBlueprint());
@@ -123,7 +130,8 @@ public class MainGame extends BasicGame { // add states
         }
         update(dt);
 
-        for (Entity ent1: ents) {
+        for (Iterator<Entity> iterator = ents.iterator(); iterator.hasNext();) {
+            Entity ent1 = (Entity) iterator.next();
             if (ent1.hasComponent(Consts.INPUT)) {
                 if (input.isKeyDown(Input.KEY_UP)) {
                     ent1.broadcast("KEY " + Input.KEY_UP);
@@ -146,12 +154,14 @@ public class MainGame extends BasicGame { // add states
                 }
                 if (input.isKeyPressed(Input.KEY_2)) {
                     ent1.broadcast("KEY " + Input.KEY_2);
+                    SpellComponent spell = (SpellComponent) (ent1.getComponent(Consts.SPELL));
+                    currentSpell = spell.getCurrentSpell();
                 }
                 if (input.isKeyPressed(Input.KEY_3)) {
                     ent1.broadcast("KEY " + Input.KEY_3);
                 }
-                if (input.isKeyPressed(Input.KEY_4)) {
-                    ent1.broadcast("KEY " + Input.KEY_4);
+                if (input.isKeyPressed(Input.KEY_ENTER)) {
+                    ent1.broadcast("KEY " + Input.KEY_ENTER);
                 }
                 if (input.isKeyPressed(Input.KEY_A)) {
                     if (ent1.hasComponent(Consts.COMBAT)) {
@@ -161,6 +171,18 @@ public class MainGame extends BasicGame { // add states
                             if (ent2.hasComponent(Consts.HEALTH)) {
                                 if (colliding(ent1, ent2, Consts.TILE_SIZE)) {
                                     ent2.process(new MessageChannel(ent1, action));
+                                    HealthComponent health = (HealthComponent) ent2.getComponent(Consts.HEALTH);
+                                    if (!health.isAlive() && action != null) {
+                                        if (ent2.hasComponent(Consts.LEVEL)) {
+                                            LevelComponent level = (LevelComponent) ent2.getComponent(Consts.LEVEL);
+                                            ent1.process(
+                                                    new MessageChannel(ent2, "exp " + level.getExperienceBounty()));
+                                        }
+
+                                    } else if (health.isAlive() && action != null) {
+                                        ent1.process(new MessageChannel(ent2,
+                                                "heal " + (Float.parseFloat(action.substring(7)) * 0.33f)));
+                                    }
                                 }
                             }
                         }
@@ -169,17 +191,67 @@ public class MainGame extends BasicGame { // add states
                 if (input.isKeyPressed(Input.KEY_E)) {
                     if (ent1.hasComponent(Consts.SPELL)) {
                         SpellComponent spell = (SpellComponent) (ent1.getComponent(Consts.SPELL));
+                        currentSpell = spell.getCurrentSpell();
                         String action = spell.cast();
-                        for (Entity ent2: ents) {
-                            if (ent2.hasComponent(Consts.HEALTH)) {
-                                if (colliding(ent1, ent2, Consts.TILE_SIZE + 25)) {
-                                    ent2.process(new MessageChannel(ent1, action));
+                        if (action != null) {
+                            if (currentSpell == SpellType.Explosion) {
+                                sound = new Sound("sounds/aa.ogg");
+                                sound.play();
+                            } else if (currentSpell == SpellType.Nourish) {
+                                sound = new Sound("sounds/049.wav");
+                                sound.play();
+                            } else if (currentSpell == SpellType.Fireball) {
+                                sound = new Sound("sounds/067.wav");
+                                sound.play();
+                            }
+
+                            if (currentSpell != SpellType.Fireball) {
+                                for (Iterator<Entity> iter = ents.iterator(); iter.hasNext();) {
+                                    Entity ent2 = iter.next();
+                                    if (ent2.hasComponent(Consts.HEALTH)) {
+                                        if (colliding(ent1, ent2, Consts.TILE_SIZE + 25)) {
+                                            ent2.process(new MessageChannel(ent1, action));
+                                        }
+                                    }
                                 }
+                            } else {
+                                TransformComponent trans = (TransformComponent) ent1.getComponent(Consts.TRANSFORM);
+                                float x = trans.getX();
+                                float y = trans.getY();
+                                Entity entity = new Entity("Fireball");
+                                entity.addComponent(new SpriteComponent(entity,
+                                        new SpriteSheet("images/spells/fireball.png", 82, 83), 80, false));
+                                entity.addComponent(new TransformComponent(entity, x + 26, y - 15));
+                                entityQueue.add(entity);
                             }
                         }
                     }
                 }
             }
+        }
+
+        for (Iterator<Entity> iterator = entityQueue.iterator(); iterator.hasNext();) {
+            Entity entity = (Entity) iterator.next();
+            ents.add(entity);
+            iterator.remove();
+        }
+
+        for (int i = 0; i < ents.size(); i++) {
+            if (ents.get(i).getName() == "Fireball") {
+                for (Entity ent2: ents) {
+                    if (colliding(ents.get(i), ent2, 25)) {
+                        ent2.process(new MessageChannel(ents.get(i), "damage 80"));
+                        sound = new Sound("sounds/068.wav");
+                        sound.play();
+                        ents.remove(ents.remove(i));
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (input.isKeyDown(Input.KEY_0)) {
+            ents.get(0).broadcast("KEY " + Input.KEY_ENTER);
         }
 
         for (Entity ent1: ents) {
@@ -195,136 +267,7 @@ public class MainGame extends BasicGame { // add states
             }
         }
 
-        // if (!input.isKeyDown(Input.KEY_LSHIFT) &&
-        // input.isKeyDown(Input.KEY_2)) {
-        // for (Entity ent1: ents) {
-        // if (!ent1.hasComponent(Consts.INPUT) &&
-        // ent1.hasComponent(Consts.TRANSFORM)
-        // && ent1.hasComponent(Consts.SPRITE)) {
-        // channel = new MessageChannel(ent1, "rescale .99");
-        // ent1.process(channel);
-        // }
-        // }
-        // }
-        // if (input.isKeyDown(Input.KEY_LSHIFT) &&
-        // input.isKeyDown(Input.KEY_2)) {
-        // for (Entity ent1: ents) {
-        // if (!ent1.hasComponent(Consts.INPUT) &&
-        // ent1.hasComponent(Consts.TRANSFORM)
-        // && ent1.hasComponent(Consts.SPRITE)) {
-        // channel = new MessageChannel(ent1, "rescale 1.01");
-        // ent1.process(channel);
-        // }
-        // }
-
-        // for (Entity ent1: ents) {
-        // for (Entity ent2: ents) {
-        // if (ent1 != ent2 && ent1.hasComponent(Consts.COLLISION) &&
-        // ent2.hasComponent(Consts.COLLISION)) {
-        // ent2.process(new MessageChannel(ent1, "collision 2.0 2.0"));
-        // }
-        // }
-        // }
-
         input.clearKeyPressedRecord();
-
-        // bit 0 reserved
-        // long mask = 2;
-        //
-        // for (Entity ent1: ents) {
-        // if ((ent1.getID() & mask) == mask) {
-        // channel = new MessageChannel(ents.get(0), "damage 20");
-        // ents.get(1).process(channel);
-        // for (Entity ent2: ents) {
-        // if ((ent2.getID() & 8) == 8) {
-        // ent2.process(channel);
-        // }
-        // }
-        // }
-        // }
-        //
-        // mask = 2;
-        // // has attack
-        // for (Entity ent: ents) {
-        // if ((ent.getID() & mask) == mask) {
-        // channel = new MessageChannel(ent, "strike");
-        // ent.Process(channel);
-        // // System.out.print("Has attack! ");
-        // // System.out.println(Long.toString(ent.getID(), 2));
-        // }
-        // }
-        //
-        // return;
-        //
-        // mask = 8;
-        // // has health
-        // for (Entity ent: ents) {
-        // if ((ent.getID() & mask) == mask) {
-        // channel = new MessageChannel(ent, "heal 33");
-        // ent.Process(channel);
-        // // System.out.print("Has health! ");
-        // // System.out.println(Long.toString(ent.getID(), 2));
-        // }
-        // }
-        //
-        // mask = 4;
-        // // has defend
-        // for (Entity ent: ents) {
-        // if ((ent.getID() & mask) == mask) {
-        // channel = new MessageChannel(ent, "uuuuuuuu 33");
-        // ent.Process(channel);
-        // // System.out.print("Has defend! ");
-        // // System.out.println(Long.toString(ent.getID(), 2));
-        // }
-        // }
-        // mask = 16;
-        // // has inventory
-        // for (Entity ent: ents) {
-        // if ((ent.getID() & mask) == mask) {
-        // channel = new MessageChannel(ent, "hhhhhhh 33");
-        // ent.Process(channel);
-        // // System.out.print("Has inventory! ");
-        // // System.out.println(Long.toString(ent.getID(), 2));
-        // }
-        // }
-        // mask = 32;
-        // // has movement
-        // for (Entity ent: ents) {
-        // if ((ent.getID() & mask) == mask) {
-        // channel = new MessageChannel(ent, "tttttt 33");
-        // ent.Process(channel);
-        // // System.out.print("Has movement! ");
-        // // System.out.println(Long.toString( ent.getID(), 2));
-        // }
-        // }
-        // mask = 64;
-        // // has transformation
-        // for (Entity ent: ents) {
-        // if ((ent.getID() & mask) == mask) {
-        // channel = new MessageChannel(ent, "nnnnnnnn 33");
-        // ent.Process(channel);
-        // // System.out.print("Has transformation! ");
-        // // System.out.println(Long.toString(ent.getID(), 2));
-        // }
-        // }
-        // mask = 128;
-        // // has sprite
-        // for (Entity ent: ents) {
-        // if ((ent.getID() & mask) == mask) {
-        // channel = new MessageChannel(ent, "lllll 33");
-        // ent.Process(channel);
-        // // System.out.print("Has sprite! ");
-        // // System.out.println(Long.toString(ent.getID(), 2));
-        // }
-        // }
-
-        // for (Component comp: colliBox.getComponents()) {
-        // comp.update();
-        // }
-        // for (Component comp: enemy.getComponents()) {
-        // comp.update();
-        // }
-
     }
 
     private boolean colliding(Entity ent1, Entity ent2, int treshold) {
@@ -348,6 +291,17 @@ public class MainGame extends BasicGame { // add states
         keyHandler.update();
         player.update(dt);
 
+        for (Entity ent: ents) {
+            if (ent.getName() == "Fireball") {
+                TransformComponent trans = (TransformComponent) ent.getComponent(Consts.TRANSFORM);
+                trans.move(5.5f * dt / 1000 * Consts.TILE_SIZE, 0);
+                if (trans.getX() > Consts.SCREEN_WIDTH) {
+                    ents.remove(ent);
+                    break;
+                }
+            }
+        }
+
         if (player.showInventory) {
             player.inventory.update();
         }
@@ -355,33 +309,42 @@ public class MainGame extends BasicGame { // add states
         if (player.showMenu) {
             player.menu.update();
         }
+
     }
 
     @Override
     public void render(GameContainer container, Graphics g) throws SlickException {
-
         g.setBackground(Color.black);
         mapTile.render(g);
-
         for (Entity ent1: ents) {
-            if (ent1.hasComponent(Consts.MANA)) {
-                ent1.getComponent(Consts.MANA).update();
-            }
-            if (ent1.hasComponent(Consts.HEALTH)) {
-                ent1.getComponent(Consts.HEALTH).update();
-            }
-            if (ent1.hasComponent(Consts.SPRITE)) {
-                SpriteComponent sprite = (SpriteComponent) ent1.getComponent(Consts.SPRITE);
-                sprite.draw();
-                // ent1.broadcast("draw");
-            }
-            if (ent1.hasComponent(Consts.INVENTORY)) {
-                InventoryComponent inv = (InventoryComponent) ent1.getComponent(Consts.INVENTORY);
-                inv.receive("drawInv");
+            for (components.Component comp: ent1.getComponents()) {
+                comp.update();
             }
         }
         player.render(g);
         g.drawString("Sup, dawg?", player.getxPos(), player.getyPos() - 20);
+
+        g.drawImage(new Image("images/ui/iface1.png"), 400, 360, 0, 0, 243, 156, new Color(255, 255, 255, 200));
+        g.drawImage(new Image(currentSpell.getIconPath()), 405, 365, 464, 424, 0, 0, 64, 64);
+
+        AttributesComponent attrs = (AttributesComponent) ents.get(0).getComponent(Consts.ATTRIBUTES);
+        LevelComponent lvl = (LevelComponent) ents.get(0).getComponent(Consts.LEVEL);
+
+        g.drawImage(new Image("images/skilltree.png"), Consts.SCREEN_WIDTH - 256, 50, Consts.SCREEN_WIDTH, 370, 0, 0,
+                256, 320);
+        
+        g.drawImage(new Image(PassiveType.Strength.getIconPath()), 470, 367, 490, 387, 0, 0, 64, 64);
+        g.drawString("STR: " + (int) attrs.getStrength(), 500, 367);
+        g.drawImage(new Image(PassiveType.Agility.getIconPath()), 470, 389, 490, 409, 0, 0, 64, 64);
+        g.drawString("AGI: " + (int) attrs.getAgility(), 500, 389);
+        g.drawImage(new Image(PassiveType.Intelligence.getIconPath()), 470, 411, 490, 431, 0, 0, 64, 64);
+        g.drawString("INT: " + (int) attrs.getIntelligence(), 500, 411);
+        g.drawString("Level " + lvl.getLevel(), 405, 440);
+        g.drawString("Experience " + (long) lvl.getExperience() + "/" + (long) lvl.getMaxExperience(), 405, 460);
+        g.drawRect(405, 480, 100, 10);
+        g.fillRect(405, 480, 100 * (lvl.getExperience() - lvl.getRequiredExperience(lvl.getLevel()))
+                / (lvl.getMaxExperience() - lvl.getRequiredExperience(lvl.getLevel())), 10);
+        g.setColor(Color.white);
 
         if (player.showInventory) {
             player.inventory.render(g);
@@ -392,8 +355,7 @@ public class MainGame extends BasicGame { // add states
         }
 
         TransformComponent trans = (TransformComponent) (ents.get(0).getComponent(Consts.TRANSFORM));
-        g.drawString("(" + (int) trans.getX() + ":" + (int) trans.getY() + ")", Consts.SCREEN_WIDTH - 150,
-                Consts.SCREEN_HEIGHT - 50);
+        g.drawString("(" + (int) trans.getX() + ":" + (int) trans.getY() + ")", Consts.SCREEN_WIDTH - 100, 10);
     }
 
 }

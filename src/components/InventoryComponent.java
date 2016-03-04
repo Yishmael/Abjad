@@ -48,18 +48,6 @@ public class InventoryComponent implements Component {
         g = new Graphics();
     }
 
-    private void draw() throws SlickException {
-        g.drawImage(image, 0, 320, 640, 512, 0, 0, width, height, new Color(255, 150, 150, 150));
-        for (int i = 0, j = 0; i < 30; i++) {
-            if (i == 10 || i == 20) {
-                j++;
-            }
-            if (items[i] != ItemType.Null) {
-                g.drawImage(new Image(items[i].getImagePath()), 64 * (i - 10 * j), 320 + 64 * j);
-            }
-        }
-    }
-
     public int getItemsCount() {
         int count = 0;
         for (int i = 0; i < items.length; i++) {
@@ -83,16 +71,6 @@ public class InventoryComponent implements Component {
     @Override
     public void receive(String command) {
         String str = command;
-        if (str.matches("drawInv")) {
-            if (shown) {
-                try {
-                    draw();
-                } catch (SlickException e) {
-                    e.printStackTrace();
-                }
-            }
-            return;
-        }
         if (str.matches("toggleInv")) {
             shown = !shown;
             return;
@@ -104,7 +82,7 @@ public class InventoryComponent implements Component {
         if (str.matches("next item")) {
             currentIndex++;
             currentIndex %= 30;
-            while (items[currentIndex] == ItemType.Null) { // first while!                
+            while (items[currentIndex] == ItemType.Null) { // first while!
                 currentIndex++;
                 currentIndex %= 30;
             }
@@ -114,9 +92,29 @@ public class InventoryComponent implements Component {
         }
     }
 
+    public void showInventory(boolean show) {
+        shown = show;
+    }
+
     @Override
     public void update() {
-
+        if (shown) {
+            g.drawImage(image, 0, Consts.SCREEN_HEIGHT * 0.7f, Consts.SCREEN_WIDTH * 0.6f, Consts.SCREEN_HEIGHT, 0, 0,
+                    width, height, new Color(255, 150, 150, 150));
+            for (int i = 0, j = 0; i < 30; i++) {
+                if (i == 10 || i == 20) {
+                    j++;
+                }
+                if (items[i] != ItemType.Null) {
+                    try {
+                        g.drawImage(new Image(items[i].getImagePath()), 64 * (i - 10 * j), 320 + 64 * j);
+                    } catch (SlickException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 
 }

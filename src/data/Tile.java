@@ -1,5 +1,7 @@
 package data;
 
+import enums.TileType;
+
 public class Tile {
     private TileType tileType;
     private float x, y;

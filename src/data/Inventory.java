@@ -26,19 +26,19 @@ public class Inventory {
             }
             switch (matrix[i]) {
             case 101:
-                g.drawImage(new Image("images/axe1.png"), 64 * (i - 10 * j), 320 + 64 * j);
+                g.drawImage(new Image("images/items/axe1.png"), 64 * (i - 10 * j), 320 + 64 * j);
                 break;
             case 102:
-                g.drawImage(new Image("images/axe2.png"), 64 * (i - 10 * j), 320 + 64 * j);
+                g.drawImage(new Image("images/items/axe2.png"), 64 * (i - 10 * j), 320 + 64 * j);
                 break;
             case 201:
-                g.drawImage(new Image("images/shield1.png"), 64 * (i - 10 * j), 320 + 64 * j);
+                g.drawImage(new Image("images/items/shield1.png"), 64 * (i - 10 * j), 320 + 64 * j);
                 break;
             case 202:
-                g.drawImage(new Image("images/shield2.png"), 64 * (i - 10 * j), 320 + 64 * j);
+                g.drawImage(new Image("images/items/shield2.png"), 64 * (i - 10 * j), 320 + 64 * j);
                 break;
             case 501:
-                g.drawImage(new Image("images/boulder1.png"), 64 * (i - 10 * j), 320 + 64 * j);
+                g.drawImage(new Image("images/items/boulder1.png"), 64 * (i - 10 * j), 320 + 64 * j);
                 break;
             default:
                 break;

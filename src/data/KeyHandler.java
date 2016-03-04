@@ -1,16 +1,15 @@
 package data;
 
 import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
+
+import enums.TileType;
 
 public class KeyHandler {
     private GameContainer gc;
     private Input input;
     private Player player;
-    private int c = 0;
-    private int index = 0;
 
     public KeyHandler(GameContainer gc, Player player) throws SlickException {
         this.gc = gc;
@@ -38,13 +37,6 @@ public class KeyHandler {
         if (input.isKeyDown(Input.KEY_NUMPAD3)) {
             player.direction[0] = 1;
         }
-        // get current tile name
-        if (input.isKeyPressed(Input.KEY_NUMPAD7)) {
-            // player.getMapTile().setTile(xTile, yTile,
-            // TileType.values()[player.tileIndex]);
-            player.addItem(new Boulder(new Image("images/boulder1.png"), "Boulder1", 0, 0, 1, 30, 0.1f));
-
-        }
         // change tile on mouse location
         if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && !player.showMenu) {
             int x = input.getMouseX();
@@ -54,18 +46,14 @@ public class KeyHandler {
             // System.out.println(xTile + " " + yTile);
             player.getMapTile().setTile(xTile, yTile, TileType.values()[player.tileIndex]);
         }
+        // get mouse location
+        if (input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
+            System.out.println(input.getMouseX() + ":" + input.getMouseY());
+        }
         // open/close menu or close inventory
         if (input.isKeyPressed(Input.KEY_SUBTRACT)) {
             if (player.showInventory) {
                 player.showInventory = false;
-            } else {
-                player.showMenu = !player.showMenu;
-                // easter egg :D
-                c++;
-                if (c == 42) {
-                    c = 0;
-                    player.addItem(new Boulder(new Image("images/boulder1.png"), "Boulder1", 0, 0, 1000, 30, 0.2f));
-                }
             }
         }
         // add item

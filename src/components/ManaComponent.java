@@ -7,7 +7,7 @@ import others.MessageChannel;
 
 public class ManaComponent implements Component {
     private int bit = Consts.MANA;
-    private float mana, baseMaxMana, maxMana, manaRegen, manaOnDeath = 0;
+    private float mana, baseMaxMana, maxMana, manaRegen, manaOnDeath = 0, percentage;
     private Entity self;
     private float dt = 0;
 
@@ -32,7 +32,7 @@ public class ManaComponent implements Component {
             mana = Math.max(mana - change, 0);
             // System.out.println("Drained to " + mana + "/" + maxMana + "!");
         }
-        update();
+        self.broadcast("updateMP " + mana + " " + maxMana);
     }
 
     public void replenish(float change) {
@@ -48,19 +48,16 @@ public class ManaComponent implements Component {
         return manaOnDeath;
     }
 
+    public float getMana() {
+        return mana;
+    }
+
     @Override
     public void process(MessageChannel channel) {
-        String str = channel.getCommand();
-        if (str.matches("drain [0-9]+[.]?[0-9]*")) {
-            str = str.substring(6);
-            drain(Float.parseFloat(str));
+        if (channel.getSender() == null) {
             return;
         }
-        if (str.matches("died")) {
-            manaOnDeath = mana;
-            // System.out.println("Mana on death: " + manaOnDeath);
-            return;
-        }
+        receive(channel.getCommand());
     }
 
     @Override
@@ -70,6 +67,11 @@ public class ManaComponent implements Component {
         if (str.matches("drain [0-9]+[.]?[0-9]*")) {
             str = str.substring(6);
             drain(Float.parseFloat(str));
+            return;
+        }
+        if (str.matches("replenish [0-9]+[.]?[0-9]*")) {
+            str = str.substring(10);
+            replenish(Float.parseFloat(str));
             return;
         }
         if (str.matches("died")) {
@@ -86,10 +88,10 @@ public class ManaComponent implements Component {
             str = str.substring(6);
             list = str.split(" ");
             float intelligence = Float.parseFloat(list[2]);
-            if (intelligence != 0) {
-                maxMana = intelligence * 10 + baseMaxMana + Math.min(10000, (float) Math.pow(1.25f, intelligence));
-                self.broadcast("updateMP " + mana + " " + maxMana);
-            }
+            percentage = mana / maxMana;
+            maxMana = Math.min(999, intelligence * 15 + baseMaxMana + (float) Math.pow(1.2f, intelligence) - 1);
+            mana = percentage * maxMana;
+            self.broadcast("updateMP " + mana + " " + maxMana);
             return;
         }
     }
@@ -101,10 +103,8 @@ public class ManaComponent implements Component {
             dt = 0;
             if (manaRegen > 0 && mana < maxMana) {
                 replenish(manaRegen / 2);
-                self.broadcast("updateMP " + mana + " " + maxMana);
             } else if (manaRegen < 0) {
                 drain(-manaRegen / 2);
-                self.broadcast("updateMP " + mana + " " + maxMana);
             }
         }
     }

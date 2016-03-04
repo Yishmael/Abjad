@@ -24,7 +24,7 @@ public class MovementComponent implements Component {
     public void move(float x, float y) {
         self.broadcast("move " + MainGame.dt / 1000.0 * x * speed * Consts.TILE_SIZE + " "
                 + MainGame.dt / 1000.0 * y * speed * Consts.TILE_SIZE);
-        self.broadcast("animateWalk");
+        self.broadcast("animate Walk");
     }
 
     @Override

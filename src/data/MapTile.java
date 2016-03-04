@@ -1,12 +1,18 @@
 package data;
 
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.Random;
 
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.opengl.Texture;
+import org.newdawn.slick.util.BufferedImageUtil;
 
+import enums.TileType;
 import others.Consts;
+import others.MapGen;
 
 public class MapTile {
     private int[][] matrix;
@@ -27,6 +33,9 @@ public class MapTile {
     // { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }};
     private int xMax, yMax;
     private boolean changed = true;
+    private MapGen mapgen;
+    private Texture mapTex;
+    private Image mapImg;
 
     public MapTile(final int WIDTH, final int HEIGHT) {
         xMax = WIDTH / Consts.TILE_SIZE;
@@ -36,22 +45,21 @@ public class MapTile {
         for (int i = 0; i < xMax; i++) {
             for (int j = 0; j < yMax; j++) {
                 int rand = dice.nextInt(100);
-                if (i == xMax - 1 || j == yMax - 1)
-                    matrix[i][j] = TileType.Sand.ordinal();
-                else if (rand < 66)
+                if (rand < 60) {
                     matrix[i][j] = TileType.Grass.ordinal();
-                else if (rand >= 66 && rand < 95)
+                } else if (rand >= 60 && rand < 95) {
                     matrix[i][j] = TileType.Dirt.ordinal();
-                else
+                } else {
                     matrix[i][j] = TileType.Stone.ordinal();
+                }
             }
         }
-
+        mapgen = new MapGen();
     }
 
     private Image getImage(int tileIndex) throws SlickException {
         Image image;
-        String path = "images/" + TileType.values()[tileIndex] + ".png";
+        String path = "images/tiles/" + TileType.values()[tileIndex] + ".png";
 
         image = new Image(path);
 
@@ -75,13 +83,18 @@ public class MapTile {
 
     public void render(Graphics g) throws SlickException {
         if (!changed) {
-            g.fillRect(0, 0, Consts.SCREEN_WIDTH, Consts.SCREEN_HEIGHT, new Image("images/map.png"), 0, 0);
+            g.drawImage(new Image("images/map.png"), 0, 0, Consts.SCREEN_WIDTH, Consts.SCREEN_HEIGHT, 0, 0,
+                    Consts.SCREEN_WIDTH, Consts.SCREEN_HEIGHT);
+            // mapImg = new Image(mapTex);
+            // g.drawImage(mapImg, 0, 0, Consts.SCREEN_WIDTH,
+            // Consts.SCREEN_HEIGHT, 0, 0, Consts.SCREEN_WIDTH,
+            // Consts.SCREEN_HEIGHT);
         } else {
-            for (int i = 0; i < xMax; i++) {
-                for (int j = 0; j < yMax; j++) {
-                    g.drawImage(getImage(matrix[i][j]), Consts.TILE_SIZE * i + i, Consts.TILE_SIZE * j + j);
-                }
-            }
+//            try {
+//                mapTex = BufferedImageUtil.getTexture("images/mapgen.png", mapgen.generateMap(matrix));
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
             changed = false;
         }
     }
@@ -90,7 +103,10 @@ public class MapTile {
         if (xTile < 0 || xTile >= xMax || yTile < 0 || yTile >= yMax)
             return;
 
-        matrix[xTile][yTile] = tileType.ordinal();
+        if (matrix[xTile][yTile] != tileType.ordinal()) {
+            matrix[xTile][yTile] = tileType.ordinal();
+            changed = true;
+        }
     }
 
     public void update() {

@@ -1,6 +1,8 @@
 package components;
 
 import org.lwjgl.Sys;
+import org.newdawn.slick.SlickException;
+import org.newdawn.slick.Sound;
 
 import others.Consts;
 import others.Entity;
@@ -14,12 +16,19 @@ public class CombatComponent implements Component {
     private long lastTime = 0;
     private long now = 0;
     private boolean canAttack = true;
+    private Sound sound;
 
     public CombatComponent(Entity self, float damage, float defense, float cooldown) {
         this.self = self;
         this.damage = damage;
         this.defense = defense;
         this.cooldown = cooldown;
+        try {
+            sound = new Sound("sounds/032.ogg");
+        } catch (SlickException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     public CombatComponent(Entity self, float damage, float cooldown) {
@@ -27,6 +36,12 @@ public class CombatComponent implements Component {
         this.damage = damage;
         this.defense = 0;
         this.cooldown = cooldown;
+        try {
+            sound = new Sound("sounds/032.ogg");
+        } catch (SlickException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     public CombatComponent(Entity self, float defense) {
@@ -41,10 +56,11 @@ public class CombatComponent implements Component {
             now = (Sys.getTime() * 1000) / Sys.getTimerResolution();
             if (now - lastTime >= 1000 * cooldown) {
                 lastTime = now;
-                self.broadcast("animateAttack");
+                self.broadcast("animate Attack");
                 float diced = (float) (damage + damage * 0.15 * (Math.random() - Math.random()));
                 // System.out.println("Attacked with " + (int)diced + "
                 // damage!");
+                sound.play();
                 return "damage " + diced;
             }
         }
@@ -86,7 +102,7 @@ public class CombatComponent implements Component {
             damage = temp.getDamage();
             defense = temp.getDefense();
             cooldown = temp.getCooldown();
-            System.out.println("Equipped " + temp.toString());
+            System.out.println(temp.toString());
             return;
         }
 

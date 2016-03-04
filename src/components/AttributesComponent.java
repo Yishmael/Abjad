@@ -30,40 +30,58 @@ public class AttributesComponent implements Component {
 
         if (str.matches("lvlup")) {
             available++;
+            strength++;
+            agility++;
+            intelligence++;
+            brdcst();
             return;
         }
         if (available > 0) {
             if (str.matches("STR[+][+]")) {
-                if (strength < 10) {
+                if (strength < 100) {
                     strength++;
                     available--;
-                    update();
+                    brdcst();
                 }
                 return;
             }
             if (str.matches("AGI[+][+]")) {
-                if (agility < 10) {
+                if (agility < 100) {
                     agility++;
                     available--;
-                    update();
+                    brdcst();
                 }
                 return;
             }
             if (str.matches("INT[+][+]")) {
-                if (intelligence < 10) {
+                if (intelligence < 100) {
                     intelligence++;
                     available--;
-                    update();
+                    brdcst();
                 }
                 return;
             }
         }
+    }
 
+    private void brdcst() {
+        self.broadcast("STATS " + strength + " " + agility + " " + intelligence);
     }
 
     @Override
     public void update() {
-        self.broadcast("STATS " + strength + " " + agility + " " + intelligence);
+    }
+
+    public float getStrength() {
+        return strength;
+    }
+
+    public float getAgility() {
+        return agility;
+    }
+
+    public float getIntelligence() {
+        return intelligence;
     }
 
     @Override

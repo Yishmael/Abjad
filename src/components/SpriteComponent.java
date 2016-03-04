@@ -5,7 +5,6 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.Sound;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Ellipse;
 
@@ -43,8 +42,6 @@ public class SpriteComponent implements Component {
     private float lastMaxMana = 0;
     private Ellipse ellipse = null;
     private Text font = new Text("fonts/verdana.ttf", java.awt.Color.white);
-
-    private Sound snd = null;
 
     public SpriteComponent(Entity self, String imagePath) throws SlickException {
         image = new Image(imagePath);
@@ -99,13 +96,13 @@ public class SpriteComponent implements Component {
             gHP.fillRect(lastX, lastY - 31, lastScale * width * lastHealth / lastMaxHealth, 10);
             gHP.setColor(new Color((int) (((1.0f - lastHealth / lastMaxHealth) * 255) % 255),
                     (int) ((lastHealth / lastMaxHealth) * 255), 122));
-            font.draw(lastX + lastScale * width / 2 - 20, lastY - 31, (int) lastHealth + "/" + (int) lastMaxHealth);
+            font.draw(lastX + lastScale * width / 2 - 20, lastY - 31, (long) lastHealth + "/" + (long) lastMaxHealth);
         }
         if (hasMana) {
             gMP.drawRect(lastX, lastY - 20, lastScale * width, 10);
             gMP.fillRect(lastX, lastY - 20, lastScale * width * lastMana / lastMaxMana, 10);
             gMP.setColor(Color.blue);
-            font.draw(lastX + lastScale * width / 2 - 20, lastY - 20, (int) lastMana + "/" + (int) lastMaxMana);
+            font.draw(lastX + lastScale * width / 2 - 20, lastY - 20, (long) lastMana + "/" + (long) lastMaxMana);
         }
         ellipse.setLocation(lastX, lastY);
         ellipse.setRadii(lastScale * width / 2, lastScale * height / 2);
@@ -215,23 +212,23 @@ public class SpriteComponent implements Component {
             updateMP(Float.parseFloat(list[0]), Float.parseFloat(list[1]));
             return;
         }
-        if (str.matches("animateAttack")) {
+        if (str.matches("animate Attack")) {
             animateAttack();
             return;
         }
-        if (str.matches("animateWalk")) {
+        if (str.matches("animate Walk")) {
             animateWalk();
             return;
         }
-        if (str.matches("animateFireball")) {
+        if (str.matches("animate Fireball")) {
             animateFireball();
             return;
         }
-        if (str.matches("animateNourish")) {
+        if (str.matches("animate Nourish")) {
             animateNourish();
             return;
         }
-        if (str.matches("animateExplosion")) {
+        if (str.matches("animate Explosion")) {
             animateExplosion();
             return;
         }
@@ -249,7 +246,7 @@ public class SpriteComponent implements Component {
             castAnimation = new Animation();
             SpriteSheet ss = null;
             try {
-                ss = new SpriteSheet("images/exp.png", 160, 160);
+                ss = new SpriteSheet("images/spells/explosion.png", 160, 160);
             } catch (SlickException e1) {
                 e1.printStackTrace();
             }
@@ -262,17 +259,6 @@ public class SpriteComponent implements Component {
             castAnimation.setLooping(false);
         }
         casting = true;
-
-        if (snd == null) {
-            try {
-                snd = new Sound("sounds/aa.ogg");
-                snd.play();
-            } catch (SlickException e) {
-                e.printStackTrace();
-            }
-        } else if (!snd.playing()) {
-            snd.play();
-        }
     }
 
     private void animateFireball() {
@@ -322,7 +308,7 @@ public class SpriteComponent implements Component {
 
     @Override
     public void update() {
-
+        draw();
     }
 
     public void updateHP(float health, float maxHealth) {

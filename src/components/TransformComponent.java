@@ -56,8 +56,8 @@ public class TransformComponent implements Component {
             this.x += x;
             this.y += y;
         }
-//        System.out.println("Moved by " + x + ":" + y);
-        update();
+        // System.out.println("Moved by " + x + ":" + y);
+        brdcst();
     }
 
     @Override
@@ -94,7 +94,7 @@ public class TransformComponent implements Component {
             return;
         }
         if (str.matches("requestPos")) {
-            update();
+            brdcst();
             return;
         }
     }
@@ -103,22 +103,27 @@ public class TransformComponent implements Component {
         this.x = x;
         this.y = y;
         // System.out.println("Moved to " + x + ":" + y);
-        update();
+        brdcst();
     }
 
     public void rescale(float scale) {
         this.scale = scale;
-        update();
+        brdcst();
     }
 
     public void rotate(float rotation) {
         this.rotation += rotation;
         this.rotation %= 360;
-        update();
+        brdcst();
+    }
+
+    private void brdcst() {
+        self.broadcast("draw " + this.x + " " + this.y + " " + this.rotation + " " + this.scale);
+
     }
 
     @Override
     public void update() {
-        self.broadcast("draw " + this.x + " " + this.y + " " + this.rotation + " " + this.scale);
+        
     }
 }

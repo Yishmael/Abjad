@@ -2,14 +2,17 @@ package others;
 
 public enum ItemType {
 
-    Null("Null", "images/null.png", 0, 0, 0), Axe("Shiny Axe", "images/axe1.png", 60, 0, 0.8f), Sword("Steel Sword",
-            "images/sword1.png", 120, 0, 1.7f), Branch("Olive Branch", "images/branch1.png", 2, 0,
-                    0.2f), Shield("Red Shield", "images/shield1.png", 0, 50, 0);
+    Axe("Shiny Axe", "images/items/axe1.png", 60, 0, 0.8f),
+    Sword("Steel Sword", "images/items/sword1.png", 120, 0, 1.7f),
+    Branch("Olive Branch", "images/items/branch1.png", 2, 0, 0.2f),
+    Shield("Red Shield", "images/items/shield1.png", 0, 50, 0),
+    Null("Null", "images/null.png", 0, 0, 0);
 
     private String name, imagePath;
     private float damage, defense, cooldown;
 
-    ItemType(String name, String imagePath, float damage, float defense, float cooldown) {
+    ItemType(String name, String imagePath, float damage, float defense,
+            float cooldown) {
         this.name = name;
         this.imagePath = imagePath;
         this.damage = damage;
@@ -18,7 +21,8 @@ public enum ItemType {
     };
 
     public String toString() {
-        String str = name + " (" + (int) damage + " dmg, " + (int) defense + " def, " + cooldown + "sec cd)";
+        String str = name + " (" + (int) damage + " dmg, " + (int) defense
+                + " def, " + cooldown + "sec cd)";
         return str;
     }
 

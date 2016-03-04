@@ -25,8 +25,8 @@ public class Player extends Creature {
         items = new Item[30];
         direction = new int[2];
         // pass strings to inventory instead of <item>;
-        inventory = new Inventory(new Image("images/inventory1.png"), matrix);
-        menu = new Menu(new Image("images/menu.png"));
+        inventory = new Inventory(new Image("images/ui/inventory1.png"), matrix);
+        menu = new Menu(new Image("images/ui/menu.png"));
         itemsCount = 1;
     }
 

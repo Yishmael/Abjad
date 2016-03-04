@@ -20,7 +20,7 @@
 			<attribute name="source_encoding" value="UTF-8"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="D:/Items/Apps/eclipse/workspace/imports/slick/lib/jogg-0.0.7.jar"/>
-	<classpathentry kind="lib" path="D:/Items/Apps/eclipse/workspace/imports/slick/lib/jorbis-0.0.15.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/Items/Apps/eclipse/workspace/imports/slick/lib/jogg-0.0.7.jar"/>
+	<classpathentry exported="true" kind="lib" path="D:/Items/Apps/eclipse/workspace/imports/slick/lib/jorbis-0.0.15.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
