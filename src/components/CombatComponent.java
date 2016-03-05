@@ -4,9 +4,9 @@ import org.lwjgl.Sys;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
 
+import enums.ItemType;
 import others.Consts;
 import others.Entity;
-import others.ItemType;
 import others.MessageChannel;
 
 public class CombatComponent implements Component {
@@ -26,7 +26,6 @@ public class CombatComponent implements Component {
         try {
             sound = new Sound("sounds/032.ogg");
         } catch (SlickException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }
@@ -39,7 +38,16 @@ public class CombatComponent implements Component {
         try {
             sound = new Sound("sounds/032.ogg");
         } catch (SlickException e) {
-            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    public CombatComponent(Entity self) {
+        this.self = self;
+        receive("equipped 0");
+        try {
+            sound = new Sound("sounds/032.ogg");
+        } catch (SlickException e) {
             e.printStackTrace();
         }
     }

@@ -62,6 +62,27 @@ public class AttributesComponent implements Component {
                 return;
             }
         }
+        if (str.matches("STR[+]5")) {
+            if (strength < 100) {
+                strength += 5;
+                brdcst();
+            }
+            return;
+        }
+        if (str.matches("AGI[+]5")) {
+            if (agility < 100) {
+                agility += 5;
+                brdcst();
+            }
+            return;
+        }
+        if (str.matches("INT[+]5")) {
+            if (intelligence < 100) {
+                intelligence += 5;
+                brdcst();
+            }
+            return;
+        }
     }
 
     private void brdcst() {

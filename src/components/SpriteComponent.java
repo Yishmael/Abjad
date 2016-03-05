@@ -238,7 +238,7 @@ public class SpriteComponent implements Component {
         }
     }
 
-    private void animateExplosion() {
+    public void animateExplosion() {
         if (sheet != null) {
             if (sheet.getHorizontalCount() < 10) {
                 return;
@@ -261,18 +261,23 @@ public class SpriteComponent implements Component {
         casting = true;
     }
 
-    private void animateFireball() {
+    public void animateFireball() {
         if (sheet != null) {
             castAnimation = new Animation();
             for (int i = 0; i < sheet.getHorizontalCount(); i++) {
-                castAnimation.addFrame(sheet.getSubImage(i, 4), 100);
+
+                // softcode this to accept all sprite sheets
+                if (sheet.getHorizontalCount() > 4)
+                    castAnimation.addFrame(sheet.getSubImage(i, 4), 100);
+                else 
+                    castAnimation.addFrame(sheet.getSubImage(0, 0), 1);
             }
             castAnimation.setLooping(true);
         }
         casting = true;
     }
 
-    private void animateNourish() {
+    public void animateNourish() {
         if (sheet != null) {
             castAnimation = new Animation();
             for (int i = 0; i < sheet.getHorizontalCount(); i++) {
@@ -283,7 +288,7 @@ public class SpriteComponent implements Component {
         casting = true;
     }
 
-    private void animateAttack() {
+    public void animateAttack() {
         if (sheet != null && attackAnimation == null) {
             attackAnimation = new Animation();
 
@@ -295,7 +300,7 @@ public class SpriteComponent implements Component {
         attacking = true;
     }
 
-    private void animateWalk() {
+    public void animateWalk() {
         if (sheet != null && walkAnimation == null) {
             walkAnimation = new Animation();
             for (int i = 0; i < sheet.getHorizontalCount(); i++) {

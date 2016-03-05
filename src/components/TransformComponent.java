@@ -118,12 +118,13 @@ public class TransformComponent implements Component {
     }
 
     private void brdcst() {
+        // ((SpriteComponent) self.getComponent(Consts.SPRITE)).draw(this.x,
+        // this.y, this.rotation, this.scale);
         self.broadcast("draw " + this.x + " " + this.y + " " + this.rotation + " " + this.scale);
-
     }
 
     @Override
     public void update() {
-        
+
     }
 }

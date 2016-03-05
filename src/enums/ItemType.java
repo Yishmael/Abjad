@@ -1,9 +1,9 @@
-package others;
+package enums;
 
 public enum ItemType {
 
-    Axe("Shiny Axe", "images/items/axe1.png", 60, 0, 0.8f),
-    Sword("Steel Sword", "images/items/sword1.png", 120, 0, 1.7f),
+    Axe("Shiny Axe", "images/items/axe1.png", 30, 0, 0.8f),
+    Sword("Steel Sword", "images/items/sword1.png", 80, 0, 1.7f),
     Branch("Olive Branch", "images/items/branch1.png", 2, 0, 0.2f),
     Shield("Red Shield", "images/items/shield1.png", 0, 50, 0),
     Null("Null", "images/null.png", 0, 0, 0);

@@ -16,6 +16,9 @@ import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
 import org.newdawn.slick.SpriteSheet;
+import org.newdawn.slick.geom.Rectangle;
+import org.newdawn.slick.geom.RoundedRectangle;
+import org.newdawn.slick.geom.Shape;
 
 import components.AttributesComponent;
 import components.CollisionComponent;
@@ -32,6 +35,7 @@ import components.TransformComponent;
 import data.KeyHandler;
 import data.MapTile;
 import data.Player;
+import enums.ItemType;
 import enums.PassiveType;
 import enums.SpellType;
 
@@ -44,7 +48,7 @@ public class MainGame extends BasicGame { // add states
             AppGameContainer appgc;
             appgc = new AppGameContainer(new MainGame("Stars are falling"));
             appgc.setDisplayMode(Consts.SCREEN_WIDTH, Consts.SCREEN_HEIGHT, false);
-            appgc.setTargetFrameRate(1500);
+            appgc.setTargetFrameRate(2000);
             appgc.setIcon("images/ui/icon.png");
             // appgc.setClearEachFrame(false);
             // appgc.setFullscreen(true);
@@ -62,8 +66,13 @@ public class MainGame extends BasicGame { // add states
     private Input input;
     private EntityFactory factory;
     private ArrayList<Entity> entityQueue;
-    private SpellType currentSpell = SpellType.Fireball;
+    private SpellType currentSpell = SpellType.values()[0];
     private Sound sound;
+    private Shape[] passiveTree;
+    private Image[] stats;
+    private Shape[] statIcon;
+    private Image skillTree, iface1;
+    private Image[] spellIcons;
 
     private long lastTime = 0;
 
@@ -92,17 +101,46 @@ public class MainGame extends BasicGame { // add states
         ents = new ArrayList<Entity>();
         factory = new EntityFactory();
         entityQueue = new ArrayList<Entity>();
+        passiveTree = new Shape[9];
+        stats = new Image[3];
+        statIcon = new Shape[3];
+        skillTree = new Image("images/skilltree.png");
+        iface1 = new Image("images/ui/iface1.png");
+
+        spellIcons = new Image[SpellType.values().length - 1];
+        for (int i = 0; i < 3; i++) {
+            passiveTree[i] = new RoundedRectangle(Consts.SCREEN_WIDTH - 230 + (i % 3) * 80, Consts.SCREEN_HEIGHT - 431, 42, 60, 5);
+        }
+        for (int i = 3; i < 6; i++) {
+            passiveTree[i] = new RoundedRectangle(Consts.SCREEN_WIDTH - 230 + (i % 3) * 80, Consts.SCREEN_HEIGHT - 337, 42, 60, 5);
+        }
+        for (int i = 6; i < 9; i++) {
+            passiveTree[i] = new RoundedRectangle(Consts.SCREEN_WIDTH - 230 + (i % 3) * 80, Consts.SCREEN_HEIGHT - 243, 42, 60, 5);
+        }
+
+        stats[0] = new Image(PassiveType.Strength.getIconPath());
+        stats[1] = new Image(PassiveType.Agility.getIconPath());
+        stats[2] = new Image(PassiveType.Intelligence.getIconPath());
+
+        for (int i = 0; i < spellIcons.length; i++) {
+            spellIcons[i] = new Image(SpellType.values()[i].getIconPath());
+        }
+
+        for (int i = 0; i < statIcon.length; i++) {
+            statIcon[i] = new Rectangle(Consts.SCREEN_WIDTH - 170, Consts.SCREEN_HEIGHT - 145 + 22 * i, 20, 20);
+        }
+
         Entity entity = new Entity("Player");
         entity.addComponent(new SpriteComponent(entity, new SpriteSheet("images/player1.png", 64, 64), 220, false));
-        entity.addComponent(new CombatComponent(entity, 25, 0.75f));
+        entity.addComponent(new CombatComponent(entity));
         entity.addComponent(new MovementComponent(entity, 2.2f));
-        entity.addComponent(new HealthComponent(entity, 300, 300, 3.2f));
+        entity.addComponent(new HealthComponent(entity, 100, 100, 2.2f));
         entity.addComponent(new ManaComponent(entity, 150, 150, 9.1f));
-        ItemType[] inventory = { ItemType.Sword, ItemType.Axe };
+        ItemType[] inventory = { ItemType.Axe, ItemType.Sword };
         entity.addComponent(new InventoryComponent(entity, "images/ui/inventory2.png", inventory));
         entity.addComponent(new InputComponent(entity));
         entity.addComponent(new TransformComponent(entity, 220, 200));
-        entity.addComponent(new SpellComponent(entity, 75, 40, 1));
+        entity.addComponent(new SpellComponent(entity));
         entity.addComponent(new AttributesComponent(entity, 0, 0, 0));
         entity.addComponent(new LevelComponent(entity, 1));
         entity.addComponent(new CollisionComponent(entity));
@@ -129,6 +167,52 @@ public class MainGame extends BasicGame { // add states
             dt = 25;
         }
         update(dt);
+
+        if (input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
+            for (Shape shape: passiveTree) {
+                if (shape.contains(input.getMouseX(), input.getMouseY())) {
+                    System.out.println("Clicked on a passive!");
+                    String msg = null;
+                    int centerX = (int) shape.getCenterX();
+                    int centerY = (int) shape.getCenterY();
+
+                    if (centerX == 430 && centerY == 298) {
+                        msg = "STR+5";
+                    } else if (centerX == 510 && centerY == 298) {
+                        msg = "AGI+5";
+                    } else if (centerX == 590 && centerY == 298) {
+                        msg = "INT+5";
+                    }
+                    for (Entity ent: ents) {
+                        if (ent.hasComponent(Consts.INPUT)) {
+                            ent.broadcast(msg);
+                        }
+                    }
+                }
+            }
+            // make class Button from classes shape and image
+            for (Shape shape: statIcon) {
+                if (shape.contains(input.getMouseX(), input.getMouseY())) {
+                    System.out.println("Clicked on a stat!");
+                    String msg = null;
+                    int centerX = (int) shape.getCenterX();
+                    int centerY = (int) shape.getCenterY();
+                    if (centerX == 480 && centerY == 377) {
+                        msg = "STR++";
+                    } else if (centerX == 480 && centerY == 399) {
+                        msg = "AGI++";
+                    } else if (centerX == 480 && centerY == 421) {
+                        msg = "INT++";
+                    }
+                    for (Entity ent: ents) {
+                        if (ent.hasComponent(Consts.INPUT)) {
+                            ent.broadcast(msg);
+                        }
+                    }
+                }
+            }
+            System.out.println(input.getMouseX() + ":" + input.getMouseY());
+        }
 
         for (Iterator<Entity> iterator = ents.iterator(); iterator.hasNext();) {
             Entity ent1 = (Entity) iterator.next();
@@ -157,9 +241,6 @@ public class MainGame extends BasicGame { // add states
                     SpellComponent spell = (SpellComponent) (ent1.getComponent(Consts.SPELL));
                     currentSpell = spell.getCurrentSpell();
                 }
-                if (input.isKeyPressed(Input.KEY_3)) {
-                    ent1.broadcast("KEY " + Input.KEY_3);
-                }
                 if (input.isKeyPressed(Input.KEY_ENTER)) {
                     ent1.broadcast("KEY " + Input.KEY_ENTER);
                 }
@@ -178,7 +259,6 @@ public class MainGame extends BasicGame { // add states
                                             ent1.process(
                                                     new MessageChannel(ent2, "exp " + level.getExperienceBounty()));
                                         }
-
                                     } else if (health.isAlive() && action != null) {
                                         ent1.process(new MessageChannel(ent2,
                                                 "heal " + (Float.parseFloat(action.substring(7)) * 0.33f)));
@@ -194,16 +274,8 @@ public class MainGame extends BasicGame { // add states
                         currentSpell = spell.getCurrentSpell();
                         String action = spell.cast();
                         if (action != null) {
-                            if (currentSpell == SpellType.Explosion) {
-                                sound = new Sound("sounds/aa.ogg");
-                                sound.play();
-                            } else if (currentSpell == SpellType.Nourish) {
-                                sound = new Sound("sounds/049.wav");
-                                sound.play();
-                            } else if (currentSpell == SpellType.Fireball) {
-                                sound = new Sound("sounds/067.wav");
-                                sound.play();
-                            }
+                            sound = new Sound(currentSpell.getSoundPath());
+                            sound.play();
 
                             if (currentSpell != SpellType.Fireball) {
                                 for (Iterator<Entity> iter = ents.iterator(); iter.hasNext();) {
@@ -222,6 +294,7 @@ public class MainGame extends BasicGame { // add states
                                 entity.addComponent(new SpriteComponent(entity,
                                         new SpriteSheet("images/spells/fireball.png", 82, 83), 80, false));
                                 entity.addComponent(new TransformComponent(entity, x + 26, y - 15));
+                                entity.addComponent(new SpellComponent(entity, 0, currentSpell.getDamage(), 0));
                                 entityQueue.add(entity);
                             }
                         }
@@ -237,13 +310,14 @@ public class MainGame extends BasicGame { // add states
         }
 
         for (int i = 0; i < ents.size(); i++) {
-            if (ents.get(i).getName() == "Fireball") {
+            if (ents.get(i).getName().matches("Fireball")) {
+                SpellComponent spell = (SpellComponent) ents.get(i).getComponent(Consts.SPELL);
                 for (Entity ent2: ents) {
                     if (colliding(ents.get(i), ent2, 25)) {
-                        ent2.process(new MessageChannel(ents.get(i), "damage 80"));
+                        ent2.process(new MessageChannel(ents.get(i), spell.cast()));
                         sound = new Sound("sounds/068.wav");
                         sound.play();
-                        ents.remove(ents.remove(i));
+                        ents.remove(i);
                         break;
                     }
                 }
@@ -324,26 +398,41 @@ public class MainGame extends BasicGame { // add states
         player.render(g);
         g.drawString("Sup, dawg?", player.getxPos(), player.getyPos() - 20);
 
-        g.drawImage(new Image("images/ui/iface1.png"), 400, 360, 0, 0, 243, 156, new Color(255, 255, 255, 200));
-        g.drawImage(new Image(currentSpell.getIconPath()), 405, 365, 464, 424, 0, 0, 64, 64);
+        g.drawImage(iface1, Consts.SCREEN_WIDTH - 240, Consts.SCREEN_HEIGHT - 152, 0, 0, 243, 156,
+                new Color(255, 255, 255, 200));
+        g.drawImage(spellIcons[currentSpell.ordinal()], Consts.SCREEN_WIDTH - 235, Consts.SCREEN_HEIGHT - 147,
+                Consts.SCREEN_WIDTH - 176, Consts.SCREEN_HEIGHT - 88, 0, 0, 64, 64);
 
         AttributesComponent attrs = (AttributesComponent) ents.get(0).getComponent(Consts.ATTRIBUTES);
         LevelComponent lvl = (LevelComponent) ents.get(0).getComponent(Consts.LEVEL);
 
-        g.drawImage(new Image("images/skilltree.png"), Consts.SCREEN_WIDTH - 256, 50, Consts.SCREEN_WIDTH, 370, 0, 0,
-                256, 320);
-        
-        g.drawImage(new Image(PassiveType.Strength.getIconPath()), 470, 367, 490, 387, 0, 0, 64, 64);
-        g.drawString("STR: " + (int) attrs.getStrength(), 500, 367);
-        g.drawImage(new Image(PassiveType.Agility.getIconPath()), 470, 389, 490, 409, 0, 0, 64, 64);
-        g.drawString("AGI: " + (int) attrs.getAgility(), 500, 389);
-        g.drawImage(new Image(PassiveType.Intelligence.getIconPath()), 470, 411, 490, 431, 0, 0, 64, 64);
-        g.drawString("INT: " + (int) attrs.getIntelligence(), 500, 411);
-        g.drawString("Level " + lvl.getLevel(), 405, 440);
-        g.drawString("Experience " + (long) lvl.getExperience() + "/" + (long) lvl.getMaxExperience(), 405, 460);
-        g.drawRect(405, 480, 100, 10);
-        g.fillRect(405, 480, 100 * (lvl.getExperience() - lvl.getRequiredExperience(lvl.getLevel()))
-                / (lvl.getMaxExperience() - lvl.getRequiredExperience(lvl.getLevel())), 10);
+        g.drawImage(skillTree, Consts.SCREEN_WIDTH - 256, Consts.SCREEN_HEIGHT - 462, Consts.SCREEN_WIDTH,
+                Consts.SCREEN_HEIGHT - 142, 0, 0, 384, 320);
+
+        for (Shape shape: passiveTree) {
+            g.draw(shape);
+        }
+
+        g.drawImage(stats[0], Consts.SCREEN_WIDTH - 170, Consts.SCREEN_HEIGHT - 145, Consts.SCREEN_WIDTH - 150,
+                Consts.SCREEN_HEIGHT - 125, 0, 0, 64, 64);
+        g.draw(statIcon[0]);
+        g.drawString("STR: " + (int) attrs.getStrength(), Consts.SCREEN_WIDTH - 140, Consts.SCREEN_HEIGHT - 145);
+        g.drawImage(stats[1], Consts.SCREEN_WIDTH - 170, Consts.SCREEN_HEIGHT - 123, Consts.SCREEN_WIDTH - 150,
+                Consts.SCREEN_HEIGHT - 103, 0, 0, 64, 64);
+        g.draw(statIcon[1]);
+        g.drawString("AGI: " + (int) attrs.getAgility(), Consts.SCREEN_WIDTH - 140, Consts.SCREEN_HEIGHT - 123);
+        g.drawImage(stats[2], Consts.SCREEN_WIDTH - 170, Consts.SCREEN_HEIGHT - 101, Consts.SCREEN_WIDTH - 150,
+                Consts.SCREEN_HEIGHT - 81, 0, 0, 64, 64);
+        g.draw(statIcon[2]);
+        g.drawString("INT: " + (int) attrs.getIntelligence(), Consts.SCREEN_WIDTH - 140, Consts.SCREEN_HEIGHT - 101);
+        g.drawString("Level " + lvl.getLevel(), Consts.SCREEN_WIDTH - 235, Consts.SCREEN_HEIGHT - 72);
+        g.drawString("Experience " + (long) lvl.getExperience() + "/" + (long) lvl.getMaxExperience(),
+                Consts.SCREEN_WIDTH - 235, Consts.SCREEN_HEIGHT - 52);
+        g.drawRect(Consts.SCREEN_WIDTH - 235, Consts.SCREEN_HEIGHT - 32, 100, 10);
+        g.fillRect(Consts.SCREEN_WIDTH - 235, Consts.SCREEN_HEIGHT - 32,
+                100 * (lvl.getExperience() - lvl.getRequiredExperience(lvl.getLevel()))
+                        / (lvl.getMaxExperience() - lvl.getRequiredExperience(lvl.getLevel())),
+                10);
         g.setColor(Color.white);
 
         if (player.showInventory) {

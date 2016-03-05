@@ -20,7 +20,7 @@ public class Entity {
     }
 
     public void broadcast(String command) {
-        // System.out.println(command);
+//         System.out.println(command);
         if (command == null) {
             return;
         }

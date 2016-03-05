@@ -5,9 +5,9 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
 
+import enums.ItemType;
 import others.Consts;
 import others.Entity;
-import others.ItemType;
 import others.MessageChannel;
 
 public class InventoryComponent implements Component {

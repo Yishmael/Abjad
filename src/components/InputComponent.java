@@ -50,16 +50,13 @@ public class InputComponent implements Component {
         case Input.KEY_2:
             command = "next spell";
             break;
-        case Input.KEY_3:
-            command = "STR++";
-            break;
         case Input.KEY_ENTER:
             command = "exp 150";
             break;
         default:
             return;
         }
-
+        // ((MovementComponent)self.getComponent(Consts.MOVEMENT)).receive(command);
         self.broadcast(command);
     }
 

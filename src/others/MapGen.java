@@ -15,9 +15,9 @@ public class MapGen {
 
     public BufferedImage generateMap(int[][] matrix) {
         try {
-            grassImage = ImageIO.read(new File(basePath + "grass.png"));
-            dirtImage = ImageIO.read(new File(basePath + "dirt.png"));
-            stoneImage = ImageIO.read(new File(basePath + "stone.png"));
+            grassImage = ImageIO.read(new File(basePath + "tiles/grass.png"));
+            dirtImage = ImageIO.read(new File(basePath + "tiles/dirt.png"));
+            stoneImage = ImageIO.read(new File(basePath + "tiles/stone.png"));
         } catch (Exception e) {
             // TODO: handle exception
         }

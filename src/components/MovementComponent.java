@@ -22,8 +22,12 @@ public class MovementComponent implements Component {
     }
 
     public void move(float x, float y) {
-        self.broadcast("move " + MainGame.dt / 1000.0 * x * speed * Consts.TILE_SIZE + " "
-                + MainGame.dt / 1000.0 * y * speed * Consts.TILE_SIZE);
+        // ((TransformComponent)self.getComponent(Consts.TRANSFORM)).move(MainGame.dt
+        // / 1000f * x * speed * Consts.TILE_SIZE, MainGame.dt / 1000f * y *
+        // speed * Consts.TILE_SIZE);
+        // ((SpriteComponent)self.getComponent(Consts.SPRITE)).animateWalk();
+        self.broadcast("move " + MainGame.dt / 1000f * x * speed * Consts.TILE_SIZE + " "
+                + MainGame.dt / 1000f * y * speed * Consts.TILE_SIZE);
         self.broadcast("animate Walk");
     }
 

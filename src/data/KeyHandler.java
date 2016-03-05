@@ -38,18 +38,17 @@ public class KeyHandler {
             player.direction[0] = 1;
         }
         // change tile on mouse location
-        if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && !player.showMenu) {
-            int x = input.getMouseX();
-            int y = input.getMouseY();
-            int xTile = player.getMapTile().getTileX(x);
-            int yTile = player.getMapTile().getTileY(y);
-            // System.out.println(xTile + " " + yTile);
-            player.getMapTile().setTile(xTile, yTile, TileType.values()[player.tileIndex]);
-        }
-        // get mouse location
-        if (input.isMousePressed(Input.MOUSE_LEFT_BUTTON)) {
-            System.out.println(input.getMouseX() + ":" + input.getMouseY());
-        }
+        // if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) &&
+        // !player.showMenu) {
+        // int x = input.getMouseX();
+        // int y = input.getMouseY();
+        // int xTile = player.getMapTile().getTileX(x);
+        // int yTile = player.getMapTile().getTileY(y);
+        // // System.out.println(xTile + " " + yTile);
+        // player.getMapTile().setTile(xTile, yTile,
+        // TileType.values()[player.tileIndex]);
+        // }
+
         // open/close menu or close inventory
         if (input.isKeyPressed(Input.KEY_SUBTRACT)) {
             if (player.showInventory) {
@@ -83,11 +82,7 @@ public class KeyHandler {
         // change brush
         if (input.isMousePressed(Input.MOUSE_RIGHT_BUTTON)) {
             player.tileIndex++;
-            player.tileIndex %= TileType.values().length;
-            if (TileType.values()[player.tileIndex] == TileType.Null) {
-                player.tileIndex++;
-                player.tileIndex %= TileType.values().length;
-            }
+            player.tileIndex %= TileType.values().length - 1;
             System.out.println("Brush changed to " + TileType.values()[player.tileIndex]);
         }
 

@@ -13,13 +13,17 @@ public class SpellComponent implements Component {
     private Entity self;
     private long lastTime = 0;
     private long now = 0;
-    private SpellType currentSpell = SpellType.Fireball;
+    private SpellType currentSpell = SpellType.values()[0];
 
     public SpellComponent(Entity self, float manaCost, float damage, float cooldown) {
         this.self = self;
         this.manaCost = manaCost;
         this.damage = damage;
         this.cooldown = cooldown;
+    }
+
+    public SpellComponent(Entity self) {
+        this.self = self;
         this.damage = currentSpell.getDamage();
         this.cooldown = currentSpell.getCooldown();
         this.manaCost = currentSpell.getManaCost();
@@ -46,11 +50,11 @@ public class SpellComponent implements Component {
             lastTime = now;
             self.broadcast("requestMP");
             if (lastMana >= manaCost) {
-                if (healing > 0) {
-                    self.broadcast("heal " + healing);
-                }
                 if (manaCost > 0) {
                     self.broadcast("drain " + manaCost);
+                }
+                if (healing > 0) {
+                    self.broadcast("heal " + healing);
                 }
                 self.broadcast("animate " + currentSpell.getName());
                 return "damage " + damage;

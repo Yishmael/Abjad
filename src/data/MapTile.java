@@ -36,6 +36,7 @@ public class MapTile {
     private MapGen mapgen;
     private Texture mapTex;
     private Image mapImg;
+    private Image tempMap;
 
     public MapTile(final int WIDTH, final int HEIGHT) {
         xMax = WIDTH / Consts.TILE_SIZE;
@@ -55,6 +56,12 @@ public class MapTile {
             }
         }
         mapgen = new MapGen();
+        try {
+            tempMap = new Image("images/map.png");
+        } catch (SlickException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     private Image getImage(int tileIndex) throws SlickException {
@@ -83,8 +90,8 @@ public class MapTile {
 
     public void render(Graphics g) throws SlickException {
         if (!changed) {
-            g.drawImage(new Image("images/map.png"), 0, 0, Consts.SCREEN_WIDTH, Consts.SCREEN_HEIGHT, 0, 0,
-                    Consts.SCREEN_WIDTH, Consts.SCREEN_HEIGHT);
+            g.drawImage(tempMap, 0, 0, Consts.SCREEN_WIDTH, Consts.SCREEN_HEIGHT, 0, 0,
+                    tempMap.getWidth(), tempMap.getHeight());
             // mapImg = new Image(mapTex);
             // g.drawImage(mapImg, 0, 0, Consts.SCREEN_WIDTH,
             // Consts.SCREEN_HEIGHT, 0, 0, Consts.SCREEN_WIDTH,
