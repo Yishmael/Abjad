@@ -7,7 +7,7 @@ import others.Entity;
 import others.MessageChannel;
 
 public class InputComponent implements Component {
-    private int bit = Consts.INPUT;
+    private int id = Consts.INPUT;
 
     private Entity self;
 
@@ -16,24 +16,18 @@ public class InputComponent implements Component {
     }
 
     @Override
-    public int getBit() {
-        return bit;
+    public int getID() {
+        return id;
     }
 
     public void handleKey(int keyCode) {
         String command = null;
         switch (keyCode) {
         case Input.KEY_UP:
-            command = "move UP";
-            break;
         case Input.KEY_DOWN:
-            command = "move DOWN";
-            break;
         case Input.KEY_LEFT:
-            command = "move LEFT";
-            break;
         case Input.KEY_RIGHT:
-            command = "move RIGHT";
+            command = "animate Walk";
             break;
         case Input.KEY_I:
             command = "toggleInv";
@@ -50,13 +44,10 @@ public class InputComponent implements Component {
         case Input.KEY_2:
             command = "next spell";
             break;
-        case Input.KEY_ENTER:
-            command = "exp 150";
-            break;
         default:
+            System.out.println("Unknown command: " + "\"" + command + "\"");
             return;
         }
-        // ((MovementComponent)self.getComponent(Consts.MOVEMENT)).receive(command);
         self.broadcast(command);
     }
 

@@ -6,7 +6,7 @@ import others.MainGame;
 import others.MessageChannel;
 
 public class HealthComponent implements Component {
-    private int bit = Consts.HEALTH;
+    private int id = Consts.HEALTH;
     private float health, baseMaxHealth, maxHealth, healthRegen, percentage;
     private boolean alive;
     private Entity self;
@@ -52,8 +52,8 @@ public class HealthComponent implements Component {
     }
 
     @Override
-    public int getBit() {
-        return bit;
+    public int getID() {
+        return id;
     }
 
     public void heal(float amount) {

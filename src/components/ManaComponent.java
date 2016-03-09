@@ -6,8 +6,9 @@ import others.MainGame;
 import others.MessageChannel;
 
 public class ManaComponent implements Component {
-    private int bit = Consts.MANA;
+    private int id = Consts.MANA;
     private float mana, baseMaxMana, maxMana, manaRegen, manaOnDeath = 0, percentage;
+    private boolean canRegen = true;
     private Entity self;
     private float dt = 0;
 
@@ -76,7 +77,7 @@ public class ManaComponent implements Component {
         }
         if (str.matches("died")) {
             manaOnDeath = mana;
-            manaRegen = 0;
+            canRegen = false;
             // System.out.println("Mana on death: " + manaOnDeath);
             return;
         }
@@ -94,23 +95,39 @@ public class ManaComponent implements Component {
             self.broadcast("updateMP " + mana + " " + maxMana);
             return;
         }
+        if (str.matches("MPregen [-]?[0-9]+[.]?[0-9]*")) {
+            str = str.substring(8);
+            manaRegen += Float.parseFloat(str);
+            self.broadcast("updateMP " + mana + " " + maxMana);
+            return;
+        }
+        if (str.matches("MPcap [-]?[0-9]+[.]?[0-9]*")) {
+            str = str.substring(6);
+            percentage = mana / maxMana;
+            maxMana = Math.min(999, maxMana + Float.parseFloat(str));
+            mana = percentage * maxMana;
+            self.broadcast("updateMP " + mana + " " + maxMana);
+            return;
+        }
     }
 
     @Override
     public void update() {
-        dt += MainGame.dt;
-        if (dt >= 500) {
-            dt = 0;
-            if (manaRegen > 0 && mana < maxMana) {
-                replenish(manaRegen / 2);
-            } else if (manaRegen < 0) {
-                drain(-manaRegen / 2);
+        if (canRegen) {
+            dt += MainGame.dt;
+            if (dt >= 500) {
+                dt = 0;
+                if (manaRegen > 0 && mana < maxMana) {
+                    replenish(manaRegen / 2);
+                } else if (manaRegen < 0) {
+                    drain(-manaRegen / 2);
+                }
             }
         }
     }
 
     @Override
-    public int getBit() {
-        return bit;
+    public int getID() {
+        return id;
     }
 }

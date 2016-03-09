@@ -2,23 +2,23 @@ package enums;
 
 public enum TileType {
 
-    Dirt("dirt", true),
-    Grass("grass", true),
-    Sand("sand", true),
-    Stone("stone", false),
-    Water("water", false),
-    Null("null", false);
+    Dirt("images/tiles/dirt.png", true),
+    Grass("images/tiles/grass.png", true),
+    Sand("images/tiles/sand.png", true),
+    Stone("images/tiles/stone.png", false),
+    Water("images/tiles/water.png", false),
+    Null("images/null.png", false);
 
-    private String tileName;
+    private String imagePath;
     private boolean walkable;
 
-    TileType(String tileName, boolean walkable) {
-        this.tileName = tileName;
+    TileType(String imagePath, boolean walkable) {
+        this.imagePath = imagePath;
         this.walkable = walkable;
     };
 
-    public String getTileName() {
-        return tileName;
+    public String getImagePath() {
+        return imagePath;
     }
 
     public boolean isWalkable() {

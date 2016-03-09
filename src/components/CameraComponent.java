@@ -5,7 +5,7 @@ import others.Entity;
 import others.MessageChannel;
 
 public class CameraComponent implements Component {
-    private int bit = Consts.CAMERA;
+    private int id = Consts.CAMERA;
     private Entity self;
 
     public CameraComponent(Entity self) {
@@ -13,8 +13,8 @@ public class CameraComponent implements Component {
     }
 
     @Override
-    public int getBit() {
-        return bit;
+    public int getID() {
+        return id;
     }
 
     @Override

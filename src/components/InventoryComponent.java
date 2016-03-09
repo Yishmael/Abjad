@@ -11,7 +11,7 @@ import others.Entity;
 import others.MessageChannel;
 
 public class InventoryComponent implements Component {
-    private int bit = Consts.INVENTORY;
+    private int id = Consts.INVENTORY;
     private Image image;
     private float width, height;
     private Graphics g;
@@ -59,8 +59,8 @@ public class InventoryComponent implements Component {
     }
 
     @Override
-    public int getBit() {
-        return bit;
+    public int getID() {
+        return id;
     }
 
     @Override

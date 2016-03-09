@@ -5,7 +5,7 @@ import others.Entity;
 import others.MessageChannel;
 
 public class LevelComponent implements Component {
-    public int bit = Consts.LEVEL;
+    public int id = Consts.LEVEL;
 
     private Entity self;
     private int level;
@@ -77,7 +77,7 @@ public class LevelComponent implements Component {
     }
 
     @Override
-    public int getBit() {
-        return bit;
+    public int getID() {
+        return id;
     }
 }

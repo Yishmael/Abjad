@@ -18,17 +18,17 @@ import enums.ItemType;
 public class EntityFactory {
     public Entity getBarrelBlueprint() throws SlickException {
         Entity entity = new Entity("Barrel");
-        entity.addComponent(new SpriteComponent(entity, "images/barrel1.png"));
+        entity.addComponent(new SpriteComponent(entity, "images/barrel1.png", 90, 90));
         entity.addComponent(new TransformComponent(entity, (float) (Math.random() * 400 + 50),
                 (float) (Math.random() * 400 + 50), 0.6f));
-        entity.addComponent(new HealthComponent(entity, 100, 100));
+        entity.addComponent(new HealthComponent(entity, 500, 500));
 
         return entity;
     }
 
     public Entity getBirdBlueprint() throws SlickException {
         Entity entity = new Entity("Bird");
-        entity.addComponent(new SpriteComponent(entity, new SpriteSheet("images/bird1.png", 64, 64), 200, false));
+        entity.addComponent(new SpriteComponent(entity, new SpriteSheet("images/bird1.png", 64, 64), 200, false, 64, 64));
         entity.addComponent(new TransformComponent(entity, 550, 225));
 
         return entity;
@@ -36,7 +36,7 @@ public class EntityFactory {
 
     public Entity getCampfireBlueprint() throws SlickException {
         Entity entity = new Entity("Campfire");
-        entity.addComponent(new SpriteComponent(entity, new SpriteSheet("images/campfire1.png", 64, 64), 80, true));
+        entity.addComponent(new SpriteComponent(entity, new SpriteSheet("images/campfire1.png", 64, 64), 80, true, 64, 64));
         entity.addComponent(new TransformComponent(entity, 440, 130));
         entity.addComponent(new HealthComponent(entity, 100, 100, -0.05f));
         entity.addComponent(new CombatComponent(entity, 1.7f, 0.15f));
@@ -44,17 +44,18 @@ public class EntityFactory {
         return entity;
     }
 
-    public Entity getEnemyBlueprint(int x, int y) throws SlickException {
+    public Entity getEnemyBlueprint(float x, float y) throws SlickException {
         Entity entity = new Entity("Enemy bot");
-        entity.addComponent(new SpriteComponent(entity, "images/bahamut.png"));
+        entity.addComponent(new SpriteComponent(entity, "images/bahamut.png", 64, 64));
 //        entity.addComponent(new SpriteComponent(entity, new SpriteSheet("images/player1.png", 64, 64), 220, false));
-        entity.addComponent(new HealthComponent(entity, (float) (Math.random() * 200) + 100, 300, 7));
+        entity.addComponent(new HealthComponent(entity, (float) (Math.random() * 200) + 100, 300, 0));
         entity.addComponent(new MovementComponent(entity, 1));
         entity.addComponent(new ManaComponent(entity, 300, 400, 10));
         entity.addComponent(new CombatComponent(entity, 20, 0.8f));
         ItemType[] inv = { ItemType.Branch };
         entity.addComponent(new InventoryComponent(entity, "images/ui/inventory2.png", inv));
         entity.addComponent(new TransformComponent(entity, x, y, 1.2f));
+//        entity.addComponent(new InputComponent(entity));
         entity.addComponent(new SpellComponent(entity, 10, 200, 1 / 3f));
         entity.addComponent(new LevelComponent(entity, 1));
         entity.addComponent(new CollisionComponent(entity));

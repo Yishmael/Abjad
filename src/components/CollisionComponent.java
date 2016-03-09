@@ -5,7 +5,7 @@ import others.Entity;
 import others.MessageChannel;
 
 public class CollisionComponent implements Component {
-    private int bit = Consts.COLLISION;
+    private int id = Consts.COLLISION;
     private Entity self;
 
     public CollisionComponent(Entity self) {
@@ -14,8 +14,8 @@ public class CollisionComponent implements Component {
     }
 
     @Override
-    public int getBit() {
-        return bit;
+    public int getID() {
+        return id;
     }
 
     public void handleCollision(Entity sender, float x, float y) {

@@ -8,7 +8,7 @@ import javax.imageio.ImageIO;
 
 import enums.TileType;
 
-public class MapGen {
+public class MapGenerator {
 
     private BufferedImage dirtImage, grassImage, stoneImage, currentImage, image;
     private String basePath = "D:/Items/Apps/eclipse/workspace/abjad/src/images/";

@@ -1,6 +1,8 @@
 package components;
 
 import org.lwjgl.Sys;
+import org.newdawn.slick.SlickException;
+import org.newdawn.slick.Sound;
 
 import enums.SpellType;
 import others.Consts;
@@ -8,31 +10,37 @@ import others.Entity;
 import others.MessageChannel;
 
 public class SpellComponent implements Component {
-    private int bit = Consts.SPELL;
+    private int id = Consts.SPELL;
     private float manaCost, damage, healing, cooldown, lastMana = 0;
+    private float damageMul = 1, healingMul = 1;
     private Entity self;
     private long lastTime = 0;
     private long now = 0;
     private SpellType currentSpell = SpellType.values()[0];
+    private Sound sounds[] = new Sound[2];
 
-    public SpellComponent(Entity self, float manaCost, float damage, float cooldown) {
+    public SpellComponent(Entity self, float manaCost, float damage, float cooldown) throws SlickException {
         this.self = self;
         this.manaCost = manaCost;
         this.damage = damage;
         this.cooldown = cooldown;
+        sounds[0] = new Sound(currentSpell.getSoundPath());
+        sounds[1] = new Sound(currentSpell.getDeathSoundPath());
     }
 
-    public SpellComponent(Entity self) {
+    public SpellComponent(Entity self) throws SlickException {
         this.self = self;
-        this.damage = currentSpell.getDamage();
+        this.damage = currentSpell.getDamage() * damageMul;
+        this.healing = currentSpell.getHealing() * healingMul;
         this.cooldown = currentSpell.getCooldown();
         this.manaCost = currentSpell.getManaCost();
-        this.healing = currentSpell.getHealing();
+        sounds[0] = new Sound(currentSpell.getSoundPath());
+        sounds[1] = new Sound(currentSpell.getDeathSoundPath());
     }
 
     @Override
-    public int getBit() {
-        return bit;
+    public int getID() {
+        return id;
     }
 
     public SpellType getCurrentSpell() {
@@ -73,10 +81,10 @@ public class SpellComponent implements Component {
         if (str.matches("next spell")) {
             currentSpell = SpellType.values()[(currentSpell.ordinal() + 1) % (SpellType.values().length - 1)];
             System.out.println(currentSpell.toString());
-            damage = currentSpell.getDamage();
+            damage = currentSpell.getDamage() * damageMul;
+            healing = currentSpell.getHealing() * healingMul;
             cooldown = currentSpell.getCooldown();
             manaCost = currentSpell.getManaCost();
-            healing = currentSpell.getHealing();
             return;
         }
         if (str.matches("updateMP [0-9]+[.]?[0-9]* [0-9]+[.]?[0-9]*")) {
@@ -85,10 +93,30 @@ public class SpellComponent implements Component {
             lastMana = Float.parseFloat(list[0]);
             return;
         }
+        if (str.matches("SP [-]?[0-9]+[.]?[0-9]*")) {
+            str = str.substring(3);
+            float temp = Float.parseFloat(str);
+            // make it give bonus based on base value?
+            damageMul *= 1 + temp / 100f;
+            healingMul *= 1 + temp / 100f;
+        }
     }
 
     @Override
     public void update() {
 
     }
+
+    public float getManaCost() {
+        return manaCost;
+    }
+
+    public float getDamage() {
+        return damage * damageMul;
+    }
+
+    public float getHealing() {
+        return healing * healingMul;
+    }
+
 }

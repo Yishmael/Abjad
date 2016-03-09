@@ -6,8 +6,8 @@ import others.MainGame;
 import others.MessageChannel;
 
 public class MovementComponent implements Component {
-    private int bit = Consts.MOVEMENT;
-    private float speed;
+    private int id = Consts.MOVEMENT;
+    private float speed, speelMul = 1;
     private Entity self;
     private boolean canMove = true;
 
@@ -16,18 +16,13 @@ public class MovementComponent implements Component {
         this.speed = speed;
     }
 
-    @Override
-    public int getBit() {
-        return bit;
-    }
-
     public void move(float x, float y) {
         // ((TransformComponent)self.getComponent(Consts.TRANSFORM)).move(MainGame.dt
         // / 1000f * x * speed * Consts.TILE_SIZE, MainGame.dt / 1000f * y *
         // speed * Consts.TILE_SIZE);
         // ((SpriteComponent)self.getComponent(Consts.SPRITE)).animateWalk();
-        self.broadcast("move " + MainGame.dt / 1000f * x * speed * Consts.TILE_SIZE + " "
-                + MainGame.dt / 1000f * y * speed * Consts.TILE_SIZE);
+        self.broadcast("move " + MainGame.dt / 1000f * x * getSpeed() * Consts.TILE_SIZE + " "
+                + MainGame.dt / 1000f * y * getSpeed() * Consts.TILE_SIZE);
         self.broadcast("animate Walk");
     }
 
@@ -55,14 +50,30 @@ public class MovementComponent implements Component {
         }
         if (str.matches("died")) {
             canMove = false;
+            return;
         }
         if (str.matches("ressed")) {
             canMove = true;
+            return;
         }
+        if (str.matches("MS [-]?[0-9]+[.]?[0-9]*")) {
+            str = str.substring(3);
+            float temp = Float.parseFloat(str);
+            speelMul += temp / 100f;
+            return;
+        }
+    }
+
+    public float getSpeed() {
+        return speed * speelMul;
     }
 
     @Override
     public void update() {
+    }
 
+    @Override
+    public int getID() {
+        return id;
     }
 }

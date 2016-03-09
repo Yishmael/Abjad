@@ -5,7 +5,7 @@ import others.Entity;
 import others.MessageChannel;
 
 public class AttributesComponent implements Component {
-    private int bit = Consts.ATTRIBUTES;
+    private int id = Consts.ATTRIBUTES;
     private float strength, agility, intelligence;
     private int available;
     private Entity self;
@@ -106,7 +106,7 @@ public class AttributesComponent implements Component {
     }
 
     @Override
-    public int getBit() {
-        return bit;
+    public int getID() {
+        return id;
     }
 }

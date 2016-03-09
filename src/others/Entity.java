@@ -6,7 +6,7 @@ import components.Component;
 
 public class Entity {
     private ArrayList<Component> comps = new ArrayList<Component>();
-    private long id = 0l;
+    private int id = 0x00000000;
     private String name;
 
     public Entity(String name) {
@@ -15,12 +15,12 @@ public class Entity {
 
     public void addComponent(Component comp) {
         comps.add(comp);
-        broadcast("added " + comp.getBit());
-        id = id | (long) Math.pow(2, comp.getBit());
+        broadcast("added " + comp.getID());
+        id = id | comp.getID();
     }
 
     public void broadcast(String command) {
-//         System.out.println(command);
+        // System.out.println(command);
         if (command == null) {
             return;
         }
@@ -32,7 +32,7 @@ public class Entity {
     // TODO make components pass lists of commands for more complex actions
     public void broadcast(String[] commands) {
         // System.out.println(commands);
-        if (commands == null) {
+        if (commands == null || commands.length == 0) {
             return;
         }
         for (String command: commands) {
@@ -52,10 +52,10 @@ public class Entity {
         }
     }
 
-    public Component getComponent(int bit) {
+    public Component getComponent(int id) {
         // System.out.println(bit);
         for (Component comp: comps) {
-            if (comp.getBit() == bit)
+            if (comp.getID() == id)
                 return comp;
         }
         return null;
@@ -69,15 +69,15 @@ public class Entity {
         return name;
     }
 
-    public boolean hasComponent(int bit) {
-        return id == (id | (long) Math.pow(2, bit));
+    public boolean hasComponent(int id) {
+        return this.id == (this.id | id);
     }
 
-    public void removeComponent(int bit) {
-        if (this.hasComponent(bit)) {
-            comps.remove(bit);
-            broadcast("removed " + bit);
-            id ^= bit;
+    public void removeComponent(int id) {
+        if (this.hasComponent(id)) {
+            comps.remove(getComponent(id));
+            broadcast("removed " + id);
+            this.id &= ~id;
         }
     }
 }

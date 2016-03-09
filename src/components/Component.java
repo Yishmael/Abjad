@@ -3,7 +3,7 @@ package components;
 import others.MessageChannel;
 
 public interface Component {
-    public abstract int getBit();
+    public abstract int getID();
 
     public abstract void process(MessageChannel channel);
 
