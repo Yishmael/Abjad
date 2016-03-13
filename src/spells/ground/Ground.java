@@ -6,13 +6,14 @@ import org.newdawn.slick.geom.Vector2f;
 import spells.Spell;
 
 public abstract class Ground extends Spell {
+    protected float duration;
 
-    public Ground(Image image, String creator, Vector2f position, Vector2f facing, float areaOfEffect) {
-        super(image,creator, position, facing, areaOfEffect);
-        this.areaOfEffect = areaOfEffect;
+    public Ground(Image image, String creator, Vector2f position, float angle, float areaOfEffect, float duration) {
+        super(image, creator, position, angle, areaOfEffect);
+        this.duration = duration;
     }
 
-    public void update() {
-        super.update();
+    public float getDuration() {
+        return duration;
     }
 }

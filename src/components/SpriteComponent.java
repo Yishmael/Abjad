@@ -27,7 +27,7 @@ public class SpriteComponent implements Component {
     private Animation castAnimation = null;
     private boolean casting = false;
     private int duration = 0;
-    private float width, height;
+    private float imageWidth, imageHeight;
     private Graphics gT, gHP, gMP;
     private Entity self;
     private float lastX = 0;
@@ -42,23 +42,23 @@ public class SpriteComponent implements Component {
     private float lastMaxMana = 0;
     private Text font = new Text("fonts/verdana.ttf", java.awt.Color.white);
 
-    public SpriteComponent(Entity self, String imagePath, float width, float height) throws SlickException {
+    public SpriteComponent(Entity self, String imagePath, float imageWidth, float imageHeight) throws SlickException {
         image = new Image(imagePath);
         this.self = self;
-        this.width = width;
-        this.height = height;
+        this.imageWidth = imageWidth;
+        this.imageHeight = imageHeight;
         gT = new Graphics();
         gHP = new Graphics();
         gMP = new Graphics();
     }
 
-    public SpriteComponent(Entity self, SpriteSheet sheet, int duration, boolean pingPong, float width, float height)
-            throws SlickException {
+    public SpriteComponent(Entity self, SpriteSheet sheet, int duration, boolean pingPong, float imageWidth,
+            float imageHeight) throws SlickException {
         this.self = self;
         this.sheet = sheet;
         image = sheet.getSubImage(0, 0);
-        this.width = width;
-        this.height = height;
+        this.imageWidth = imageWidth;
+        this.imageHeight = imageHeight;
         this.duration = duration;
         standAnimation = new Animation();
         for (int i = 0; i < sheet.getHorizontalCount(); i++) {
@@ -109,35 +109,37 @@ public class SpriteComponent implements Component {
         }
     }
 
+    // TODO optimize it
     @SuppressWarnings("deprecation")
     public void draw() {
         // add rotation
         image.setCenterOfRotation(lastScale * image.getWidth() / 2, lastScale * image.getHeight() / 2);
         if (lastHealth == 0 && lastMaxHealth > 0) {
-            gT.drawImage(image, lastX, lastY, lastX + width * lastScale, lastY + height * lastScale, 0, 0,
+            gT.drawImage(image, lastX, lastY, lastX + imageWidth * lastScale, lastY + imageHeight * lastScale, 0, 0,
                     image.getWidth(), image.getHeight());
         } else if (sheet != null) {
             if (standing) {
                 standAnimation.getCurrentFrame().getFlippedCopy(facing.getX() == -1, false).draw(lastX, lastY,
-                        width * lastScale, height * lastScale);
+                        imageWidth * lastScale, imageHeight * lastScale);
                 standAnimation.updateNoDraw();
             }
         } else {
-            gT.drawImage(image, lastX, lastY, lastX + width * lastScale, lastY + height * lastScale, 0, 0,
+            gT.drawImage(image, lastX, lastY, lastX + imageWidth * lastScale, lastY + imageHeight * lastScale, 0, 0,
                     image.getWidth(), image.getHeight());
         }
         if (hasHealth) {
-            gHP.drawRect(lastX, lastY - 31, lastScale * width, 10);
-            gHP.fillRect(lastX, lastY - 31, lastScale * width * lastHealth / lastMaxHealth, 10);
+            gHP.drawRect(lastX, lastY - 31, lastScale * imageWidth, 10);
+            gHP.fillRect(lastX, lastY - 31, lastScale * imageWidth * lastHealth / lastMaxHealth, 10);
             gHP.setColor(new Color((int) (((1.0f - lastHealth / lastMaxHealth) * 255) % 255),
                     (int) ((lastHealth / lastMaxHealth) * 255), 122));
-            font.draw(lastX + lastScale * width / 2 - 20, lastY - 31, (long) lastHealth + "/" + (long) lastMaxHealth);
+            font.draw(lastX + lastScale * imageWidth / 2 - 20, lastY - 31,
+                    (long) lastHealth + "/" + (long) lastMaxHealth);
         }
         if (hasMana) {
-            gMP.drawRect(lastX, lastY - 20, lastScale * width, 10);
-            gMP.fillRect(lastX, lastY - 20, lastScale * width * lastMana / lastMaxMana, 10);
+            gMP.drawRect(lastX, lastY - 20, lastScale * imageWidth, 10);
+            gMP.fillRect(lastX, lastY - 20, lastScale * imageWidth * lastMana / lastMaxMana, 10);
             gMP.setColor(Color.blue);
-            font.draw(lastX + lastScale * width / 2 - 20, lastY - 20, (long) lastMana + "/" + (long) lastMaxMana);
+            font.draw(lastX + lastScale * imageWidth / 2 - 20, lastY - 20, (long) lastMana + "/" + (long) lastMaxMana);
         }
 
         if (sheet != null) {
@@ -145,8 +147,8 @@ public class SpriteComponent implements Component {
                 walking = false;
                 standing = false;
                 casting = false;
-                attackAnimation.getCurrentFrame().getFlippedCopy(facing.getX() == -1, false).draw(lastX, lastY, width,
-                        height);
+                attackAnimation.getCurrentFrame().getFlippedCopy(facing.getX() == -1, false).draw(lastX, lastY,
+                        imageWidth, imageHeight);
                 attackAnimation.updateNoDraw();
                 if (attackAnimation.getFrame() == attackAnimation.getFrameCount() - 1) {
                     attacking = false;
@@ -155,8 +157,8 @@ public class SpriteComponent implements Component {
                 attacking = false;
                 standing = false;
                 walking = false;
-                castAnimation.getCurrentFrame().getFlippedCopy(facing.getX() == -1, false).draw(lastX, lastY, width,
-                        height);
+                castAnimation.getCurrentFrame().getFlippedCopy(facing.getX() == -1, false).draw(lastX, lastY,
+                        imageWidth, imageHeight);
                 castAnimation.updateNoDraw();
                 if (castAnimation.getFrame() == castAnimation.getFrameCount() - 1) {
                     casting = false;
@@ -165,8 +167,8 @@ public class SpriteComponent implements Component {
                 attacking = false;
                 standing = false;
                 casting = false;
-                walkAnimation.getCurrentFrame().getFlippedCopy(facing.getX() == -1, false).draw(lastX, lastY, width,
-                        height);
+                walkAnimation.getCurrentFrame().getFlippedCopy(facing.getX() == -1, false).draw(lastX, lastY,
+                        imageWidth, imageHeight);
                 walkAnimation.updateNoDraw();
                 if (walkAnimation.getFrame() == walkAnimation.getFrameCount() - 1) {
                     walking = false;
@@ -222,8 +224,6 @@ public class SpriteComponent implements Component {
             return;
         }
         if (str.matches("added " + Consts.TRANSFORM)) {
-            self.broadcast("width " + width);
-            self.broadcast("height " + height);
             self.broadcast("requestPos");
             return;
         }
@@ -296,7 +296,6 @@ public class SpriteComponent implements Component {
 
     @Override
     public void update() {
-        draw();
     }
 
     public void updateHP(float health, float maxHealth) {

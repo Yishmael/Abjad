@@ -13,24 +13,13 @@ public class CombatComponent implements Component {
     private int id = Consts.COMBAT;
     private float cooldown, damage, defense;
     private float damageMul = 1, cooldownMul = 1, critChance = 0, cleaveRadius = 0;
+    private int rangeAdder;
     private float lifesteal = 0;
     private Entity self;
     private long lastTime = 0;
     private long now = 0;
     private boolean canAttack = true;
     private Sound sound;
-
-    public CombatComponent(Entity self, float damage, float defense, float cooldown) {
-        this.self = self;
-        this.damage = damage;
-        this.defense = defense;
-        this.cooldown = cooldown;
-        try {
-            sound = new Sound("sounds/032.ogg");
-        } catch (SlickException e) {
-            e.printStackTrace();
-        }
-    }
 
     public CombatComponent(Entity self, float damage, float cooldown) {
         this.self = self;
@@ -54,11 +43,8 @@ public class CombatComponent implements Component {
         }
     }
 
-    public CombatComponent(Entity self, float defense) {
-        this.self = self;
-        this.damage = 0;
-        this.defense = defense;
-        this.cooldown = 0;
+    public boolean isReady() {
+        return (Sys.getTime() * 1000) / Sys.getTimerResolution() - lastTime >= 1000 * getCooldown();
     }
 
     public String attack() {
@@ -74,8 +60,7 @@ public class CombatComponent implements Component {
                 if (critMul == 2) {
                     System.out.println("Critical hit!");
                 }
-                // System.out.println("Attacked with " + (int)diced + "
-                // damage!");
+                System.out.println("Attacked with " + diced + " damage!");
                 sound.play();
                 return "damage " + diced;
             }
@@ -90,6 +75,10 @@ public class CombatComponent implements Component {
 
     public float getCleaveRadius() {
         return cleaveRadius;
+    }
+
+    public float getRangeAdder() {
+        return rangeAdder;
     }
 
     @Override
@@ -117,36 +106,59 @@ public class CombatComponent implements Component {
             damage = temp.getDamage() * damageMul;
             defense = temp.getDefense();
             cooldown = temp.getCooldown() * cooldownMul;
+            rangeAdder = temp.getRangeAdder();
             System.out.println(temp.toString());
             return;
         }
         if (str.matches("died")) {
             canAttack = false;
+            return;
         }
-        if (str.matches("AS [-]?[0-9]+[.]?[0-9]*")) {
-            str = str.substring(3);
+        if (str.matches("ressed")) {
+            canAttack = true;
+            return;
+        }
+        if (str.matches("AS [-]?[0-9]+[.]?[0-9]*[%]")) {
+            str = str.substring(3, str.indexOf('%'));
             float temp = Float.parseFloat(str);
             cooldownMul *= 1 - temp / 100f;
+            return;
+        }
+        if (str.matches("DMG [-]?[0-9]+[.]?[0-9]*[%]")) {
+            str = str.substring(4, str.indexOf('%'));
+            float temp = Float.parseFloat(str);
+            damageMul *= 1 + temp / 100f;
+            return;
         }
         if (str.matches("DMG [-]?[0-9]+[.]?[0-9]*")) {
             str = str.substring(4);
             float temp = Float.parseFloat(str);
-            damageMul *= 1 + temp / 100f;
+            damage += temp;
+            return;
         }
-        if (str.matches("CRT [-]?[0-9]+[.]?[0-9]*")) {
-            str = str.substring(4);
+        if (str.matches("CRT [-]?[0-9]+[.]?[0-9]*[%]")) {
+            str = str.substring(4, str.indexOf('%'));
             float temp = Float.parseFloat(str);
             critChance += temp / 100f;
+            return;
         }
-        if (str.matches("LS [-]?[0-9]+[.]?[0-9]*")) {
-            str = str.substring(3);
+        if (str.matches("LS [-]?[0-9]+[.]?[0-9]*[%]")) {
+            str = str.substring(3, str.indexOf('%'));
             float temp = Float.parseFloat(str);
             lifesteal += temp / 100f;
+            return;
         }
-        if (str.matches("CLV [-]?[0-9]+[.]?[0-9]*")) {
-            str = str.substring(4);
+        if (str.matches("CLV [-]?[0-9]+[.]?[0-9]*[%]")) {
+            str = str.substring(4, str.indexOf('%'));
             float temp = Float.parseFloat(str);
             cleaveRadius += temp;
+            return;
+        }
+        if (str.matches("CD [-]?[0-9]+[.]?[0-9]*[%]")) {
+            str = str.substring(3, str.indexOf('%'));
+            float temp = Float.parseFloat(str);
+            cooldownMul = 1 - temp / 100;
+            return;
         }
 
     }

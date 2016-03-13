@@ -4,6 +4,7 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SlickException;
+import org.newdawn.slick.geom.Circle;
 
 import enums.ItemType;
 import others.Consts;
@@ -13,6 +14,7 @@ import others.MessageChannel;
 public class InventoryComponent implements Component {
     private int id = Consts.INVENTORY;
     private Image image;
+    private Image[] itemImages;
     private float width, height;
     private Graphics g;
     private boolean shown = false;
@@ -34,6 +36,10 @@ public class InventoryComponent implements Component {
             items[i] = ItemType.Null;
         }
         g = new Graphics();
+        itemImages = new Image[ItemType.values().length];
+        for (int i = 0; i < itemImages.length; i++) {
+            itemImages[i] = new Image(ItemType.values()[i].getImagePath());
+        }
     }
 
     public InventoryComponent(Entity self, String imagePath) throws SlickException {
@@ -46,6 +52,30 @@ public class InventoryComponent implements Component {
             items[i] = ItemType.Null;
         }
         g = new Graphics();
+        itemImages = new Image[ItemType.values().length];
+        for (int i = 0; i < itemImages.length; i++) {
+            itemImages[i] = new Image(ItemType.values()[i].getImagePath());
+        }
+    }
+
+    public void addItem(ItemType item) {
+        if (getItemsCount() < 30) {
+            for (int i = 0; i < items.length; i++) {
+                if (items[i] == ItemType.Null) {
+                    items[i] = item;
+                    break;
+                }
+            }
+        }
+    }
+
+    public boolean hasItem(ItemType item) {
+        for (ItemType i: items) {
+            if (item == i) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public int getItemsCount() {
@@ -76,7 +106,7 @@ public class InventoryComponent implements Component {
             return;
         }
         if (str.matches("invOff")) {
-            shown = false;
+            // shown = false;
             return;
         }
         if (str.matches("next item")) {
@@ -98,6 +128,10 @@ public class InventoryComponent implements Component {
 
     @Override
     public void update() {
+
+    }
+
+    public void draw() {
         if (shown) {
             g.drawImage(image, 0, Consts.SCREEN_HEIGHT * 0.7f, Consts.SCREEN_WIDTH * 0.6f, Consts.SCREEN_HEIGHT, 0, 0,
                     width, height, new Color(255, 150, 150, 150));
@@ -106,15 +140,12 @@ public class InventoryComponent implements Component {
                     j++;
                 }
                 if (items[i] != ItemType.Null) {
-                    try {
-                        g.drawImage(new Image(items[i].getImagePath()), 64 * (i - 10 * j), 320 + 64 * j);
-                    } catch (SlickException e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                    g.drawImage(itemImages[items[i].ordinal()], 64 * (i - 10 * j), 320 + 64 * j);
+                    if (i == currentIndex) {
+                        g.draw(new Circle(64 * (i - 10 * j) + 25, 320 + 64 * j + 25, 25));
                     }
                 }
             }
         }
     }
-
 }

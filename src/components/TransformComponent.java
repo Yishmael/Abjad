@@ -3,7 +3,6 @@ package components;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.geom.Ellipse;
-import org.newdawn.slick.geom.Vector2f;
 
 import others.Consts;
 import others.Entity;
@@ -11,37 +10,32 @@ import others.MessageChannel;
 
 public class TransformComponent implements Component {
     private int id = Consts.TRANSFORM;
-    private float x, y, rotation, scale;
+    private float x, y, rotation, scale = 1;
     private Entity self;
     private float width, height, radius;
     private Ellipse ellipse = new Ellipse(0, 0, 0, 0);
     private Graphics g = new Graphics();
 
-    public TransformComponent(Entity self, float x, float y, float rotation, float scale) throws SlickException {
+    public TransformComponent(Entity self, float x, float y, float width, float height) throws SlickException {
         this.self = self;
         this.x = x;
         this.y = y;
-        this.rotation = rotation;
-        this.scale = scale;
+        this.width = width;
+        this.height = height;
         ellipse.setLocation(x, y);
+        setRadii();
     }
 
-    public TransformComponent(Entity self, float x, float y) throws SlickException {
+    public TransformComponent(Entity self, float x, float y, float width, float height, float scale)
+            throws SlickException {
         this.self = self;
         this.x = x;
         this.y = y;
-        this.rotation = 0;
-        this.scale = 1;
-        ellipse.setLocation(x, y);
-    }
-
-    public TransformComponent(Entity self, float x, float y, float scale) throws SlickException {
-        this.self = self;
-        this.x = x;
-        this.y = y;
-        this.rotation = 0;
+        this.width = width;
+        this.height = height;
         this.scale = scale;
         ellipse.setLocation(x, y);
+        setRadii();
     }
 
     @Override
@@ -54,19 +48,15 @@ public class TransformComponent implements Component {
     }
 
     public float getCenterX() {
-        return x + width / 2;
+        return ellipse.getCenterX();
     }
 
     public float getCenterY() {
-        return y + height / 2;
+        return ellipse.getCenterY();
     }
 
     public float getY() {
         return y;
-    }
-
-    public Vector2f getPoint() {
-        return new Vector2f(x, y);
     }
 
     public void move(float dx, float dy) {
@@ -79,9 +69,13 @@ public class TransformComponent implements Component {
         }
 
         ellipse.setLocation(x, y);
-        g.draw(ellipse);
         // System.out.println("Moved by " + x + ":" + y);
         brdcst();
+    }
+
+    // temp
+    public void draw() {
+        g.draw(ellipse);
     }
 
     @Override
@@ -120,19 +114,9 @@ public class TransformComponent implements Component {
             brdcst();
             return;
         }
-        if (str.matches("width [0-9]+[.]?[0-9]*")) {
-            width = Float.parseFloat(str.substring(6));
-            setEllipse();
-            return;
-        }
-        if (str.matches("height [0-9]+[.]?[0-9]*")) {
-            height = Float.parseFloat(str.substring(6));
-            setEllipse();
-            return;
-        }
     }
 
-    private void setEllipse() {
+    private void setRadii() {
         ellipse.setRadii(scale * width / 2, scale * height / 2);
         radius = (ellipse.getRadius1() + ellipse.getRadius2()) / 2;
     }

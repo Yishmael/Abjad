@@ -1,5 +1,7 @@
 package components;
 
+import org.lwjgl.Sys;
+
 import others.Consts;
 import others.Entity;
 import others.MainGame;
@@ -11,6 +13,7 @@ public class HealthComponent implements Component {
     private boolean alive;
     private Entity self;
     private float dt;
+    private long timeOfDeath;
 
     public HealthComponent(Entity self, float health, float baseMaxHealth, float healthRegen) {
         this.self = self;
@@ -25,7 +28,16 @@ public class HealthComponent implements Component {
         this.self = self;
         this.health = Math.min(health, baseMaxHealth);
         this.maxHealth = baseMaxHealth;
+        this.baseMaxHealth = baseMaxHealth;
+        this.healthRegen = 0;
+        this.alive = health > 0;
+    }
+
+    public HealthComponent(Entity self, float baseMaxHealth) {
+        this.self = self;
+        this.health = baseMaxHealth;
         this.maxHealth = baseMaxHealth;
+        this.baseMaxHealth = baseMaxHealth;
         this.healthRegen = 0;
         this.alive = health > 0;
     }
@@ -79,6 +91,10 @@ public class HealthComponent implements Component {
         return alive;
     }
 
+    public long getTimeOfDeath() {
+        return timeOfDeath;
+    }
+
     @Override
     public void process(MessageChannel channel) {
         if (channel.getSender() == null) {
@@ -116,6 +132,22 @@ public class HealthComponent implements Component {
             self.broadcast("updateHP " + health + " " + maxHealth);
             return;
         }
+        if (str.matches("HPcap [-]?[0-9]+[.]?[0-9]*")) {
+            str = str.substring(6);
+            percentage = health / maxHealth;
+            maxHealth = Math.min(999, maxHealth + Float.parseFloat(str));
+            health = percentage * maxHealth;
+            self.broadcast("updateHP " + health + " " + maxHealth);
+            return;
+        }
+        if (str.matches("ress")) {
+            if (!alive) {
+                health = maxHealth / 2;
+                alive = true;
+                self.broadcast("updateHP " + health + " " + maxHealth);
+                self.broadcast("ressed");
+            }
+        }
     }
 
     @Override
@@ -134,6 +166,7 @@ public class HealthComponent implements Component {
         } else {
             if (alive) {
                 alive = false;
+                timeOfDeath = (Sys.getTime() * 1000) / Sys.getTimerResolution();
                 self.broadcast("died");
             }
         }

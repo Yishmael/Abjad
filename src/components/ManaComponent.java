@@ -22,7 +22,7 @@ public class ManaComponent implements Component {
 
     public ManaComponent(Entity self, float mana, float baseMaxMana) {
         this.self = self;
-        this.mana = Math.min(mana, maxMana);
+        this.mana = Math.min(mana, baseMaxMana);
         this.baseMaxMana = baseMaxMana;
         this.maxMana = baseMaxMana;
         this.manaRegen = 0;
@@ -81,6 +81,12 @@ public class ManaComponent implements Component {
             // System.out.println("Mana on death: " + manaOnDeath);
             return;
         }
+        if (str.matches("ressed")) {
+            manaOnDeath = 0;
+            canRegen = true;
+            // System.out.println("Mana on death: " + manaOnDeath);
+            return;
+        }
         if (str.matches("requestMP")) {
             self.broadcast("updateMP " + mana + " " + maxMana);
             return;
@@ -98,7 +104,6 @@ public class ManaComponent implements Component {
         if (str.matches("MPregen [-]?[0-9]+[.]?[0-9]*")) {
             str = str.substring(8);
             manaRegen += Float.parseFloat(str);
-            self.broadcast("updateMP " + mana + " " + maxMana);
             return;
         }
         if (str.matches("MPcap [-]?[0-9]+[.]?[0-9]*")) {

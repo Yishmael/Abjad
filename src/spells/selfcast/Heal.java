@@ -5,27 +5,21 @@ import org.newdawn.slick.geom.Vector2f;
 
 public class Heal extends Selfcast {
     public float healing;
-    public boolean finished = false;
 
-    public Heal(Image image, String creator, Vector2f position, Vector2f facing, float healing, float areaOfEffect) {
-        super(image, creator, position, facing, areaOfEffect);
+    public Heal(Image image, String creator, Vector2f position, float angle, float healing, float areaOfEffect) {
+        super(image, creator, position, angle, areaOfEffect);
         this.healing = healing;
     }
 
     @Override
     public String getMessage() {
-        trigger();
+        finished = true;
         return "heal " + healing;
     }
 
     @Override
-    public boolean finished() {
-        return finished;
-    }
-
-    @Override
     public void trigger() {
-        finished = true; 
+        finished = true;
     }
 
 }

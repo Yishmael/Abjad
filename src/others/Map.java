@@ -63,21 +63,25 @@ public class Map {
             offsetVector.y += y;
         }
 
-        // minimap is a square!
         g.drawImage(mapImage, offsetVector.getX(), offsetVector.getY());
-        g.drawImage(mapImage, Consts.SCREEN_WIDTH - 155, Consts.SCREEN_WIDTH - 610, Consts.SCREEN_WIDTH - 5,
-                Consts.SCREEN_HEIGHT - 330, -offsetVector.getX() - Consts.TILE_SIZE * zoom,
-                -offsetVector.getY() - Consts.TILE_SIZE * zoom,
+
+        // minimap is a square, but the screen might not be!
+        g.drawImage(mapImage, Consts.SCREEN_WIDTH - 155, 30, Consts.SCREEN_WIDTH - 5, 180,
+                -offsetVector.getX() - Consts.TILE_SIZE * zoom, -offsetVector.getY() - Consts.TILE_SIZE * zoom,
                 -offsetVector.getX() + Consts.TILE_SIZE * 10 + Consts.TILE_SIZE * zoom,
                 -offsetVector.getY() + Consts.TILE_SIZE * 10 + Consts.TILE_SIZE * zoom, new Color(255, 255, 255, 200));
-        g.drawString("x", Consts.SCREEN_WIDTH - 80, Consts.SCREEN_HEIGHT - 415);
+        g.drawString("x", Consts.SCREEN_WIDTH - 80, 105);
     }
 
     public void zoomIn() {
         zoom = Math.max(zoom - 1, -2);
     }
-    
+
     public void zoomOut() {
         zoom = Math.min(zoom + 1, 3);
+    }
+    
+    public Vector2f getOffset() {
+        return offsetVector;
     }
 }

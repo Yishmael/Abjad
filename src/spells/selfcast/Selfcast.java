@@ -7,12 +7,7 @@ import spells.Spell;
 
 public abstract class Selfcast extends Spell {
 
-    public Selfcast(Image image, String creator, Vector2f position, Vector2f facing, float areaOfEffect) {
-        super(image, creator, position, facing, areaOfEffect);
+    public Selfcast(Image image, String creator, Vector2f position, float angle, float areaOfEffect) {
+        super(image, creator, position, angle, areaOfEffect);
     }
-
-    public void update() {
-        super.update();
-    }
-
 }
