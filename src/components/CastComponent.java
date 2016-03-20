@@ -11,7 +11,7 @@ import others.Consts;
 import others.Entity;
 import others.MessageChannel;
 
-public class SpellComponent implements Component {
+public class CastComponent implements Component {
     private int id = Consts.SPELL;
     private float manaCost, damage, healing, cooldown, lastMana;
     private boolean canCast = true;
@@ -21,8 +21,9 @@ public class SpellComponent implements Component {
     private SpellType currentSpell = SpellType.Null;
     private Sound sounds[] = new Sound[2];
     private ArrayList<SpellType> spells = new ArrayList<SpellType>();
+    private String damageType;
 
-    public SpellComponent(Entity self, SpellType[] spells) throws SlickException {
+    public CastComponent(Entity self, SpellType[] spells) throws SlickException {
         this.self = self;
         if (spells != null && spells.length > 0) {
             for (SpellType spell: spells) {
@@ -37,6 +38,7 @@ public class SpellComponent implements Component {
             healing = currentSpell.getHealing() * healingMul;
             cooldown = currentSpell.getCooldown();
             manaCost = currentSpell.getManaCost();
+            damageType = currentSpell.getDamageType();
             sounds[0] = new Sound(currentSpell.getSoundPath());
             sounds[1] = new Sound(currentSpell.getDeathSoundPath());
         }
@@ -86,8 +88,8 @@ public class SpellComponent implements Component {
                     if (healing > 0) {
                         // self.broadcast("heal " + healing);
                     }
-                    self.broadcast("animate " + currentSpell.getName());
-                    return "damage " + damage;
+                    self.broadcast("animate " + currentSpell);
+                    return damageType + "dmg " + damage;
                 } else {
                     System.out.println(
                             "Need " + (int) (manaCost - lastMana) + " more mana for " + currentSpell.getName());
@@ -110,6 +112,19 @@ public class SpellComponent implements Component {
                 healing = currentSpell.getHealing() * healingMul;
                 cooldown = currentSpell.getCooldown();
                 manaCost = currentSpell.getManaCost();
+                damageType = currentSpell.getDamageType();
+            }
+            return;
+        }
+        if (str.matches("prev spell")) {
+            if (spells.size() > 0) {
+                currentSpell = spells.get(((spells.indexOf(currentSpell) - 1) + spells.size()) % spells.size());
+                System.out.println(currentSpell.toString());
+                damage = currentSpell.getDamage() * damageMul;
+                healing = currentSpell.getHealing() * healingMul;
+                cooldown = currentSpell.getCooldown();
+                manaCost = currentSpell.getManaCost();
+                damageType = currentSpell.getDamageType();
             }
             return;
         }
@@ -134,6 +149,16 @@ public class SpellComponent implements Component {
             canCast = true;
             return;
         }
+        if (str.matches("learn [0-9]+")) {
+            str = str.substring(6);
+            int temp = Integer.parseInt(str);
+            SpellType newSpell = SpellType.values()[temp];
+            if (newSpell != SpellType.Null) {
+                if (!hasSpell(newSpell)) {
+                    spells.add(newSpell);
+                }
+            }
+        }
     }
 
     @Override
@@ -147,6 +172,9 @@ public class SpellComponent implements Component {
 
     public float getDamage() {
         return damage * damageMul;
+    }
+    public String getDamageType() {
+        return damageType;
     }
 
     public float getHealing() {

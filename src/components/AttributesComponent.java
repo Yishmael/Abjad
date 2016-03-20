@@ -6,11 +6,11 @@ import others.MessageChannel;
 
 public class AttributesComponent implements Component {
     private int id = Consts.ATTRIBUTES;
-    private float strength, agility, intelligence;
+    private int strength, agility, intelligence;
     private int available;
     private Entity self;
 
-    public AttributesComponent(Entity self, float strength, float agility, float intelligence) {
+    public AttributesComponent(Entity self, int strength, int agility, int intelligence) {
         this.self = self;
         this.strength = strength;
         this.agility = agility;
@@ -20,8 +20,6 @@ public class AttributesComponent implements Component {
 
     @Override
     public void process(MessageChannel channel) {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
@@ -33,7 +31,9 @@ public class AttributesComponent implements Component {
             strength++;
             agility++;
             intelligence++;
-            brdcst();
+            self.broadcast("STR 1");
+            self.broadcast("AGI 1");
+            self.broadcast("INT 1");
             return;
         }
         if (available > 0) {
@@ -41,7 +41,7 @@ public class AttributesComponent implements Component {
                 if (strength < 100) {
                     strength++;
                     available--;
-                    brdcst();
+                    self.broadcast("STR 1");
                 }
                 return;
             }
@@ -49,7 +49,7 @@ public class AttributesComponent implements Component {
                 if (agility < 100) {
                     agility++;
                     available--;
-                    brdcst();
+                    self.broadcast("AGI 1");
                 }
                 return;
             }
@@ -57,36 +57,15 @@ public class AttributesComponent implements Component {
                 if (intelligence < 100) {
                     intelligence++;
                     available--;
-                    brdcst();
+                    self.broadcast("INT 1");
                 }
                 return;
             }
         }
-        if (str.matches("STR[+]5")) {
-            if (strength < 100) {
-                strength += 5;
-                brdcst();
-            }
-            return;
-        }
-        if (str.matches("AGI[+]5")) {
-            if (agility < 100) {
-                agility += 5;
-                brdcst();
-            }
-            return;
-        }
-        if (str.matches("INT[+]5")) {
-            if (intelligence < 100) {
-                intelligence += 5;
-                brdcst();
-            }
-            return;
-        }
     }
 
-    private void brdcst() {
-        self.broadcast("STATS " + strength + " " + agility + " " + intelligence);
+    public int getAvailablePoints() {
+        return available;
     }
 
     @Override

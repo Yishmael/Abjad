@@ -11,13 +11,12 @@ import enums.TileType;
 public class MapGenerator {
 
     private BufferedImage dirtImage, grassImage, stoneImage, currentImage, image;
-    private String basePath = "D:/Items/Apps/eclipse/workspace/abjad/src/images/";
 
     public BufferedImage generateMap(int[][] matrix) {
         try {
-            grassImage = ImageIO.read(new File(basePath + "tiles/grass.png"));
-            dirtImage = ImageIO.read(new File(basePath + "tiles/dirt.png"));
-            stoneImage = ImageIO.read(new File(basePath + "tiles/stone.png"));
+            grassImage = ImageIO.read(getClass().getResource("images/tiles/grass.png"));
+            dirtImage = ImageIO.read(getClass().getResource("images/tiles/dirt.png"));
+            stoneImage = ImageIO.read(getClass().getResource("images/tiles/stone.png"));
         } catch (Exception e) {
             // TODO: handle exception
         }
@@ -40,7 +39,7 @@ public class MapGenerator {
             }
         }
         try {
-            ImageIO.write(image, "PNG", new File(basePath + "mapgen.png"));
+            ImageIO.write(image, "PNG", new File("D:/mapgen.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }

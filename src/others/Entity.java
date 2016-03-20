@@ -14,13 +14,15 @@ public class Entity {
     }
 
     public void addComponent(Component comp) {
-        comps.add(comp);
-        broadcast("added " + comp.getID());
-        id = id | comp.getID();
+        if (!this.hasComponent(comp.getID())) {
+            comps.add(comp);
+            broadcast("added " + comp.getID());
+            id = id | comp.getID();
+        }
     }
 
     public void broadcast(String command) {
-//         System.out.println(command);
+        // System.out.println(name + ":" +command);
         if (command == null) {
             return;
         }

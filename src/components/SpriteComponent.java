@@ -47,6 +47,7 @@ public class SpriteComponent implements Component {
         this.self = self;
         this.imageWidth = imageWidth;
         this.imageHeight = imageHeight;
+        image.setCenterOfRotation(lastScale * imageWidth / 2, lastScale * imageHeight / 2);
         gT = new Graphics();
         gHP = new Graphics();
         gMP = new Graphics();
@@ -113,7 +114,7 @@ public class SpriteComponent implements Component {
     @SuppressWarnings("deprecation")
     public void draw() {
         // add rotation
-        image.setCenterOfRotation(lastScale * image.getWidth() / 2, lastScale * image.getHeight() / 2);
+        image.setRotation((float) (lastRotation * 180f / Math.PI));
         if (lastHealth == 0 && lastMaxHealth > 0) {
             gT.drawImage(image, lastX, lastY, lastX + imageWidth * lastScale, lastY + imageHeight * lastScale, 0, 0,
                     image.getWidth(), image.getHeight());
@@ -319,6 +320,10 @@ public class SpriteComponent implements Component {
 
     public void bindFacing(Vector2f facing) {
         this.facing = facing;
+    }
+
+    public Image getImage() {
+        return image;
     }
 
     @Override

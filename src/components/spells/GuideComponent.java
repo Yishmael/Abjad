@@ -9,8 +9,8 @@ import others.MessageChannel;
 
 public class GuideComponent implements MovementComponent {
     private int id = Consts.GUIDE;
-    private float speed, speelMul = 1;
     private Entity self;
+    private float speed, speelMul = 1;
     private boolean canMove = true;
     private float angle;
 

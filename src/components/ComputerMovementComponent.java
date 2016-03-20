@@ -16,6 +16,7 @@ public class ComputerMovementComponent implements MovementComponent {
         this.speed = speed;
     }
 
+    @Override
     public void move(float dx, float dy) {
         if (canMove) {
             ((TransformComponent) self.getComponent(Consts.TRANSFORM)).move(
@@ -55,21 +56,26 @@ public class ComputerMovementComponent implements MovementComponent {
         }
     }
 
+    @Override
     public float getSpeed() {
         return speed * speelMul;
     }
 
+    @Override
     public void setSpeed(float speed) {
         this.speed = speed;
     }
 
+    @Override
     public boolean canMove() {
         return canMove;
     }
 
+    @Override
     public void update() {
     }
 
+    @Override
     public int getID() {
         return id;
     }

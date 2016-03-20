@@ -4,7 +4,6 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Ellipse;
-import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.geom.Vector2f;
 
 import others.Consts;
@@ -33,7 +32,7 @@ public abstract class Spell {
 
         image.setCenterOfRotation(image.getWidth() / 2, image.getHeight() / 2);
 
-        image.rotate((float) (angle * 180f / Math.PI));
+        image.setRotation((float) (angle * 180f / Math.PI));
 
         xProj = (float) Math.cos(angle);
         yProj = (float) Math.sin(angle);
@@ -101,7 +100,7 @@ public abstract class Spell {
         return radius;
     }
 
-    public void setCreator(String targets) {
+    public void setTargets(String targets) {
         if (targets == null) {
             return;
         }
@@ -112,7 +111,7 @@ public abstract class Spell {
         return targets;
     }
 
-    public boolean finished() {
+    public boolean isFinished() {
         return finished;
     }
 

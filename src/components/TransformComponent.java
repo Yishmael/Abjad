@@ -38,6 +38,19 @@ public class TransformComponent implements Component {
         setRadii();
     }
 
+    public TransformComponent(Entity self, float x, float y, float width, float height, float scale, float rotation)
+            throws SlickException {
+        this.self = self;
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.scale = scale;
+        this.rotation = rotation;
+        ellipse.setLocation(x, y);
+        setRadii();
+    }
+
     @Override
     public int getID() {
         return id;
@@ -61,14 +74,16 @@ public class TransformComponent implements Component {
 
     public void move(float dx, float dy) {
         if (dx != 0 && dy != 0) {
-            this.x += dx * Math.sqrt(2) / 2;
-            this.y += dy * Math.sqrt(2) / 2;
+            float angle = (float) Math.atan2(dy, dx);
+            this.x += dx * Math.abs(Math.cos(angle));
+            this.y += dy * Math.abs(Math.sin(angle));
         } else {
             this.x += dx;
             this.y += dy;
         }
 
         ellipse.setLocation(x, y);
+
         // System.out.println("Moved by " + x + ":" + y);
         brdcst();
     }
@@ -118,7 +133,7 @@ public class TransformComponent implements Component {
 
     private void setRadii() {
         ellipse.setRadii(scale * width / 2, scale * height / 2);
-        radius = (ellipse.getRadius1() + ellipse.getRadius2()) / 2;
+        radius = ellipse.getBoundingCircleRadius();
     }
 
     public void reposition(float x, float y) {
@@ -156,6 +171,10 @@ public class TransformComponent implements Component {
 
     public float getRadius() {
         return radius;
+    }
+
+    public boolean contains(float x, float y) {
+        return ellipse.contains(x, y);
     }
 
     @Override

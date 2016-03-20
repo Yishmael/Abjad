@@ -64,7 +64,6 @@ public class ManaComponent implements Component {
     @Override
     public void receive(String command) {
         String str = command;
-        String[] list = null;
         if (str.matches("drain [0-9]+[.]?[0-9]*")) {
             str = str.substring(6);
             drain(Float.parseFloat(str));
@@ -91,12 +90,11 @@ public class ManaComponent implements Component {
             self.broadcast("updateMP " + mana + " " + maxMana);
             return;
         }
-        if (str.matches("STATS [0-9]+[.]?[0-9]* [0-9]+[.]?[0-9]* [0-9]+[.]?[0-9]*")) {
-            str = str.substring(6);
-            list = str.split(" ");
-            float intelligence = Float.parseFloat(list[2]);
+        if (str.matches("INT [0-9]+")) {
+            str = str.substring(4);
+            int intelligence = Integer.parseInt(str);
             percentage = mana / maxMana;
-            maxMana = Math.min(999, intelligence * 15 + baseMaxMana + (float) Math.pow(1.2f, intelligence) - 1);
+            maxMana += intelligence * 3;
             mana = percentage * maxMana;
             self.broadcast("updateMP " + mana + " " + maxMana);
             return;
@@ -109,7 +107,7 @@ public class ManaComponent implements Component {
         if (str.matches("MPcap [-]?[0-9]+[.]?[0-9]*")) {
             str = str.substring(6);
             percentage = mana / maxMana;
-            maxMana = Math.min(999, maxMana + Float.parseFloat(str));
+            maxMana = Math.max(0, maxMana + Float.parseFloat(str));
             mana = percentage * maxMana;
             self.broadcast("updateMP " + mana + " " + maxMana);
             return;

@@ -11,14 +11,13 @@ public class Fireball extends Projectile {
             float areaOfEffect) throws SlickException {
         super(image, creator, position, angle, speed, range, areaOfEffect);
         this.damage = damage;
-        
     }
 
     @Override
     public String getMessage() {
-        return "damage " + damage;
+        return "firedmg " + damage;
     }
-    
+
     public void trigger() {
         finished = true;
     }

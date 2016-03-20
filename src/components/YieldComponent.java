@@ -1,39 +1,50 @@
 package components;
 
-import enums.ItemType;
+import java.util.ArrayList;
+
 import others.Consts;
 import others.Entity;
 import others.MessageChannel;
 
 public class YieldComponent implements Component {
     private int id = Consts.YIELD;
-    private Entity entity;
+    private Entity self;
 
-    private ItemType[] drops;
+    private ArrayList<Entity> drops = new ArrayList<Entity>();
+    private boolean yielded;
 
-    public YieldComponent(Entity entity, ItemType[] drops) {
-        this.entity = entity;
-        this.drops = new ItemType[drops.length];
-        for (int i = 0; i < drops.length; i++) {
-            this.drops[i] = drops[i];
+    public YieldComponent(Entity self, ArrayList<Entity> drops) {
+        this.self = self;
+        for (Entity drop: drops) {
+            if (drop != null) {
+                this.drops.add(drop);
+            }
         }
     }
 
-    public ItemType[] getDrops() {
+    public ArrayList<Entity> getDrops() {
+        yielded = true;
         return drops;
     }
 
+    public boolean hasYielded() {
+        return yielded;
+    }
+
+    @Override
     public void process(MessageChannel channel) {
     }
 
+    @Override
     public void receive(String command) {
-        // TODO Auto-generated method stub
 
     }
 
+    @Override
     public void update() {
     }
 
+    @Override
     public int getID() {
         return id;
     }

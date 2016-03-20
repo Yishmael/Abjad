@@ -91,6 +91,10 @@ public class HealthComponent implements Component {
         return alive;
     }
 
+    public float getHealth() {
+        return health;
+    }
+
     public long getTimeOfDeath() {
         return timeOfDeath;
     }
@@ -100,34 +104,37 @@ public class HealthComponent implements Component {
         if (channel.getSender() == null) {
             return;
         }
-
         receive(channel.getCommand());
     }
 
     @Override
     public void receive(String command) {
         String str = command;
-        String[] list = null;
         if (str.matches("heal [0-9]+[.]?[0-9]*")) {
             str = str.substring(5);
             heal(Float.parseFloat(str));
             return;
         }
-        if (str.matches("damage [0-9]+[.]?[0-9]*")) {
-            str = str.substring(7);
-            damage(Float.parseFloat(str));
+        if (str.matches("HPdelta [-]?[0-9]+[.]?[0-9]*")) {
+            str = str.substring(8);
+            float temp = Float.parseFloat(str);
+
+            if (temp < 0) {
+                damage(-temp);
+            } else if (temp > 0) {
+                heal(temp);
+            }
             return;
         }
         if (str.matches("requestHP")) {
             self.broadcast("updateHP " + health + " " + maxHealth);
             return;
         }
-        if (str.matches("STATS [0-9]+[.]?[0-9]* [0-9]+[.]?[0-9]* [0-9]+[.]?[0-9]*")) {
-            str = str.substring(6);
-            list = str.split(" ");
-            float strength = Float.parseFloat(list[0]);
+        if (str.matches("STR [0-9]+")) {
+            str = str.substring(4);
+            int strength = Integer.parseInt(str);
             percentage = health / maxHealth;
-            maxHealth = Math.min(999, strength * 10 + baseMaxHealth + (float) Math.pow(1.17f, strength) - 1);
+            maxHealth += strength * 5;
             health = percentage * maxHealth;
             self.broadcast("updateHP " + health + " " + maxHealth);
             return;
@@ -135,7 +142,7 @@ public class HealthComponent implements Component {
         if (str.matches("HPcap [-]?[0-9]+[.]?[0-9]*")) {
             str = str.substring(6);
             percentage = health / maxHealth;
-            maxHealth = Math.min(999, maxHealth + Float.parseFloat(str));
+            maxHealth = Math.max(0, maxHealth + Float.parseFloat(str));
             health = percentage * maxHealth;
             self.broadcast("updateHP " + health + " " + maxHealth);
             return;
@@ -147,6 +154,12 @@ public class HealthComponent implements Component {
                 self.broadcast("updateHP " + health + " " + maxHealth);
                 self.broadcast("ressed");
             }
+            return;
+        }
+        if (str.matches("HPregen [-]?[0-9]+[.]?[0-9]*")) {
+            str = str.substring(8);
+            healthRegen += Float.parseFloat(str);
+            return;
         }
     }
 

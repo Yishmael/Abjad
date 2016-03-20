@@ -16,7 +16,7 @@ public class Decrepify extends Ground {
     @Override
     public String getMessage() {
         if (counter < 42) {
-            return "decrepify " + 100 + " " + 5;
+            return "decrepify " + 1 + " " + 5;
         }
         return null;
     }

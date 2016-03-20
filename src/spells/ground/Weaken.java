@@ -16,7 +16,7 @@ public class Weaken extends Ground {
     @Override
     public String getMessage() {
         if (counter < 42) {
-            return "weaken " + 10 + " " + 5;
+            return "weaken " + 1 + " " + 5;
         }
         return null;
     }

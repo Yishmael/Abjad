@@ -54,10 +54,11 @@ public class Map {
         g.drawImage(mapImage, 0, 0);
     }
 
-    public void drawMap(Graphics g, float x, float y) {
+    public void drawMap(Graphics g, float x, float y, boolean showMinimap) {
         if (x != 0 && y != 0) {
-            offsetVector.x += x * Math.sqrt(2) / 2;
-            offsetVector.y += y * Math.sqrt(2) / 2;
+            float angle = (float) Math.atan2(y, x);
+            offsetVector.x += x * Math.abs(Math.cos(angle));
+            offsetVector.y += y * Math.abs(Math.sin(angle));
         } else {
             offsetVector.x += x;
             offsetVector.y += y;
@@ -65,12 +66,15 @@ public class Map {
 
         g.drawImage(mapImage, offsetVector.getX(), offsetVector.getY());
 
-        // minimap is a square, but the screen might not be!
-        g.drawImage(mapImage, Consts.SCREEN_WIDTH - 155, 30, Consts.SCREEN_WIDTH - 5, 180,
-                -offsetVector.getX() - Consts.TILE_SIZE * zoom, -offsetVector.getY() - Consts.TILE_SIZE * zoom,
-                -offsetVector.getX() + Consts.TILE_SIZE * 10 + Consts.TILE_SIZE * zoom,
-                -offsetVector.getY() + Consts.TILE_SIZE * 10 + Consts.TILE_SIZE * zoom, new Color(255, 255, 255, 200));
-        g.drawString("x", Consts.SCREEN_WIDTH - 80, 105);
+        if (showMinimap) {
+            // minimap is a square, but the screen might not be!
+            g.drawImage(mapImage, Consts.SCREEN_WIDTH - 155, 30, Consts.SCREEN_WIDTH - 5, 180,
+                    -offsetVector.getX() - Consts.TILE_SIZE * zoom, -offsetVector.getY() - Consts.TILE_SIZE * zoom,
+                    -offsetVector.getX() + Consts.TILE_SIZE * 10 + Consts.TILE_SIZE * zoom,
+                    -offsetVector.getY() + Consts.TILE_SIZE * 10 + Consts.TILE_SIZE * zoom,
+                    new Color(255, 255, 255, 200));
+            g.drawString("x", Consts.SCREEN_WIDTH - 80, 105);
+        }
     }
 
     public void zoomIn() {
@@ -80,7 +84,7 @@ public class Map {
     public void zoomOut() {
         zoom = Math.min(zoom + 1, 3);
     }
-    
+
     public Vector2f getOffset() {
         return offsetVector;
     }

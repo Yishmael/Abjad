@@ -6,7 +6,7 @@ import org.newdawn.slick.geom.Vector2f;
 
 public class Bouncer extends Projectile {
     private float damage, amount;
-    private String command = "damage";
+    private String command = "arcanedmg";
     private int bounces = 0;
 
     public Bouncer(Image image, String creator, Vector2f position, float angle, float speed, float range, float damage,
@@ -27,7 +27,7 @@ public class Bouncer extends Projectile {
             case 0:
                 command = "heal";
                 amount = damage * 0.5f;
-                super.setCreator("Barrel");
+                super.setTargets("friendly");
                 super.setSpeed(super.getSpeed() * 0.6f);
                 super.setAngle((float) (Math.PI + super.getAngle()));
                 break;

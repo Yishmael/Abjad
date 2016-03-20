@@ -4,27 +4,24 @@ import org.lwjgl.Sys;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.Sound;
 
-import enums.ItemType;
 import others.Consts;
 import others.Entity;
 import others.MessageChannel;
 
-public class CombatComponent implements Component {
-    private int id = Consts.COMBAT;
-    private float cooldown, damage, defense;
-    private float damageMul = 1, cooldownMul = 1, critChance = 0, cleaveRadius = 0;
+public class AttackComponent implements Component {
+    private int id = Consts.ATTACK;
+    private float cooldown = 9999, damage;
+    private float damageMul = 1, cooldownMul = 1, critChance, cleaveRadius, lifesteal;
     private int rangeAdder;
-    private float lifesteal = 0;
     private Entity self;
     private long lastTime = 0;
     private long now = 0;
     private boolean canAttack = true;
     private Sound sound;
 
-    public CombatComponent(Entity self, float damage, float cooldown) {
+    public AttackComponent(Entity self, float damage, float cooldown) {
         this.self = self;
         this.damage = damage;
-        this.defense = 0;
         this.cooldown = cooldown;
         try {
             sound = new Sound("sounds/032.ogg");
@@ -33,9 +30,8 @@ public class CombatComponent implements Component {
         }
     }
 
-    public CombatComponent(Entity self) {
+    public AttackComponent(Entity self) {
         this.self = self;
-        receive("equipped 0");
         try {
             sound = new Sound("sounds/032.ogg");
         } catch (SlickException e) {
@@ -58,11 +54,10 @@ public class CombatComponent implements Component {
                 float diced = (float) (getDamage() * critMul
                         + getDamage() * critMul * 0.15 * (Math.random() - Math.random()));
                 if (critMul == 2) {
-                    System.out.println("Critical hit!");
+                    System.out.println("Critical hit (" + (int) diced + " damage)");
                 }
-                System.out.println("Attacked with " + diced + " damage!");
                 sound.play();
-                return "damage " + diced;
+                return "physdmg " + diced;
             }
         }
         // self.broadcast("damage " + damage);
@@ -89,25 +84,20 @@ public class CombatComponent implements Component {
     @Override
     public void receive(String command) {
         String str = command;
+        String[] list = null;
         if (canAttack) {
             if (str.matches("attack")) {
                 attack();
                 return;
             }
-            if (str.matches("defend")) {
-                defend();
-                return;
-            }
         }
-        if (str.matches("equipped [0-9]+")) {
-            str = str.substring(9);
-            ItemType temp = ItemType.values()[Integer.parseInt(str)];
-
-            damage = temp.getDamage() * damageMul;
-            defense = temp.getDefense();
-            cooldown = temp.getCooldown() * cooldownMul;
-            rangeAdder = temp.getRangeAdder();
-            System.out.println(temp.toString());
+        if (str.matches("equippedW [0-9]+[.]?[0-9]* [0-9]+[.]?[0-9]* [0-9]+")) {
+            str = str.substring(10);
+            list = str.split(" ");
+            damage = Float.parseFloat(list[0]);
+            cooldown = Float.parseFloat(list[1]);
+            rangeAdder = Integer.parseInt(list[2]);
+            System.out.println((int) damage + "/" + cooldown + "/" + rangeAdder);
             return;
         }
         if (str.matches("died")) {
@@ -119,6 +109,7 @@ public class CombatComponent implements Component {
             return;
         }
         if (str.matches("AS [-]?[0-9]+[.]?[0-9]*[%]")) {
+            System.out.println(str);
             str = str.substring(3, str.indexOf('%'));
             float temp = Float.parseFloat(str);
             cooldownMul *= 1 - temp / 100f;

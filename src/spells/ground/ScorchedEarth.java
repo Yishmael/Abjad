@@ -21,7 +21,7 @@ public class ScorchedEarth extends Ground {
         now = (Sys.getTime() * 1000) / Sys.getTimerResolution();
         if (now - lastTime >= 500) {
             lastTime = now;
-            return "damage " + (damage / 2);
+            return "firedmg " + (damage / 2);
         }
         return null;
     }
