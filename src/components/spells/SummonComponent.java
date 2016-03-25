@@ -3,13 +3,13 @@ package components.spells;
 import org.newdawn.slick.SlickException;
 
 import components.Component;
-import components.SpriteComponent;
+import components.units.SpriteComponent;
 import others.Consts;
 import others.Entity;
 import others.MessageChannel;
 
 public class SummonComponent implements Component {
-    private int id = Consts.SUMMON;
+    private long id = Consts.SUMMON;
     private Entity self;
 
     private boolean ready = false;
@@ -30,7 +30,6 @@ public class SummonComponent implements Component {
         String str = command;
         if (str.matches("trigger")) {
             ready = true;
-            return;
         }
     }
 
@@ -60,7 +59,7 @@ public class SummonComponent implements Component {
         return count;
     }
 
-    public int getID() {
+    public long getID() {
         return id;
     }
 }

@@ -35,7 +35,7 @@ public class Map {
         offsetVector = new Vector2f(0, 0);
 
         try {
-            mapImage = new Image("images/mapbig.png");
+            mapImage = new Image("res/images/mapbig.png");
         } catch (SlickException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

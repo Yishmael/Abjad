@@ -14,7 +14,7 @@ public class Heal extends Selfcast {
     @Override
     public String getMessage() {
         finished = true;
-        return "heal " + healing;
+        return "HPdelta " + healing;
     }
 
     @Override

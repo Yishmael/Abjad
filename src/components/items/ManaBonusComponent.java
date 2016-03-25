@@ -1,12 +1,13 @@
 package components.items;
 
 import components.Component;
+import components.ItemComponent;
 import others.Consts;
 import others.Entity;
 import others.MessageChannel;
 
 public class ManaBonusComponent implements Component, ItemComponent {
-    private int id = Consts.MANABONUS;
+    private long id = Consts.MANABONUS;
     private Entity self;
     private float manaBonus;
 
@@ -31,13 +32,13 @@ public class ManaBonusComponent implements Component, ItemComponent {
     }
 
     @Override
-    public String giveBonus() {
-        return "MPcap " + manaBonus;
+    public String[] giveBonuses() {
+        return new String[] { "MPcap " + manaBonus };
     }
 
     @Override
-    public String negateBonus() {
-        return "MPcap " + -manaBonus;
+    public String[] negateBonuses() {
+        return new String[] { "MPcap " + -manaBonus };
     }
 
     public float getManaBonus() {
@@ -45,7 +46,7 @@ public class ManaBonusComponent implements Component, ItemComponent {
     }
 
     @Override
-    public int getID() {
+    public long getID() {
         return id;
     }
 

@@ -1,12 +1,13 @@
 package components.items;
 
 import components.Component;
+import components.ItemComponent;
 import others.Consts;
 import others.Entity;
 import others.MessageChannel;
 
 public class MovementSpeedBonusComponent implements Component, ItemComponent {
-    private int id = Consts.MOVEMENTBONUS;
+    private long id = Consts.MOVEMENTBONUS;
     private Entity self;
     private float speedBonus;
 
@@ -31,13 +32,13 @@ public class MovementSpeedBonusComponent implements Component, ItemComponent {
     }
 
     @Override
-    public String giveBonus() {
-        return "MS " + speedBonus + "%";
+    public String[] giveBonuses() {
+        return new String[] { "MS " + speedBonus + "%" };
     }
 
     @Override
-    public String negateBonus() {
-        return "MS " + -speedBonus + "%";
+    public String[] negateBonuses() {
+        return new String[] { "MS " + -speedBonus + "%" };
     }
 
     public float getMovementBonus() {
@@ -45,7 +46,7 @@ public class MovementSpeedBonusComponent implements Component, ItemComponent {
     }
 
     @Override
-    public int getID() {
+    public long getID() {
         return id;
     }
 

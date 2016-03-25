@@ -1,12 +1,13 @@
 package components.items;
 
 import components.Component;
+import components.ItemComponent;
 import others.Consts;
 import others.Entity;
 import others.MessageChannel;
 
 public class WeaponComponent implements Component, ItemComponent {
-    private int id = Consts.WEAPON;
+    private long id = Consts.WEAPON;
     private Entity self;
     private float damage, cooldown;
     private int rangeAdder;
@@ -34,13 +35,15 @@ public class WeaponComponent implements Component, ItemComponent {
     }
 
     @Override
-    public String giveBonus() {
-        return "equippedW " + damage + " " + cooldown + " " + rangeAdder;
+    public String[] giveBonuses() {
+        // letting attack component know which weapon was equipped
+        return new String[] { "equippedW " + damage + " " + cooldown + " " + rangeAdder };
     }
 
     @Override
-    public String negateBonus() {
-        return null;
+    public String[] negateBonuses() {
+        // letting attack component know which weapon was unequipped
+        return new String[] { "unequippedW" };
     }
 
     public float getDamage() {
@@ -56,7 +59,7 @@ public class WeaponComponent implements Component, ItemComponent {
     }
 
     @Override
-    public int getID() {
+    public long getID() {
         return id;
     }
 

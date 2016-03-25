@@ -1,12 +1,13 @@
 package components.items;
 
 import components.Component;
+import components.ItemComponent;
 import others.Consts;
 import others.Entity;
 import others.MessageChannel;
 
 public class HealthBonusComponent implements Component, ItemComponent {
-    private int id = Consts.HEALTHBONUS;
+    private long id = Consts.HEALTHBONUS;
     private Entity self;
     private float healthBonus;
 
@@ -31,13 +32,13 @@ public class HealthBonusComponent implements Component, ItemComponent {
     }
 
     @Override
-    public String giveBonus() {
-        return "HPcap " + healthBonus;
+    public String[] giveBonuses() {
+        return new String[] {"HPcap " + healthBonus};
     }
 
     @Override
-    public String negateBonus() {
-        return "HPcap " + -healthBonus;
+    public String[] negateBonuses() {
+        return new String[] {"HPcap " + -healthBonus};
     }
 
     public float getHealthBonus() {
@@ -45,7 +46,7 @@ public class HealthBonusComponent implements Component, ItemComponent {
     }
 
     @Override
-    public int getID() {
+    public long getID() {
         return id;
     }
 

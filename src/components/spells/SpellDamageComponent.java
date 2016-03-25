@@ -6,7 +6,7 @@ import others.Entity;
 import others.MessageChannel;
 
 public class SpellDamageComponent implements Component {
-    private int id = Consts.SPELLDAMAGE;
+    private long id = Consts.SPELLDAMAGE;
     private Entity self;
 
     private float damage;
@@ -25,12 +25,10 @@ public class SpellDamageComponent implements Component {
 
     @Override
     public void receive(String command) {
-
-    }
-
-    public String getMessage() {
-        self.broadcast("finished");
-        return damageType + "dmg " + damage;
+        String str = command;
+        if (str.matches("requestspelldmg")) {
+            self.broadcast("spelldmg " + damageType + "dmg " + damage);
+        }
     }
 
     @Override
@@ -39,7 +37,7 @@ public class SpellDamageComponent implements Component {
     }
 
     @Override
-    public int getID() {
+    public long getID() {
         return id;
     }
 }

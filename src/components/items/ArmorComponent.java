@@ -1,12 +1,13 @@
 package components.items;
 
 import components.Component;
+import components.ItemComponent;
 import others.Consts;
 import others.Entity;
 import others.MessageChannel;
 
 public class ArmorComponent implements Component, ItemComponent {
-    private int id = Consts.ARMOR;
+    private long id = Consts.ARMOR;
     private Entity self;
 
     private float defense;
@@ -32,13 +33,13 @@ public class ArmorComponent implements Component, ItemComponent {
     }
 
     @Override
-    public String giveBonus() {
-        return "DEF " + defense;
+    public String[] giveBonuses() {
+        return new String[] { "DEF " + defense };
     }
 
     @Override
-    public String negateBonus() {
-        return "DEF " + -defense;
+    public String[] negateBonuses() {
+        return new String[] { "DEF " + -defense };
     }
 
     public float getDefense() {
@@ -46,7 +47,7 @@ public class ArmorComponent implements Component, ItemComponent {
     }
 
     @Override
-    public int getID() {
+    public long getID() {
         return id;
     }
 }

@@ -6,7 +6,7 @@ import components.Component;
 
 public class Entity {
     private ArrayList<Component> comps = new ArrayList<Component>();
-    private int id = 0x00000000;
+    private long id = 0x00000000;
     private String name;
 
     public Entity(String name) {
@@ -54,7 +54,7 @@ public class Entity {
         }
     }
 
-    public Component getComponent(int id) {
+    public Component getComponent(long id) {
         // System.out.println(bit);
         for (Component comp: comps) {
             if (comp.getID() == id)
@@ -71,11 +71,15 @@ public class Entity {
         return name;
     }
 
-    public boolean hasComponent(int id) {
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public boolean hasComponent(long id) {
         return this.id == (this.id | id);
     }
 
-    public void removeComponent(int id) {
+    public void removeComponent(long id) {
         if (this.hasComponent(id)) {
             comps.remove(getComponent(id));
             broadcast("removed " + id);

@@ -25,7 +25,7 @@ public class Bouncer extends Projectile {
         if (!finished) {
             switch (bounces) {
             case 0:
-                command = "heal";
+                command = "HPdelta";
                 amount = damage * 0.5f;
                 super.setTargets("friendly");
                 super.setSpeed(super.getSpeed() * 0.6f);

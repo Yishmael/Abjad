@@ -4,10 +4,10 @@ public enum SpellType {
 
     // sorcerer
     Teleport(
-            "images/spells/teleport-icon.png",
-            "images/spells/teleport.png",
-            "sounds/000.ogg",
-            "sounds/000.ogg",
+            "res/images/spells/teleport-icon.png",
+            "res/images/spells/teleport.png",
+            "res/sounds/000.ogg",
+            "res/sounds/000.ogg",
             "Teleport",
             "",
             10,
@@ -17,10 +17,10 @@ public enum SpellType {
             0.5f,
             0),
     Fireball(
-            "images/spells/fireball-icon.png",
-            "images/spells/fireball-1.png",
-            "sounds/067.ogg",
-            "sounds/068.ogg",
+            "res/images/spells/fireball-icon.png",
+            "res/images/spells/fireball-1.png",
+            "res/sounds/067.ogg",
+            "res/sounds/068.ogg",
             "Fireball",
             "fire",
             6,
@@ -30,10 +30,10 @@ public enum SpellType {
             0.5f,
             7.4f),
     Bouncer(
-            "images/spells/bouncer-icon.png",
-            "images/spells/bouncer.png",
-            "sounds/000.ogg",
-            "sounds/020.ogg",
+            "res/images/spells/bouncer-icon.png",
+            "res/images/spells/bouncer.png",
+            "res/sounds/000.ogg",
+            "res/sounds/020.ogg",
             "Bouncer",
             "arcane",
             4,
@@ -43,10 +43,10 @@ public enum SpellType {
             1f,
             6.5f),
     MultiBouncer(
-            "images/spells/multibouncer-icon.png",
-            "images/spells/multibouncer.png",
-            "sounds/000.ogg",
-            "sounds/020.ogg",
+            "res/images/spells/multibouncer-icon.png",
+            "res/images/spells/multibouncer.png",
+            "res/sounds/000.ogg",
+            "res/sounds/020.ogg",
             "Multi Bouncer",
             "arcane",
             10,
@@ -56,23 +56,23 @@ public enum SpellType {
             0.2f,
             5.5f),
     ScorchedEarth(
-            "images/spells/scorchedearth-icon.png",
-            "images/spells/scorchedearth.png",
-            "sounds/067.ogg",
-            "sounds/067.ogg",
+            "res/images/spells/scorchedearth-icon.png",
+            "res/images/spells/scorchedearth.png",
+            "res/sounds/067.ogg",
+            "res/sounds/067.ogg",
             "Scorched Earth",
             "fire",
             4,
-            3,
+            1,
             0,
             200,
             4f,
             0),
     CoFireball(
-            "images/spells/cofireball-icon.png",
-            "images/spells/cofireball-1.png",
-            "sounds/067.ogg",
-            "sounds/068.ogg",
+            "res/images/spells/cofireball-icon.png",
+            "res/images/spells/cofireball-1.png",
+            "res/sounds/067.ogg",
+            "res/sounds/068.ogg",
             "CoFireball",
             "fire",
             10,
@@ -84,10 +84,10 @@ public enum SpellType {
 
     // summoner
     ReviveMinion(
-            "images/spells/reviveminion-icon.png",
-            "images/spells/reviveminion.png",
-            "sounds/000.ogg",
-            "sounds/000.ogg",
+            "res/images/spells/reviveminion-icon.png",
+            "res/images/spells/reviveminion.png",
+            "res/sounds/000.ogg",
+            "res/sounds/000.ogg",
             "Revive Minion",
             "",
             7,
@@ -97,10 +97,10 @@ public enum SpellType {
             4,
             0),
     SummonKirith(
-            "images/spells/summonkirith-icon.png",
-            "images/spells/summonkirith.png",
-            "sounds/000.ogg",
-            "sounds/000.ogg",
+            "res/images/spells/summonkirith-icon.png",
+            "res/images/spells/summonkirith.png",
+            "res/sounds/000.ogg",
+            "res/sounds/000.ogg",
             "Summon Kirith",
             "",
             15,
@@ -110,10 +110,10 @@ public enum SpellType {
             1f,
             0),
     SummonWall(
-            "images/spells/summonwall-icon.png",
-            "images/spells/summonwall.png",
-            "sounds/000.ogg",
-            "sounds/000.ogg",
+            "res/images/spells/summonwall-icon.png",
+            "res/images/spells/summonwall.png",
+            "res/sounds/000.ogg",
+            "res/sounds/000.ogg",
             "Summon Wall",
             "",
             15,
@@ -124,24 +124,24 @@ public enum SpellType {
             0),
 
     // protector
-    Nourish(
-            "images/spells/nourish-icon.png",
-            "images/spells/nourish.png",
-            "sounds/049.ogg",
-            "sounds/000.ogg",
-            "Nourish",
+    Heal(
+            "res/images/spells/heal-icon.png",
+            "res/images/spells/heal.png",
+            "res/sounds/049.ogg",
+            "res/sounds/000.ogg",
+            "Heal",
             "",
             12,
             0,
-            5,
+            10,
             0,
             0.5f,
             0),
     HolyShield(
-            "images/spells/holyshield-icon.png",
-            "images/spells/holyshield.png",
-            "sounds/000.ogg",
-            "sounds/000.ogg",
+            "res/images/spells/holyshield-icon.png",
+            "res/images/spells/holyshield.png",
+            "res/sounds/000.ogg",
+            "res/sounds/000.ogg",
             "Holy Shield",
             "holy",
             20,
@@ -150,13 +150,13 @@ public enum SpellType {
             0,
             1f,
             0),
-    
+
     // disabler
     Weaken(
-            "images/spells/weaken-icon.png",
-            "images/spells/weaken.png",
-            "sounds/000.ogg",
-            "sounds/000.ogg",
+            "res/images/spells/weaken-icon.png",
+            "res/images/spells/weaken.png",
+            "res/sounds/000.ogg",
+            "res/sounds/000.ogg",
             "Weaken",
             "",
             10,
@@ -166,10 +166,10 @@ public enum SpellType {
             0.66f,
             0),
     Decrepify(
-            "images/spells/decrepify-icon.png",
-            "images/spells/decrepify.png",
-            "sounds/000.ogg",
-            "sounds/000.ogg",
+            "res/images/spells/decrepify-icon.png",
+            "res/images/spells/decrepify.png",
+            "res/sounds/000.ogg",
+            "res/sounds/000.ogg",
             "Decrepify",
             "",
             10,
@@ -179,23 +179,23 @@ public enum SpellType {
             0.34f,
             0),
     PoisonArrow(
-            "images/spells/poisonarrow-icon.png",
-            "images/spells/poisonarrow.png",
-            "sounds/024.ogg",
-            "sounds/000.ogg",
+            "res/images/spells/poisonarrow-icon.png",
+            "res/images/spells/poisonarrow.png",
+            "res/sounds/024.ogg",
+            "res/sounds/000.ogg",
             "Poison Arrow",
             "poison",
             5,
-            3,
             0,
-            250,
+            0,
+            150,
             0.34f,
             9.5f),
     Null(
-            "images/spells/null-icon.png",
-            "images/null.png",
-            "sounds/000.ogg",
-            "sounds/000.ogg",
+            "res/images/spells/null-icon.png",
+            "res/images/null.png",
+            "res/sounds/000.ogg",
+            "res/sounds/000.ogg",
             "Null",
             "",
             0,
@@ -208,8 +208,8 @@ public enum SpellType {
     private String iconPath, imagePath, soundPath, deathSoundPath, name, damageType;
     private float damage, manaCost, healing, range, cooldown, speed;
 
-    private SpellType(String iconPath, String imagePath, String soundPath, String deathSoundPath, String name, String damageType,
-            float manaCost, float damage, float healing, float range, float cooldown, float speed) {
+    private SpellType(String iconPath, String imagePath, String soundPath, String deathSoundPath, String name,
+            String damageType, float manaCost, float damage, float healing, float range, float cooldown, float speed) {
         this.iconPath = iconPath;
         this.imagePath = imagePath;
         this.soundPath = soundPath;
@@ -275,6 +275,23 @@ public enum SpellType {
 
     public float getSpeed() {
         return speed;
+    }
+
+    public static SpellType[] getSorcererSpells() {
+        return new SpellType[] { SpellType.Fireball, SpellType.Bouncer, SpellType.MultiBouncer, SpellType.CoFireball,
+                SpellType.ScorchedEarth, SpellType.Teleport };
+    }
+
+    public static SpellType[] getSummonerSpells() {
+        return new SpellType[] { SpellType.SummonWall, SpellType.ReviveMinion, SpellType.SummonKirith };
+    }
+
+    public static SpellType[] getProtectorSpells() {
+        return new SpellType[] { SpellType.Heal, SpellType.HolyShield };
+    }
+
+    public static SpellType[] getDisablerSpells() {
+        return new SpellType[] { SpellType.PoisonArrow, SpellType.Weaken, SpellType.Decrepify };
     }
 
 }

@@ -17,7 +17,7 @@ public class HolyShield extends Selfcast {
     @Override
     public String getMessage() {
         finished = true;
-        return "damage 30";
+        return "lightningdmg 30";
     }
 
     @Override

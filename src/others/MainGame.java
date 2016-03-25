@@ -15,43 +15,37 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
 import org.newdawn.slick.Input;
 import org.newdawn.slick.SlickException;
-import org.newdawn.slick.Sound;
 import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.RoundedRectangle;
 import org.newdawn.slick.geom.Vector2f;
 
-import components.AttackComponent;
-import components.AttributesComponent;
-import components.CameraComponent;
-import components.CastComponent;
-import components.CollisionComponent;
 import components.Component;
-import components.ComputerMovementComponent;
-import components.DefenseComponent;
-import components.HealthComponent;
-import components.InputComponent;
-import components.InventoryComponent;
-import components.LevelComponent;
-import components.ManaComponent;
-import components.PlayerMovementCompenent;
-import components.ResistanceComponent;
-import components.SpriteComponent;
-import components.StatusComponent;
-import components.TransformComponent;
-import components.YieldComponent;
-import components.spells.GuideComponent;
+import components.spells.CircularMovement;
 import components.spells.SpellComponent;
-import components.spells.SpellDamageComponent;
+import components.units.AttackComponent;
+import components.units.AttributesComponent;
+import components.units.CameraComponent;
+import components.units.CastComponent;
+import components.units.CollisionComponent;
+import components.units.ComputerMovementComponent;
+import components.units.DefenseComponent;
+import components.units.HealthComponent;
+import components.units.InputComponent;
+import components.units.InventoryComponent;
+import components.units.LevelComponent;
+import components.units.ManaComponent;
+import components.units.PlayerMovementCompenent;
+import components.units.ResistanceComponent;
+import components.units.SpriteComponent;
+import components.units.StatusComponent;
+import components.units.TransformComponent;
+import components.units.YieldComponent;
 import enums.PassiveType;
 import enums.SpellType;
 import spells.Spell;
-import spells.ground.Decrepify;
-import spells.ground.ScorchedEarth;
-import spells.ground.Weaken;
 import spells.projectile.Bouncer;
 import spells.projectile.Fireball;
-import spells.projectile.PoisonArrow;
 import spells.selfcast.Heal;
 import spells.selfcast.HolyShield;
 
@@ -65,7 +59,7 @@ public class MainGame extends BasicGame { // add states
             appgc = new AppGameContainer(new MainGame());
             appgc.setDisplayMode(Consts.SCREEN_WIDTH, Consts.SCREEN_HEIGHT, Consts.FULLSCREEN);
             appgc.setTargetFrameRate(Consts.FPS);
-            appgc.setIcon("images/ui/icon.png");
+            appgc.setIcon("res/images/ui/icon.png");
             // appgc.setClearEachFrame(false);
             // appgc.setUpdateOnlyWhenVisible(false);
             appgc.setAlwaysRender(true);
@@ -90,39 +84,31 @@ public class MainGame extends BasicGame { // add states
 
     private Map map;
     private Input input;
-    private EntityFactory factory;
-    private Sound sound;
+    // private Sound sound;
     private Image iface1;
     private Image[] spellIcons;
     private SpellType currentSpell = SpellType.Null;
-    private Vector2f offset;
+    private Vector2f offset = new Vector2f();
     private Button[] buttons;
     private float mouseX, mouseY;
     private int mouseWheel;
     private Vector2f playerPos = new Vector2f(Consts.SCREEN_WIDTH / 2 - 32, Consts.SCREEN_HEIGHT / 2 - 32);
+    private float playerAngle;
     private Vector2f destination = new Vector2f(playerPos);
     private long lastTime = 0;
     private float decayTime = 12f;
     private boolean showTree = false;
     private boolean showMap = false;
 
-    private SpellType[] sorcerer = { SpellType.Fireball, SpellType.Bouncer, SpellType.MultiBouncer,
-            SpellType.CoFireball, SpellType.ScorchedEarth, SpellType.Teleport };
-    private SpellType[] summoner = { SpellType.SummonWall, SpellType.ReviveMinion, SpellType.SummonKirith };
-    private SpellType[] protector = { SpellType.Nourish, SpellType.HolyShield };
-    private SpellType[] disabler = { SpellType.PoisonArrow, SpellType.Weaken, SpellType.Decrepify };
-    
     public MainGame() {
         super("Stars are falling");
     }
 
     @Override
     public void init(GameContainer gc) throws SlickException {
-        gc.setMouseCursor(new Image("images/ui/cursor2.png"), 0, 0);
+        gc.setMouseCursor(new Image("res/images/ui/cursor2.png"), 0, 0);
         map = new Map();
-        factory = new EntityFactory();
-        iface1 = new Image("images/ui/iface1.png");
-        offset = new Vector2f(1, 0);
+        iface1 = new Image("res/images/ui/iface1.png");
         buttons = new Button[30];
 
         initButtons();
@@ -136,7 +122,7 @@ public class MainGame extends BasicGame { // add states
         // TODO make map with coords where enemies should spawn
         Entity entity = new Entity("Player");
         entity.addComponent(
-                new SpriteComponent(entity, new SpriteSheet("images/player1.png", 64, 64), 220, false, 64, 64));
+                new SpriteComponent(entity, new SpriteSheet("res/images/player1.png", 64, 64), 220, false, 64, 64));
         entity.addComponent(new TransformComponent(entity, playerPos.getX(), playerPos.getY(), 60, 60));
         entity.addComponent(new HealthComponent(entity, 50, 50, 0.34f));
         entity.addComponent(new AttackComponent(entity, 1.5f, 0.8f));
@@ -146,13 +132,15 @@ public class MainGame extends BasicGame { // add states
         entity.addComponent(new StatusComponent(entity));
         entity.addComponent(new ResistanceComponent(entity));
         ArrayList<Entity> inventory = new ArrayList<Entity>();
-        inventory.add(factory.getAxeBlueprint(1));
-        inventory.add(factory.getHealingPotionBlueprint(1));
-        inventory.add(factory.getReplenishingPotionBlueprint(1));
-        inventory.add(factory.getGlovesBlueprint(1));
+        // inventory.add(EntityFactory.getCherryBlueprint(1));
+        inventory.add(EntityFactory.getSwiftnessPotion1(1));
+        inventory.add(EntityFactory.getAxeBlueprint(1));
+        inventory.add(EntityFactory.getHealingPotionBlueprint1(2));
+        inventory.add(EntityFactory.getHealingPotionBlueprint2(2));
+        inventory.add(EntityFactory.getReplenishingPotionBlueprint2(1));
         entity.addComponent(new InventoryComponent(entity, inventory));
         entity.addComponent(new InputComponent(entity));
-        SpellType[] spells = { SpellType.CoFireball };
+        SpellType[] spells = SpellType.getSorcererSpells();
         currentSpell = spells[0];
         entity.addComponent(new CastComponent(entity, spells));
         entity.addComponent(new AttributesComponent(entity, 0, 0, 0));
@@ -161,31 +149,32 @@ public class MainGame extends BasicGame { // add states
         entity.addComponent(new CameraComponent(entity));
         friendlyEnts.add(entity);
 
-        enemyEnts.add(factory.getEnemyBlueprint1(300, 50, 1));
-        enemyEnts.add(factory.getEnemyBlueprint1(180, 450, 1));
-        enemyEnts.add(factory.getEnemyBlueprint1(60, 260, 1));
-        enemyEnts.add(factory.getEnemyBlueprint1(70, 60, 1));
-        enemyEnts.add(factory.getEnemyBlueprint2(40, 400, 1));
-        enemyEnts.add(factory.getBarrelBlueprint());
-        enemyEnts.add(factory.getBarrelBlueprint());
-        enemyEnts.add(factory.getCampfireBlueprint());
-        enemyEnts.add(factory.getBirdBlueprint());
+        enemyEnts.add(EntityFactory.getEnemyBlueprint1(300, 50, 5));
+        enemyEnts.add(EntityFactory.getEnemyBlueprint1(180, 450, 1));
+        enemyEnts.add(EntityFactory.getEnemyBlueprint1(60, 260, 1));
+        enemyEnts.add(EntityFactory.getEnemyBlueprint2(70, 60, 1));
+        enemyEnts.add(EntityFactory.getDummyBlueprint(40, 400, 500, 500));
+        enemyEnts.add(EntityFactory.getBarrelBlueprint());
+        enemyEnts.add(EntityFactory.getBarrelBlueprint());
+        enemyEnts.add(EntityFactory.getCampfireBlueprint());
+        enemyEnts.add(EntityFactory.getBirdBlueprint());
+        // for (int i = 0; i < 3; i++) {
+        // for (int j = 0; j < 3; j++) {
+        // if (Math.random() < 0.3) {
+        // enemyEnts.add(EntityFactory.getEnemyBlueprint2(Consts.SCREEN_WIDTH -
+        // 100 +
+        // i * 3 * 64,
+        // Consts.SCREEN_HEIGHT - 100 + j * 3 * 64, j + 1));
+        // } else {
+        // enemyEnts.add(EntityFactory.getEnemyBlueprint1(Consts.SCREEN_WIDTH -
+        // 100 +
+        // i * 3 * 64,
+        // Consts.SCREEN_HEIGHT - 100 + j * 3 * 64, j + 1));
+        // }
+        // }
+        // }
 
-//         for (int i = 0; i < 3; i++) {
-//         for (int j = 0; j < 3; j++) {
-//         if (Math.random() < 0.3) {
-//         enemyEnts.add(factory.getEnemyBlueprint2(Consts.SCREEN_WIDTH - 100 +
-//         i * 3 * 64,
-//         Consts.SCREEN_HEIGHT - 100 + j * 3 * 64, j + 1));
-//         } else {
-//         enemyEnts.add(factory.getEnemyBlueprint1(Consts.SCREEN_WIDTH - 100 +
-//         i * 3 * 64,
-//         Consts.SCREEN_HEIGHT - 100 + j * 3 * 64, j + 1));
-//         }
-//         }
-//         }
-
-        friendlyEnts.add(factory.getShopBlueprint1(500, 10));
+        friendlyEnts.add(EntityFactory.getShopBlueprint1(500, 10));
     }
 
     @Override
@@ -194,6 +183,7 @@ public class MainGame extends BasicGame { // add states
         mouseX = input.getMouseX();
         mouseY = input.getMouseY();
         mouseWheel = Mouse.getDWheel();
+        playerAngle = (float) Math.atan2(mouseY - playerPos.getY() - 32, mouseX - playerPos.getX() - 32);
 
         dt = getDelta();
         if (dt > 20) {
@@ -232,12 +222,12 @@ public class MainGame extends BasicGame { // add states
                     }
                 }
             }
-            System.out.println(mouseX + ":" + mouseY);
+            // System.out.println(mouseX + ":" + mouseY);
         }
 
         if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
             if (((PlayerMovementCompenent) friendlyEnts.get(0).getComponent(Consts.PLAYERMOVEMENT)).canMove()) {
-                if (new Vector2f(mouseX, mouseY).distance(playerPos) > 32) {
+                if (new Vector2f(mouseX, mouseY).distance(playerPos) > 1) {
                     destination = new Vector2f(mouseX, mouseY);
                 }
             }
@@ -246,12 +236,15 @@ public class MainGame extends BasicGame { // add states
         if (destination.distance(playerPos) > 1) {
             float angle1 = (float) Math.atan2(destination.getY() - playerPos.getY(),
                     destination.getX() - playerPos.getX());
-            float speed1 = ((PlayerMovementCompenent) friendlyEnts.get(0).getComponent(Consts.PLAYERMOVEMENT))
-                    .getSpeed();
-            offset.x = (float) -(-dt / 1000f * speed1 * Math.cos(angle1) * Consts.TILE_SIZE);
-            offset.y = (float) -(-dt / 1000f * speed1 * Math.sin(angle1) * Consts.TILE_SIZE);
-            destination.x = Math.abs(destination.getX() - offset.getX());
-            destination.y = Math.abs(destination.getY() - offset.getY());
+            PlayerMovementCompenent movement = ((PlayerMovementCompenent) friendlyEnts.get(0)
+                    .getComponent(Consts.PLAYERMOVEMENT));
+            if (movement.canMove()) {
+                float speed1 = movement.getSpeed();
+                offset.x = (float) (dt / 1000f * speed1 * Math.cos(angle1) * Consts.TILE_SIZE);
+                offset.y = (float) (dt / 1000f * speed1 * Math.sin(angle1) * Consts.TILE_SIZE);
+                destination.x = Math.abs(destination.getX() - offset.getX());
+                destination.y = Math.abs(destination.getY() - offset.getY());
+            }
         }
 
         if (input.isKeyPressed(Input.KEY_ESCAPE)) {
@@ -292,7 +285,7 @@ public class MainGame extends BasicGame { // add states
                     currentSpell = spell.getCurrentSpell();
                 }
                 if (input.isKeyPressed(Input.KEY_3)) {
-
+                    System.out.println(((StatusComponent) ent1.getComponent(Consts.STATUS)).getCurrentStatus());
                 }
                 if (input.isKeyPressed(Input.KEY_4)) {
 
@@ -304,10 +297,10 @@ public class MainGame extends BasicGame { // add states
                     ent1.broadcast("KEY " + Input.KEY_ESCAPE);
                 }
                 if (input.isKeyPressed(Input.KEY_F9)) {
-                    ent1.broadcast("AS 50%");
-                    ent1.broadcast("DMG 100%");
-                    ent1.broadcast("MS 100%");
-                    ent1.broadcast("LS 100%");
+                    ent1.broadcast("AS 20%");
+                    ent1.broadcast("DMG 20%");
+                    ent1.broadcast("MS 20%");
+                    ent1.broadcast("LS 20%");
                     ent1.broadcast("MPcap 500");
                     ent1.broadcast("HPcap 500");
                     ent1.broadcast("MPregen 100");
@@ -341,7 +334,7 @@ public class MainGame extends BasicGame { // add states
                                     }
                                     if (healthBefore > 0) {
                                         ent1.process(new MessageChannel(ent2,
-                                                "heal " + (healthBefore - healthAfter) * attack.getLifesteal()));
+                                                "HPdelta " + (healthBefore - healthAfter) * attack.getLifesteal()));
                                     }
                                     if (attack.getCleaveRadius() == 0) {
                                         break;
@@ -357,34 +350,18 @@ public class MainGame extends BasicGame { // add states
                     if (spell.isReady()) {
                         String action = spell.cast();
                         if (action != null) {
-                            sound = new Sound(currentSpell.getSoundPath());
-                            sound.play();
-                            float angle = (float) Math.atan2(mouseY - playerPos.getY() - 32,
-                                    mouseX - playerPos.getX() - 32);
-
+                            // sound = new Sound(currentSpell.getSoundPath());
+                            // sound.play();
                             switch (currentSpell) {
                             case CoFireball:
-                                Entity entity1 = new Entity("CoFireball");
-                                entity1.addComponent(
-                                        new SpriteComponent(entity1, "images/spells/cofireball-1.png", 64, 64));
-                                entity1.addComponent(new GuideComponent(entity1, 9f, angle));
-                                entity1.addComponent(new TransformComponent(entity1, playerPos.getX() + 32,
-                                        playerPos.getY() + 32, 16, 16, 1, angle));
-                                entity1.addComponent(new SpellComponent(entity1, "enemy"));
-                                entity1.addComponent(
-                                        new SpellDamageComponent(entity1, spell.getDamage(), spell.getDamageType()));
-                                cospells.add(entity1);
+                                cospells.add(EntityFactory.getFireballBlueprint(playerPos.getX() + 32,
+                                        playerPos.getY() + 32, playerAngle, spell.getDamage(), spell.getDamageType()));
+                                break;
+                            case Decrepify:
+                                cospells.add(EntityFactory.getDecrepifyBlueprint(mouseX, mouseY, 128));
                                 break;
                             case SummonWall:
-                                // remove any previous summons
-                                Entity entity2 = new Entity("Wall");
-                                entity2.addComponent(new SpriteComponent(entity2, "images/wall.png", 128, 32));
-                                // dies too soon?!
-                                entity2.addComponent(new HealthComponent(entity2, 9000, 9000, -900));
-                                System.out.println(angle * 180 / Math.PI);
-                                entity2.addComponent(new TransformComponent(entity2, mouseX - 32, mouseY - 32, 128, 32,
-                                        1, (float) (Math.PI / 2 + angle)));
-                                friendlyEntsQueue.add(entity2);
+                                friendlyEntsQueue.add(EntityFactory.getWallBlueprint(mouseX, mouseY, playerAngle));
                                 break;
                             case ReviveMinion:
                                 Entity closestEntity = getClosestEntity(new Vector2f(mouseX, mouseY), friendlyEnts);
@@ -397,33 +374,24 @@ public class MainGame extends BasicGame { // add states
                             case Teleport:
                                 offset = new Vector2f(-(playerPos.getX() - mouseX), -(playerPos.getY() - mouseY));
                                 break;
-                            case Nourish:
-                                friendlySpells.add(new Heal(new Image(currentSpell.getImagePath()), "friend",
-                                        new Vector2f(playerPos.getX() + 32, playerPos.getY() + 32), angle,
-                                        spell.getHealing(), 15));
+                            case Heal:
+                                cospells.add(EntityFactory.getHealBlueprint(playerPos.getX() + 32,
+                                        playerPos.getY() + 32, spell.getHealing(), "friend"));
                                 break;
                             case ScorchedEarth:
-                                friendlySpells.add(new ScorchedEarth(new Image(currentSpell.getImagePath()), "enemy",
-                                        new Vector2f(playerPos.getX() + 32, playerPos.getY() + 32), angle, 128,
-                                        spell.getDamage(), 1.5f));
+                                cospells.add(EntityFactory.getScorchedEarthBlueprint(playerPos.getX() + 32,
+                                        playerPos.getY() + 32, spell.getDamage(), 50));
                                 break;
                             case Weaken:
-                                friendlySpells.add(new Weaken(new Image(currentSpell.getImagePath()), "enemy",
-                                        new Vector2f(mouseX, mouseY), angle, 128, 0.5f));
-                                break;
-                            case Decrepify:
-                                friendlySpells.add(new Decrepify(new Image(currentSpell.getImagePath()), "enemy",
-                                        new Vector2f(mouseX, mouseY), angle, 128, 0.5f));
+                                cospells.add(EntityFactory.getWeakenBlueprint(mouseX, mouseY, 50));
                                 break;
                             case PoisonArrow:
-                                friendlySpells.add(new PoisonArrow(new Image(currentSpell.getImagePath()), "enemy",
-                                        new Vector2f(playerPos.getX() + 32, playerPos.getY() + 32), angle,
-                                        SpellType.PoisonArrow.getSpeed(), SpellType.PoisonArrow.getRange(),
-                                        spell.getDamage(), 0));
+                                cospells.add(EntityFactory.getPoisonArrowBlueprint(playerPos.getX() + 32,
+                                        playerPos.getY() + 32, playerAngle, 2, 4, "enemy"));
                                 break;
                             case Bouncer:
                                 friendlySpells.add(new Bouncer(new Image(currentSpell.getImagePath()), "enemy",
-                                        new Vector2f(playerPos.getX() + 32, playerPos.getY() + 32), angle,
+                                        new Vector2f(playerPos.getX() + 32, playerPos.getY() + 32), playerAngle,
                                         SpellType.Bouncer.getSpeed(), SpellType.Bouncer.getRange(), spell.getDamage(),
                                         15));
                                 break;
@@ -438,21 +406,18 @@ public class MainGame extends BasicGame { // add states
                                 }
                                 break;
                             case SummonKirith:
-                                // remove any previous summons
-                                Entity entity = new Entity("Kirith");
-                                entity.addComponent(new SpriteComponent(entity, "images/kirith.png", 64, 64));
-                                // dies too soon?!
-                                entity.addComponent(new HealthComponent(entity, 100000, 100000, -10000));
-                                SpellType[] spells = { SpellType.MultiBouncer };
-                                entity.addComponent(new CastComponent(entity, spells));
-                                entity.addComponent(new ManaComponent(entity, 200, 200));
-                                entity.addComponent(new ComputerMovementComponent(entity, 0.5f));
-                                entity.addComponent(new AttackComponent(entity, currentSpell.getDamage(), 0.7f));
-                                entity.addComponent(new TransformComponent(entity, mouseX - 32, mouseY - 32, 64, 64));
-                                friendlyEntsQueue.add(entity);
+                                // kill any previous summons
+                                for (Entity ent: friendlyEnts) {
+                                    if (ent.getName().matches("Kirith")) {
+                                        ent.broadcast("HPdelta -999999");
+                                    }
+                                }
+                                friendlyEntsQueue
+                                        .add(EntityFactory.getKirithBlueprint(mouseX, mouseY, spell.getDamage()));
+                                break;
                             case Fireball:
                                 friendlySpells.add(new Fireball(new Image(currentSpell.getImagePath()), "enemy",
-                                        new Vector2f(playerPos.getX() + 32, playerPos.getY() + 32), angle,
+                                        new Vector2f(playerPos.getX() + 32, playerPos.getY() + 32), playerAngle,
                                         SpellType.Fireball.getSpeed(), SpellType.Fireball.getRange(), spell.getDamage(),
                                         16));
                                 break;
@@ -475,72 +440,60 @@ public class MainGame extends BasicGame { // add states
                     float dx = x - playerPos.getX();
                     float dy = y - playerPos.getY();
                     if (Math.sqrt(dx * dx + dy * dy) <= spell.getCurrentSpell().getRange()) {
-                        if (spell.getCurrentSpell() != SpellType.Null
-                                && spell.getCurrentSpell() != SpellType.SummonKirith) {
-                            if (spell.isReady()) {
-                                String action = spell.cast();
-                                if (action != null) {
-                                    Sound sound = new Sound(spell.getCurrentSpell().getSoundPath());
-                                    sound.play();
-                                    float angle = (float) Math.atan2(playerPos.getY() + 32 - y,
-                                            playerPos.getX() + 32 - x);
-                                    switch (spell.getCurrentSpell()) {
-                                    case Fireball:
-                                        enemySpells.add(new Fireball(new Image(spell.getCurrentSpell().getImagePath()),
-                                                "friend", new Vector2f(x, y), angle, SpellType.Fireball.getSpeed(),
-                                                SpellType.Fireball.getRange(), spell.getDamage(), 16));
-                                        break;
-                                    case ReviveMinion:
-                                        ArrayList<Entity> ents = new ArrayList<Entity>();
-                                        for (Entity entity: enemyEnts) {
-                                            ents.add(entity);
-                                        }
-                                        Entity temp = ents.get(0);
-                                        if (temp.hasComponent(Consts.HEALTH)) {
-                                            while (((HealthComponent) temp.getComponent(Consts.HEALTH)).isAlive()) {
-                                                ents.remove(temp);
-                                                temp = getClosestEntity(ent1, ents);
-                                                if (ents.isEmpty()) {
-                                                    break;
-                                                }
-                                                if (!temp.hasComponent(Consts.HEALTH)) {
-                                                    break;
-                                                }
-                                            }
-                                            if (temp.getName().matches("Common unit")) {
-                                                temp.broadcast("ress");
-                                            }
-                                        }
-                                        break;
-                                    case PoisonArrow:
-                                        enemySpells.add(new PoisonArrow(new Image(SpellType.PoisonArrow.getImagePath()),
-                                                "friend", new Vector2f(x, y), angle, SpellType.PoisonArrow.getSpeed(),
-                                                SpellType.PoisonArrow.getRange(), SpellType.PoisonArrow.getDamage(),
-                                                0));
-                                        break;
-                                    case Bouncer:
-                                        enemySpells.add(new Bouncer(new Image(SpellType.Bouncer.getImagePath()),
-                                                "friend", new Vector2f(x + 30, y), angle, SpellType.Bouncer.getSpeed(),
-                                                SpellType.Bouncer.getRange(), spell.getDamage(), 15));
-                                        break;
-                                    case ScorchedEarth:
-                                        enemySpells.add(
-                                                new ScorchedEarth(new Image(SpellType.ScorchedEarth.getImagePath()),
-                                                        "friend", new Vector2f(x, y), 0, 128, spell.getDamage(), 1.5f));
-                                        break;
-                                    case Nourish:
-                                        enemySpells.add(new Heal(new Image(SpellType.Nourish.getImagePath()), "enemy",
-                                                new Vector2f(x, y), 0, spell.getHealing(), 15));
-                                        break;
-                                    default:
-                                        break;
+                        if (spell.isReady()) {
+                            String action = spell.cast();
+                            if (action != null) {
+                                // sound = new
+                                // Sound(spell.getCurrentSpell().getSoundPath());
+                                // sound.play();
+                                float angle = (float) Math.atan2(playerPos.getY() + 32 - y, playerPos.getX() + 32 - x);
+                                switch (spell.getCurrentSpell()) {
+                                case Fireball:
+                                    enemySpells.add(new Fireball(new Image(spell.getCurrentSpell().getImagePath()),
+                                            "friend", new Vector2f(x, y), angle, SpellType.Fireball.getSpeed(),
+                                            SpellType.Fireball.getRange(), spell.getDamage(), 16));
+                                    break;
+                                case ReviveMinion:
+                                    ArrayList<Entity> ents = new ArrayList<Entity>();
+                                    for (Entity ent: enemyEnts) {
+                                        ents.add(ent);
                                     }
-                                    spell.receive("next spell");
+                                    Entity temp = ents.get(0);
+                                    if (temp.hasComponent(Consts.HEALTH)) {
+                                        while (((HealthComponent) temp.getComponent(Consts.HEALTH)).isAlive()) {
+                                            ents.remove(temp);
+                                            temp = getClosestEntity(ent1, ents);
+                                            if (ents.isEmpty()) {
+                                                break;
+                                            }
+                                            if (!temp.hasComponent(Consts.HEALTH)) {
+                                                break;
+                                            }
+                                        }
+                                        if (temp.getName().matches("Common unit [0-9]+")) {
+                                            temp.broadcast("ress");
+                                        }
+                                    }
+                                    break;
+                                case PoisonArrow:
+                                    cospells.add(EntityFactory.getPoisonArrowBlueprint(x, y, angle, 2, 4, "friend"));
+                                    break;
+                                case Bouncer:
+                                    enemySpells.add(new Bouncer(new Image(SpellType.Bouncer.getImagePath()), "friend",
+                                            new Vector2f(x + 30, y), angle, SpellType.Bouncer.getSpeed(),
+                                            SpellType.Bouncer.getRange(), spell.getDamage(), 15));
+                                    break;
+                                case Heal:
+                                    enemySpells.add(new Heal(new Image(SpellType.Heal.getImagePath()), "enemy",
+                                            new Vector2f(x, y), 0, spell.getHealing(), 15));
+                                    break;
+                                default:
+                                    break;
                                 }
+                                spell.receive("next spell");
                             }
-                        } else {
-                            spell.receive("next spell");
                         }
+
                     }
                 }
             }
@@ -609,14 +562,38 @@ public class MainGame extends BasicGame { // add states
             Entity spell = iter.next();
             SpellComponent spellComp = ((SpellComponent) spell.getComponent(Consts.SPELL));
             if (spellComp.getTargets().contains("enemy")) {
+                ArrayList<Entity> targets = new ArrayList<Entity>();
                 for (Entity enemy: enemyEnts) {
                     if (colliding(enemy, spell)) {
-                        SpellDamageComponent spellDamage = ((SpellDamageComponent) spell
-                                .getComponent(Consts.SPELLDAMAGE));
-                        sound = new Sound(SpellType.valueOf(spell.getName()).getDeathSoundPath());
-                        sound.play();
-                        enemy.broadcast(spellDamage.getMessage());
+                        if (!targets.contains(enemy)) {
+                            targets.add(enemy);
+                        }
+                        // sound = new
+                        // Sound(SpellType.valueOf(spell.getName()).getDeathSoundPath());
+                        // sound.play();
                     }
+                }
+                if (targets.size() > 0) {
+                    spellComp.handleTargets(targets);
+                }
+                if (spellComp.isFinished()) {
+                    iter.remove();
+                }
+            }
+            if (spellComp.getTargets().contains("friend")) {
+                ArrayList<Entity> targets = new ArrayList<Entity>();
+                for (Entity friend: friendlyEnts) {
+                    if (colliding(friend, spell)) {
+                        if (!targets.contains(friend)) {
+                            targets.add(friend);
+                        }
+                        // sound = new
+                        // Sound(SpellType.valueOf(spell.getName()).getDeathSoundPath());
+                        // sound.play();
+                    }
+                }
+                if (targets.size() > 0) {
+                    spellComp.handleTargets(targets);
                 }
                 if (spellComp.isFinished()) {
                     iter.remove();
@@ -788,6 +765,21 @@ public class MainGame extends BasicGame { // add states
                 }
                 if (!isOutsideScreen(ent1)) {
                     comp.update();
+                    if (comp.getID() == Consts.TRANSFORM) {
+                        if (ent1.hasComponent(Consts.COMPUTERMOVEMENT)) {
+                            ComputerMovementComponent movement = ((ComputerMovementComponent) ent1
+                                    .getComponent(Consts.COMPUTERMOVEMENT));
+                            if (distance(ent1, friendlyEnts.get(0)) <= movement.getAquisitionRange()
+                                    && distance(ent1, friendlyEnts.get(0)) >= movement.getMinimumDistance()) {
+                                if (movement.canMove()) {
+                                    TransformComponent trans = (TransformComponent) comp;
+                                    float angle = (float) Math.atan2(playerPos.getY() - trans.getY(),
+                                            playerPos.getX() - trans.getX());
+                                    movement.move((float) Math.cos(angle), (float) Math.sin(angle));
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -819,6 +811,12 @@ public class MainGame extends BasicGame { // add states
 
         offset.x = 0;
         offset.y = 0;
+
+        ArrayList<Status> statusList = ((StatusComponent) friendlyEnts.get(0).getComponent(Consts.STATUS))
+                .getCurrentStatus();
+        for (int i = 0; i < statusList.size(); i++) {
+            g.drawString(statusList.get(i).toString(), 5, 50 + 15 * i);
+        }
 
         drawUI(g);
 
@@ -883,6 +881,9 @@ public class MainGame extends BasicGame { // add states
         for (Entity cospell: cospells) {
             ((SpriteComponent) cospell.getComponent(Consts.SPRITE)).draw();
             ((TransformComponent) cospell.getComponent(Consts.TRANSFORM)).draw();
+            if (cospell.hasComponent(Consts.CIRCULARMOVEMENT)) {
+                ((CircularMovement) cospell.getComponent(Consts.CIRCULARMOVEMENT)).draw();
+            }
         }
     }
 
@@ -934,8 +935,8 @@ public class MainGame extends BasicGame { // add states
                 10);
         g.setColor(Color.white);
 
-        g.drawString("(" + (int) -map.getOffset().getX() + ":" + (int) -map.getOffset().getY() + ")",
-                Consts.SCREEN_WIDTH - 120, 10);
+        g.drawString("(" + (int) (-map.getOffset().getX() + playerPos.getX()) + ":"
+                + (int) (-map.getOffset().getY() + playerPos.getY()) + ")", Consts.SCREEN_WIDTH - 120, 10);
     }
 
     private Entity getClosestEntity(Entity ent1, ArrayList<Entity> ents) {
@@ -980,7 +981,6 @@ public class MainGame extends BasicGame { // add states
             float dx = trans1.getCenterX() - trans2.getCenterX();
             float dy = trans1.getCenterY() - trans2.getCenterY();
             float distance = (float) Math.sqrt(dx * dx + dy * dy);
-
             // TODO optimize it
             if (distance <= trans1.getRadius() + trans2.getRadius()) {
                 if (trans1.getShape().intersects(trans2.getShape())) {
