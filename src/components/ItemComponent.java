@@ -1,7 +1,9 @@
 package components;
 
-public interface ItemComponent {
-    public String[] giveBonuses();
+import java.util.ArrayList;
 
-    public String[] negateBonuses();
+public interface ItemComponent {
+    public ArrayList<String> giveBonuses();
+
+    public ArrayList<String> negateBonuses();
 }

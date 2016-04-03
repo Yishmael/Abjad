@@ -1,6 +1,9 @@
 package components.units;
 
+import org.lwjgl.Sys;
+
 import components.Component;
+import loaders.FontLoader;
 import others.Consts;
 import others.Entity;
 import others.MessageChannel;
@@ -12,6 +15,8 @@ public class LevelComponent implements Component {
     private int level;
     private float experience;
     private float maxExperience;
+    private FontLoader font = new FontLoader("cac", 23, java.awt.Color.WHITE);
+    private long levelUpTime;
 
     public LevelComponent(Entity self, int level) {
         this.self = self;
@@ -36,8 +41,16 @@ public class LevelComponent implements Component {
                 level++;
                 maxExperience = calculateMaxExperience(level);
                 System.out.println("Level " + level + "!");
-                self.broadcast("lvlup");
+                self.broadcast("leveledup");
+                levelUpTime = (Sys.getTime() * 1000) / Sys.getTimerResolution();
             }
+        } else if (str.matches("lvlup")) {
+            level++;
+            maxExperience = calculateMaxExperience(level);
+            // TODO fix the experience when forcing a level up
+            experience = maxExperience;
+            System.out.println("Level " + level + "!");
+            self.broadcast("leveledup");
         }
     }
 
@@ -48,9 +61,21 @@ public class LevelComponent implements Component {
         return maxExperience + (float) (100 * (level + 1) + Math.pow(1.25f, (level + 1)));
     }
 
+    // temp
+    @Override
+    public void draw() {
+        if (levelUpTime > 0) {
+            // display the text for 1.5 seconds
+            if ((Sys.getTime() * 1000) / Sys.getTimerResolution() - levelUpTime <= 1500) {
+                font.draw(Consts.SCREEN_WIDTH / 2 - 32, Consts.SCREEN_HEIGHT / 2 - (32 + 32 + 25), "Level up.");
+            } else {
+                levelUpTime = 0;
+            }
+        }
+    }
+
     @Override
     public void update() {
-        // TODO Auto-generated method stub
 
     }
 
@@ -58,7 +83,7 @@ public class LevelComponent implements Component {
         if (level < 2) {
             return 0;
         }
-        return getRequiredExperience(level - 1) + (float) (100 * (level) + Math.pow(1.25f, (level )));
+        return getRequiredExperience(level - 1) + (float) (100 * (level) + Math.pow(1.25f, (level)));
     }
 
     public float getExperienceBounty() {

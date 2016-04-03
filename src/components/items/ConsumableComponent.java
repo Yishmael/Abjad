@@ -1,5 +1,7 @@
 package components.items;
 
+import java.util.ArrayList;
+
 import components.Component;
 import components.ItemComponent;
 import enums.StatusType;
@@ -55,20 +57,27 @@ public class ConsumableComponent implements Component, ItemComponent {
     }
 
     @Override
-    public String[] giveBonuses() {
+    public ArrayList<String> giveBonuses() {
         if (duration > 0) {
-            String[] total = new String[status.length];
-            for (int i = 0; i < total.length; i++) {
-                total[i] = status[i].name() + " " + (amount[i] / duration) + " " + duration;
+            ArrayList<String> total = new ArrayList<String>();
+            for (int i = 0; i < status.length; i++) {
+                total.add(status[i].name() + " " + (amount[i] / duration) + " " + duration);
             }
+
             return total;
         }
         return null;
     }
 
     @Override
-    public String[] negateBonuses() {
+    public ArrayList<String> negateBonuses() {
         return null;
+    }
+
+    @Override
+    public void draw() {
+        // TODO Auto-generated method stub
+
     }
 
 }

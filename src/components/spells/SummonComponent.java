@@ -34,7 +34,7 @@ public class SummonComponent implements Component {
     }
 
     public Entity summon() throws SlickException {
-        Entity entity1 = new Entity("CoFireball");
+        Entity entity1 = new Entity("Summoned Ifrit");
 
         entity1.addComponent(new SpriteComponent(entity1, "images/ifrit.png", 64, 64));
         entity1.addComponent(new SpriteComponent(entity1, "images/ifrit.png", 64, 64));
@@ -61,5 +61,11 @@ public class SummonComponent implements Component {
 
     public long getID() {
         return id;
+    }
+
+    @Override
+    public void draw() {
+        // TODO Auto-generated method stub
+
     }
 }

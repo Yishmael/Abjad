@@ -9,7 +9,8 @@ import org.newdawn.slick.geom.Rectangle;
 
 import components.Component;
 import components.ItemComponent;
-import fonts.Text;
+import loaders.FontLoader;
+import others.Button;
 import others.Consts;
 import others.Entity;
 import others.MessageChannel;
@@ -18,67 +19,109 @@ public class InventoryComponent implements Component {
     private long id = Consts.INVENTORY;
     private Entity self;
 
-    private float width = Consts.SCREEN_WIDTH * 0.66f, height = Consts.SCREEN_HEIGHT * 0.33f;
     private Image inventoryImage;
     private Graphics g = new Graphics();
     private boolean shown = false;
     private ArrayList<Entity> unequippedItems = new ArrayList<Entity>();
-    private Text font = new Text("fonts/verdana.ttf", java.awt.Color.YELLOW);
+    private FontLoader font = new FontLoader("verdana", 9, java.awt.Color.YELLOW);
+    // TODO move this to Consts
+    int ratio = 1;
 
-    private int capacity = 16;
+    private int capacity = 20;
     private Image gearPane;
     private ArrayList<Entity> equippedItems = new ArrayList<Entity>();
-    private Rectangle[] frames = { new Rectangle(90, 30, 40, 40), new Rectangle(20, 80, 50, 80),
-            new Rectangle(80, 80, 60, 100), new Rectangle(150, 80, 50, 80), new Rectangle(150, 175, 50, 50),
-            new Rectangle(20, 175, 50, 50), new Rectangle(150, 40, 30, 30), new Rectangle(80, 190, 60, 20) };
+    private Button[] gearFrames = new Button[8];
+    private Button[] inventoryFrames = new Button[capacity];
+    private Button[] frames = new Button[gearFrames.length + inventoryFrames.length];
 
     public InventoryComponent(Entity self, ArrayList<Entity> items) throws SlickException {
-        this.inventoryImage = new Image("res/images/ui/inventory1.png");
         this.self = self;
         if (items != null) {
             for (Entity item: items) {
                 if (item != null) {
-                    if (this.unequippedItems.size() < capacity) {
-                        this.unequippedItems.add(item);
+                    if (unequippedItems.size() < capacity) {
+                        unequippedItems.add(item);
                     }
                 }
             }
         }
-        this.gearPane = new Image("res/images/ui/iface2.png");
+        inventoryImage = new Image("res/images/ui/inventory1.png");
+        gearPane = new Image("res/images/ui/iface2.png");
+
+        inventoryFrames = new Button[20];
+        for (int i = 0; i < 20; i++) {
+            float x = 5 + 45 * (ratio * (i - 5 * (i / 5)));
+            float y = 5 + Consts.SCREEN_HEIGHT * 0.65f + ratio * 45 * (i / 5);
+            inventoryFrames[i] = new Button(null, new Rectangle(x, y, ratio * 40, ratio * 40), "slot " + i,
+                    "slot" + i + " cmd");
+        }
+
+        gearFrames[0] = new Button(null, new Rectangle(ratio * 90, ratio * 30, ratio * 40, ratio * 40), "Helm",
+                "helm command");
+        gearFrames[1] = new Button(null, new Rectangle(ratio * 20, ratio * 80, ratio * 50, ratio * 80), "Weapon",
+                "weap command");
+        gearFrames[2] = new Button(null, new Rectangle(ratio * 80, ratio * 80, ratio * 60, ratio * 100), "Chest",
+                "chest command");
+        gearFrames[3] = new Button(null, new Rectangle(ratio * 150, ratio * 80, ratio * 50, ratio * 80), "Shield",
+                "shield command");
+        gearFrames[4] = new Button(null, new Rectangle(ratio * 150, ratio * 175, ratio * 50, ratio * 50), "Boots",
+                "boots command");
+        gearFrames[5] = new Button(null, new Rectangle(ratio * 20, ratio * 175, ratio * 50, ratio * 50), "Gloves",
+                "gloves command");
+        gearFrames[6] = new Button(null, new Rectangle(ratio * 150, ratio * 40, ratio * 30, ratio * 30), "Necklace",
+                "necklace command");
+        gearFrames[7] = new Button(null, new Rectangle(ratio * 80, ratio * 190, ratio * 60, ratio * 20), "Belt",
+                "belt command");
+
+        for (int i = 0; i < gearFrames.length; i++) {
+            frames[i] = gearFrames[i];
+        }
+
+        for (int i = 0; i < inventoryFrames.length; i++) {
+            frames[i + gearFrames.length] = inventoryFrames[i];
+        }
     }
 
     public void addItem(Entity item) {
         if (item != null) {
             if (unequippedItems.size() < capacity) {
                 unequippedItems.add(item);
+                System.out.println("Picked up: " + item.getName());
+            }
+        }
+    }
+
+    public void drawFrame(Button frame) {
+        for (Button f: frames) {
+            if (f == frame) {
+                f.drawDescription(g, font);
             }
         }
     }
 
     public void draw() {
         if (shown) {
-            g.drawImage(inventoryImage, 0, Consts.SCREEN_HEIGHT * 0.56f, Consts.SCREEN_WIDTH * 0.34f,
-                    Consts.SCREEN_HEIGHT, 0, 0, width, height);
-            for (int i = 0, j = 0; i < unequippedItems.size(); i++) {
-                if (i == 5 || i == 10) {
-                    j++;
+            g.drawImage(gearPane, 0, 0, Consts.SCREEN_WIDTH * 0.34f, Consts.SCREEN_HEIGHT * 0.65f, 0, 0,
+                    gearPane.getWidth(), gearPane.getHeight());
+            g.drawImage(inventoryImage, 0, Consts.SCREEN_HEIGHT * 0.65f, Consts.SCREEN_WIDTH * 0.34f,
+                    Consts.SCREEN_HEIGHT, 0, 0, inventoryImage.getWidth(), inventoryImage.getHeight());
+
+            for (int i = 0; i < unequippedItems.size(); i++) {
+                if (inventoryFrames[i]
+                        .getImage() != ((SpriteComponent) unequippedItems.get(i).getComponent(Consts.SPRITE))
+                                .getImage()) {
+                    inventoryFrames[i].setImage(
+                            ((SpriteComponent) unequippedItems.get(i).getComponent(Consts.SPRITE)).getImage());
+                    inventoryFrames[i].setDescription(unequippedItems.get(i).getName());
                 }
-                int x = 40 * (i - 5 * j);
-                int y = Consts.SCREEN_HEIGHT - 192 + 40 * j;
-                ((SpriteComponent) unequippedItems.get(i).getComponent(Consts.SPRITE)).draw(x, y, 0, 2f);
-                ((SpriteComponent) unequippedItems.get(i).getComponent(Consts.SPRITE)).draw();
-                g.draw(new Rectangle(x, y, 40, 40));
+                inventoryFrames[i].draw(g);
             }
 
-            g.drawImage(gearPane, 0, 0, Consts.SCREEN_WIDTH * 0.34f, Consts.SCREEN_HEIGHT * 0.60f, 0, 0,
-                    gearPane.getWidth(), gearPane.getHeight());
-
-            for (int i = 0; i < frames.length; i++) {
-                g.draw(frames[i]);
+            for (int i = 0; i < gearFrames.length; i++) {
+                gearFrames[i].draw(g);
             }
             for (int i = 0; i < equippedItems.size(); i++) {
                 int index = 0;
-                Image img = ((SpriteComponent) equippedItems.get(i).getComponent(Consts.SPRITE)).getImage();
                 String name = equippedItems.get(i).getName();
                 if (name.contains("Helm")) {
                     index = 0;
@@ -97,21 +140,42 @@ public class InventoryComponent implements Component {
                 } else if (name.contains("Belt")) {
                     index = 7;
                 }
-
-                g.drawImage(img, frames[index].getX(), frames[index].getY(),
-                        frames[index].getX() + frames[index].getWidth(),
-                        frames[index].getY() + frames[index].getHeight(), 0, 0, img.getWidth(), img.getHeight());
-                int row = 0;
-                for (Component comp: equippedItems.get(i).getComponents())
-                    if (ItemComponent.class.isInstance(comp)) {
-                        for (String bonus: ((ItemComponent) comp).giveBonuses()) {
-                            font.draw(frames[index].getX(), frames[index].getY() + row * 12, bonus);
-                            row++;
+                if (gearFrames[index].getImage() != ((SpriteComponent) equippedItems.get(i).getComponent(Consts.SPRITE))
+                        .getImage()) {
+                    gearFrames[index]
+                            .setImage(((SpriteComponent) equippedItems.get(i).getComponent(Consts.SPRITE)).getImage());
+                    ArrayList<String> bonuses = new ArrayList<String>();
+                    for (Component comp: equippedItems.get(i).getComponents()) {
+                        if (ItemComponent.class.isInstance(comp)) {
+                            for (String bonus: ((ItemComponent) comp).giveBonuses()) {
+                                bonuses.add(bonus);
+                            }
                         }
                     }
+                    gearFrames[index].setDescriptionList(bonuses);
+                }
+
+                gearFrames[index].draw(g);
+                int row = 0;
+                for (String bonus: gearFrames[index].getDescriptionList()) {
+                    font.draw(gearFrames[index].getX(), gearFrames[index].getY() + 13 * row, bonus);
+                    row++;
+                }
             }
         }
+    }
 
+    public void nextItem() {
+        if (unequippedItems.size() > 0) {
+            for (Entity equipped: equippedItems) {
+                if (equipped.getName().matches(unequippedItems.get(0).getName())) {
+                    unequip(equipped);
+                    equip(unequippedItems.get(0));
+                    return;
+                }
+            }
+            equip(unequippedItems.get(0));
+        }
     }
 
     public void receive(String command) {
@@ -148,7 +212,7 @@ public class InventoryComponent implements Component {
         unequippedItems.remove(item);
         if (!item.hasComponent(Consts.CONSUMABLE)) {
             equippedItems.add(item);
-            System.out.println(item.getName());
+            // System.out.println(item.getName());
         }
         // if (currentItem.hasComponent(Consts.ATTACK)) {
         // AttackComponent attack = (AttackComponent)
@@ -193,6 +257,26 @@ public class InventoryComponent implements Component {
         // currentItem.getComponent(Consts.MANABONUS);
         // self.broadcast(manaBonus.negateBonus());
         // }
+    }
+
+    public Button[] getGearFrames() {
+        return gearFrames;
+    }
+
+    public Button[] getInventoryFrames() {
+        return inventoryFrames;
+    }
+
+    public Button[] getFrames() {
+        return frames;
+    }
+
+    public void toggleInv() {
+        shown = !shown;
+    }
+
+    public boolean isShown() {
+        return shown;
     }
 
     public long getID() {

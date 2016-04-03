@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import org.newdawn.slick.SlickException;
 
 import components.Component;
+import factories.ItemFactory;
 import others.Consts;
 import others.Entity;
-import others.EntityFactory;
 import others.MessageChannel;
 
 public class YieldComponent implements Component {
@@ -34,22 +34,22 @@ public class YieldComponent implements Component {
     public ArrayList<Entity> getDrops() throws SlickException {
         self.broadcast("requestlvl");
         if (Math.random() < 0.1) {
-            drops.add(EntityFactory.getAxeBlueprint(level));
+            drops.add(ItemFactory.getAxeBlueprint(level));
         }
         if (Math.random() < 0.1) {
-            drops.add(EntityFactory.getBootsBlueprint(level));
+            drops.add(ItemFactory.getBootsBlueprint(level));
         }
         if (Math.random() < 0.1) {
-            drops.add(EntityFactory.getWandBlueprint(level));
+            drops.add(ItemFactory.getWandBlueprint(level));
         }
         if (Math.random() < 0.1) {
-            drops.add(EntityFactory.getCherryBlueprint(level));
+            drops.add(ItemFactory.getCherryBlueprint(level));
         }
         if (Math.random() < 0.1) {
-            drops.add(EntityFactory.getChestBlueprint(level));
+            drops.add(ItemFactory.getChestBlueprint(level));
         }
         if (Math.random() < 0.1) {
-            drops.add(EntityFactory.getGlovesBlueprint(level));
+            drops.add(ItemFactory.getGlovesBlueprint(level));
         }
         yielded = true;
 
@@ -79,5 +79,11 @@ public class YieldComponent implements Component {
     @Override
     public long getID() {
         return id;
+    }
+
+    @Override
+    public void draw() {
+        // TODO Auto-generated method stub
+
     }
 }

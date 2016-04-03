@@ -28,6 +28,7 @@ public class ManaComponent implements Component {
         this.maxMana = baseMaxMana;
         this.manaRegen = 0;
     }
+
     public ManaComponent(Entity self, float baseMaxMana) {
         this.self = self;
         this.mana = baseMaxMana;
@@ -73,44 +74,31 @@ public class ManaComponent implements Component {
             str = str.substring(8);
             float temp = Float.parseFloat(str);
             MPdelta(temp);
-            return;
-        }
-        if (str.matches("died")) {
+        } else if (str.matches("died")) {
             manaOnDeath = mana;
             canRegen = false;
             // System.out.println("Mana on death: " + manaOnDeath);
-            return;
-        }
-        if (str.matches("ressed")) {
+        } else if (str.matches("ressed")) {
             manaOnDeath = 0;
             canRegen = true;
-            return;
-        }
-        if (str.matches("requestMP")) {
+        } else if (str.matches("requestMP")) {
             self.broadcast("updateMP " + mana + " " + maxMana);
-            return;
-        }
-        if (str.matches("INT [0-9]+")) {
+        } else if (str.matches("INT [0-9]+")) {
             str = str.substring(4);
             int intelligence = Integer.parseInt(str);
             percentage = mana / maxMana;
             maxMana += intelligence * 3;
             mana = percentage * maxMana;
             self.broadcast("updateMP " + mana + " " + maxMana);
-            return;
-        }
-        if (str.matches("MPregen [-]?[0-9]+[.]?[0-9]*")) {
+        } else if (str.matches("MPregen [-]?[0-9]+[.]?[0-9]*")) {
             str = str.substring(8);
             manaRegen += Float.parseFloat(str);
-            return;
-        }
-        if (str.matches("MPcap [-]?[0-9]+[.]?[0-9]*")) {
+        } else if (str.matches("MPcap [-]?[0-9]+[.]?[0-9]*")) {
             str = str.substring(6);
             percentage = mana / maxMana;
             maxMana = Math.max(0, maxMana + Float.parseFloat(str));
             mana = percentage * maxMana;
             self.broadcast("updateMP " + mana + " " + maxMana);
-            return;
         }
     }
 
@@ -120,7 +108,9 @@ public class ManaComponent implements Component {
             dt += MainGame.dt;
             if (dt >= 500) {
                 dt = 0;
-                MPdelta(manaRegen / 2);
+                if (manaRegen > 0 && mana < maxMana || manaRegen < 0 && manaRegen > 0) {
+                    MPdelta(manaRegen / 2);
+                }
             }
         }
     }
@@ -128,5 +118,11 @@ public class ManaComponent implements Component {
     @Override
     public long getID() {
         return id;
+    }
+
+    @Override
+    public void draw() {
+        // TODO Auto-generated method stub
+
     }
 }

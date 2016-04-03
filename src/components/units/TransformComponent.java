@@ -8,6 +8,7 @@ import org.newdawn.slick.geom.Point;
 import components.Component;
 import others.Consts;
 import others.Entity;
+import others.MainGame;
 import others.MessageChannel;
 
 public class TransformComponent implements Component {
@@ -77,7 +78,6 @@ public class TransformComponent implements Component {
     public void move(float dx, float dy) {
         if (dx != 0 && dy != 0) {
             float angle = (float) Math.atan2(dy, dx);
-            // this.rotation = angle;
             this.x += dx * Math.abs(Math.cos(angle));
             this.y += dy * Math.abs(Math.sin(angle));
         } else {
@@ -93,7 +93,9 @@ public class TransformComponent implements Component {
 
     // temp
     public void draw() {
-        g.draw(ellipse);
+        if (MainGame.DEBUG) {
+            g.draw(ellipse);
+        }
     }
 
     @Override
@@ -114,8 +116,8 @@ public class TransformComponent implements Component {
             list = str.split(" ");
             rescale(Float.parseFloat(list[0]));
         } else if (str.matches("rotate [-]?[0-9]+[.]?[0-9]*")) {
-            str = str.substring(7);
-            rotate(Float.parseFloat(str));
+            // str = str.substring(7);
+            // rotate(Float.parseFloat(str));
         } else if (str.matches("reposition [-]?[0-9]+[.]?[0-9]* [-]?[0-9]+[.]?[0-9]*")) {
             str = str.substring(9);
             list = str.split(" ");
@@ -156,11 +158,11 @@ public class TransformComponent implements Component {
         brdcst();
     }
 
-    public void rotate(float rotation) {
-        rotation %= 360;
-        this.rotation += rotation * Math.PI / 180f;
-        brdcst();
-    }
+    // public void rotate(float rotation) {
+    // rotation %= 360;
+    // this.rotation += rotation * Math.PI / 180f;
+    // brdcst();
+    // }
 
     private void brdcst() {
         // keep this until i encode messages as ints

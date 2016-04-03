@@ -58,9 +58,8 @@ public class ComputerMovementComponent implements Component, MovementComponent {
     public float getAquisitionRange() {
         return aquisitionRange;
     }
-    
-    public float getMinimumDistance() 
-    {
+
+    public float getMinimumDistance() {
         return minimumDistance;
     }
 
@@ -86,6 +85,12 @@ public class ComputerMovementComponent implements Component, MovementComponent {
     @Override
     public long getID() {
         return id;
+    }
+
+    @Override
+    public void draw() {
+        // TODO Auto-generated method stub
+
     }
 
 }

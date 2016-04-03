@@ -15,6 +15,9 @@ public class HealthComponent implements Component {
     private Entity self;
     private float dt;
     private long timeOfDeath;
+    // private Graphics g = new Graphics();
+    // private FontLoader font = new FontLoader("verdana", 9,
+    // java.awt.Color.white);
 
     public HealthComponent(Entity self, float health, float baseMaxHealth, float healthRegen) {
         this.self = self;
@@ -117,6 +120,8 @@ public class HealthComponent implements Component {
         } else if (str.matches("HPregen [-]?[0-9]+[.]?[0-9]*")) {
             str = str.substring(8);
             healthRegen += Float.parseFloat(str);
+        } else if (str.matches("kill")) {
+            HPdelta(-999999);
         }
     }
 
@@ -126,7 +131,9 @@ public class HealthComponent implements Component {
             dt += MainGame.dt;
             if (dt >= 500) {
                 dt = 0;
-                HPdelta(healthRegen / 2);
+                if (healthRegen > 0 && health < maxHealth || healthRegen < 0 && health > 0) {
+                    HPdelta(healthRegen / 2);
+                }
             }
             // System.out.println("I'm alive!");
         } else {
@@ -136,5 +143,18 @@ public class HealthComponent implements Component {
                 self.broadcast("died");
             }
         }
+    }
+
+    @Override
+    public void draw() {
+        // g.drawRect(Consts.SCREEN_WIDTH / 2, Consts.SCREEN_HEIGHT / 2, 50,
+        // 10);
+        // g.fillRect(Consts.SCREEN_WIDTH / 2, Consts.SCREEN_HEIGHT / 2, 50 *
+        // health / maxHealth, 10);
+        // g.setColor(
+        // new Color((int) (((1.0f - health / maxHealth) * 255) % 255), (int)
+        // ((health / maxHealth) * 255), 122));
+        // font.draw(Consts.SCREEN_WIDTH / 2, Consts.SCREEN_HEIGHT / 2, (long)
+        // health + "/" + (long) maxHealth);
     }
 }

@@ -36,4 +36,10 @@ public class CameraComponent implements Component {
 
     }
 
+    @Override
+    public void draw() {
+        // TODO Auto-generated method stub
+
+    }
+
 }

@@ -59,6 +59,7 @@ public final class Consts {
     public static final long LIFESTEAL = 0x100000000L;
     public static final long ATTRIBUTESBONUS = 0x200000000L;
     public static final long RESISTANCEBONUS = 0x400000000L;
+    public static final long ELEMENTALATTACKDAMAGEBONUS = 0x10000000000L;
 
     public Consts() {
         throw new AssertionError("Can't instantiate this object!");

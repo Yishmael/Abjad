@@ -1,5 +1,7 @@
 package components.items;
 
+import java.util.ArrayList;
+
 import components.Component;
 import components.ItemComponent;
 import others.Consts;
@@ -33,13 +35,18 @@ public class ArmorComponent implements Component, ItemComponent {
     }
 
     @Override
-    public String[] giveBonuses() {
-        return new String[] { "DEF " + defense };
+    public ArrayList<String> giveBonuses() {
+        ArrayList<String> list = new ArrayList<String>();
+        list.add("DEF " + defense);
+        return list;
     }
 
     @Override
-    public String[] negateBonuses() {
-        return new String[] { "DEF " + -defense };
+    public ArrayList<String> negateBonuses() {
+        ArrayList<String> list = new ArrayList<String>();
+        list.add("DEF " + -defense);
+
+        return list;
     }
 
     public float getDefense() {
@@ -49,5 +56,11 @@ public class ArmorComponent implements Component, ItemComponent {
     @Override
     public long getID() {
         return id;
+    }
+
+    @Override
+    public void draw() {
+        // TODO Auto-generated method stub
+
     }
 }

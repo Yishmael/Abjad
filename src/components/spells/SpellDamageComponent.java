@@ -40,4 +40,10 @@ public class SpellDamageComponent implements Component {
     public long getID() {
         return id;
     }
+
+    @Override
+    public void draw() {
+        // TODO Auto-generated method stub
+
+    }
 }

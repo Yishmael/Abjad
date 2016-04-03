@@ -9,7 +9,7 @@ import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Vector2f;
 
 import components.Component;
-import fonts.Text;
+import loaders.FontLoader;
 import others.Consts;
 import others.Entity;
 import others.MessageChannel;
@@ -41,7 +41,7 @@ public class SpriteComponent implements Component {
     private boolean hasMana = false;
     private float lastMana = 0;
     private float lastMaxMana = 0;
-    private Text font = new Text("fonts/verdana.ttf", java.awt.Color.white);
+    private FontLoader font = new FontLoader("verdana", 9, java.awt.Color.white);
 
     public SpriteComponent(Entity self, String imagePath, float imageWidth, float imageHeight) throws SlickException {
         image = new Image(imagePath);
@@ -115,6 +115,7 @@ public class SpriteComponent implements Component {
     @SuppressWarnings("deprecation")
     public void draw() {
         // add rotation
+        image.rotate((float) (lastRotation * 180f / Math.PI));
         image.setRotation((float) (lastRotation * 180f / Math.PI));
         if (lastHealth == 0 && lastMaxHealth > 0) {
             gT.drawImage(image, lastX, lastY, lastX + imageWidth * lastScale, lastY + imageHeight * lastScale, 0, 0,
@@ -193,6 +194,8 @@ public class SpriteComponent implements Component {
         lastY = y;
         lastRotation = rotation;
         lastScale = scale;
+
+        image.setCenterOfRotation(lastScale * imageWidth / 2, lastScale * imageHeight / 2);
     }
 
     @Override

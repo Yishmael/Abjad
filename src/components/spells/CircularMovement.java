@@ -12,13 +12,15 @@ public class CircularMovement implements Component, GuideComponent {
     private long id = Consts.CIRCULARMOVEMENT;
     private Entity self;
     private float speed, radius, cycles, cyclesRemaining, angle;
+    private boolean clockwise;
 
-    public CircularMovement(Entity self, float speed, float cycles, float radius) {
+    public CircularMovement(Entity self, float speed, float cycles, float radius, boolean clockwise) {
         this.self = self;
         this.speed = speed;
         this.cycles = cycles;
         cyclesRemaining = cycles;
         this.radius = radius;
+        this.clockwise = clockwise;
     }
 
     public void move(float dx, float dy) {
@@ -43,7 +45,7 @@ public class CircularMovement implements Component, GuideComponent {
     }
 
     public void update() {
-        angle += 0.01f;
+        angle += clockwise ? 0.01f : -0.01f;
         angle %= Math.PI * 2;
         float dx = (float) (Math.cos(angle));
         float dy = (float) (Math.sin(angle));

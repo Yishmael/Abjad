@@ -1,5 +1,7 @@
 package components.items;
 
+import java.util.ArrayList;
+
 import components.Component;
 import components.ItemComponent;
 import others.Consts;
@@ -25,42 +27,53 @@ public class ResistancesBonusComponent implements Component, ItemComponent {
     }
 
     @Override
-    public String[] giveBonuses() {
-        String[] temp = new String[6];
-        int i = 0;
+    public ArrayList<String> giveBonuses() {
+        ArrayList<String> list = new ArrayList<String>();
         if (arcaneResistance != 0) {
-            temp[i++] = "arcaneres " + arcaneResistance;
+            list.add("arcaneres " + arcaneResistance);
         }
         if (fireResistance != 0) {
-            temp[i++] = "fireres " + fireResistance;
+            list.add("fireres " + fireResistance);
         }
         if (frostResistance != 0) {
-            temp[i++] = "frostres " + frostResistance;
+            list.add("frostres " + frostResistance);
         }
         if (lightningResistance != 0) {
-            temp[i++] = "lightningres " + lightningResistance;
+            list.add("lightningres " + lightningResistance);
         }
         if (poisonResistance != 0) {
-            temp[i++] = "poisonres " + poisonResistance;
+            list.add("poisonres " + poisonResistance);
         }
         if (shadowResistance != 0) {
-            temp[i++] = "shadowres " + shadowResistance;
+            list.add("shadowres " + shadowResistance);
         }
 
-        // returning only those strings whose bonuses are not zero
-        String bonuses[] = new String[i];
-        for (int j = 0; j < i; j++) {
-            bonuses[j] = temp[j];
-        }
-
-        return bonuses;
+        return list;
     }
 
     @Override
-    public String[] negateBonuses() {
-        return new String[] { "arcaneres " + -arcaneResistance, "fireres " + -fireResistance,
-                "frostres " + -frostResistance, "lightningres " + -lightningResistance,
-                "poisonres " + -poisonResistance, "shadowres " + -shadowResistance };
+    public ArrayList<String> negateBonuses() {
+        ArrayList<String> list = new ArrayList<String>();
+        if (arcaneResistance != 0) {
+            list.add("arcaneres " + -arcaneResistance);
+        }
+        if (fireResistance != 0) {
+            list.add("fireres " + -fireResistance);
+        }
+        if (frostResistance != 0) {
+            list.add("frostres " + -frostResistance);
+        }
+        if (lightningResistance != 0) {
+            list.add("lightningres " + -lightningResistance);
+        }
+        if (poisonResistance != 0) {
+            list.add("poisonres " + -poisonResistance);
+        }
+        if (shadowResistance != 0) {
+            list.add("shadowres " + -shadowResistance);
+        }
+
+        return list;
     }
 
     @Override
@@ -84,6 +97,12 @@ public class ResistancesBonusComponent implements Component, ItemComponent {
     @Override
     public long getID() {
         return id;
+    }
+
+    @Override
+    public void draw() {
+        // TODO Auto-generated method stub
+
     }
 
 }

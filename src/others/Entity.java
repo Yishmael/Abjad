@@ -21,11 +21,14 @@ public class Entity {
         }
     }
 
+    static int i;
+
     public void broadcast(String command) {
         // System.out.println(name + ":" +command);
         if (command == null) {
             return;
         }
+        // System.out.println(++i + " : " + command);
         for (Component component: comps) {
             component.receive(command);
         }

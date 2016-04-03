@@ -30,10 +30,12 @@ public class DefenseComponent implements Component {
             str = str.substring(4);
             float temp = Float.parseFloat(str);
             defense += temp;
+            System.out.println("Def: " + defense);
         } else if (str.matches("DEF [-]?[0-9]+[.]?[0-9]*[%]")) {
             str = str.substring(4, str.indexOf('%'));
             float temp = Float.parseFloat(str);
             defenseMul *= 1 + temp / 100f;
+            System.out.println("Def bonus: " + (1 - defenseMul) + "%");
         } else if (str.matches("physdmg [0-9]+[.]?[0-9]*")) {
             str = str.substring(8);
             float temp = Float.parseFloat(str);
@@ -55,5 +57,11 @@ public class DefenseComponent implements Component {
     @Override
     public long getID() {
         return id;
+    }
+
+    @Override
+    public void draw() {
+        // TODO Auto-generated method stub
+
     }
 }

@@ -35,12 +35,12 @@ public class PlayerMovementCompenent implements Component, MovementComponent {
             str = str.substring(3, str.indexOf('%'));
             float temp = Float.parseFloat(str);
             speelMul += temp / 100f;
-            System.out.println(getSpeed());
+            System.out.println("MS: " + getSpeed());
         } else if (str.matches("MS [-]?[0-9]+[.]?[0-9]*")) {
             str = str.substring(3);
             float temp = Float.parseFloat(str);
             speelMul += temp / 100f;
-            System.out.println(getSpeed());
+            System.out.println("MS: " + getSpeed());
         }
     }
 
@@ -70,6 +70,12 @@ public class PlayerMovementCompenent implements Component, MovementComponent {
     @Override
     public long getID() {
         return id;
+    }
+
+    @Override
+    public void draw() {
+        // TODO Auto-generated method stub
+
     }
 
 }

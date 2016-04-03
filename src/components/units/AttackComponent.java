@@ -1,8 +1,8 @@
 package components.units;
 
+import java.util.ArrayList;
+
 import org.lwjgl.Sys;
-import org.newdawn.slick.SlickException;
-import org.newdawn.slick.Sound;
 
 import components.Component;
 import others.Consts;
@@ -12,12 +12,12 @@ import others.MessageChannel;
 public class AttackComponent implements Component {
     private long id = Consts.ATTACK;
     private float cooldown = 9999, damage;
-    private float damageMul = 1, cooldownMul = 1, critChance, cleaveRadius, lifesteal;
+    private float damageMul = 1, cooldownMul = 1, critChance, lifesteal;
     private int rangeAdder;
     private Entity self;
-    private long lastTime = 0;
-    private long now = 0;
+    private long lastTime;
     private boolean canAttack = true;
+    private ArrayList<String> modifiers = new ArrayList<String>();
 
     // default attack
     public AttackComponent(Entity self) {
@@ -37,32 +37,35 @@ public class AttackComponent implements Component {
         return (Sys.getTime() * 1000) / Sys.getTimerResolution() - lastTime >= 1000 * getCooldown();
     }
 
-    public String attack() {
-        if (canAttack) {
-            now = (Sys.getTime() * 1000) / Sys.getTimerResolution();
-            if (now - lastTime >= 1000 * getCooldown()) {
-                lastTime = now;
-                self.broadcast("animate Attack");
-                float critMul = Math.random() <= critChance ? 2 : 1;
+    public boolean canAttack() {
+        return canAttack;
+    }
 
-                float diced = (float) (getDamage() * critMul
-                        + getDamage() * critMul * 0.15 * (Math.random() - Math.random()));
-                if (critMul == 2) {
-                    System.out.println("Critical hit (" + (int) diced + " damage)");
-                }
-                return "physdmg " + diced;
-            }
+    public ArrayList<String> attack() {
+        ArrayList<String> list = new ArrayList<String>();
+
+        self.broadcast("animate Attack");
+        float critMul = Math.random() <= critChance ? 2 : 1;
+
+        float diced = (float) (getDamage() * critMul + getDamage() * critMul * 0.15 * (Math.random() - Math.random()));
+        if (critMul == 2) {
+            System.out.println("Critical hit (" + (int) diced + " damage)");
         }
-        // self.broadcast("damage " + damage);
-        return null;
+        lastTime = (Sys.getTime() * 1000) / Sys.getTimerResolution();
+
+        // always deal physical damage before modifiers
+        list.add(0, "physdmg " + diced);
+        list.addAll(modifiers);
+
+        for (String string: modifiers) {
+//            System.out.println(string);
+        }
+
+        return list;
     }
 
     public void defend() {
         // self.broadcast("damage " + (int) (damage - defense * 0.2));
-    }
-
-    public float getCleaveRadius() {
-        return cleaveRadius;
     }
 
     public float getRangeAdder() {
@@ -123,18 +126,24 @@ public class AttackComponent implements Component {
             str = str.substring(3, str.indexOf('%'));
             float temp = Float.parseFloat(str);
             lifesteal += temp / 100f;
-        } else if (str.matches("CLV [-]?[0-9]+[.]?[0-9]*[%]")) {
-            System.out.println(str);
-            str = str.substring(4, str.indexOf('%'));
-            float temp = Float.parseFloat(str);
-            cleaveRadius += temp;
         } else if (str.matches("CD [-]?[0-9]+[.]?[0-9]*[%]")) {
             System.out.println(str);
             str = str.substring(3, str.indexOf('%'));
             float temp = Float.parseFloat(str);
             cooldownMul = 1 - temp / 100;
+        } else if (str.matches("attackMod [a-z]+ [-]?[0-9]+[.]?[0-9]*")) {
+            System.out.println(str);
+            str = str.substring(10);
+            list = str.split(" ");
+            String damageType = list[0];
+            float damageBonus = Float.parseFloat(list[1]);
+            // temp
+            if (damageBonus < 0) {
+                modifiers.remove(damageType + "dmg " + -damageBonus);
+            } else {
+                modifiers.add(damageType + "dmg " + damageBonus);
+            }
         }
-
     }
 
     @Override
@@ -162,6 +171,12 @@ public class AttackComponent implements Component {
     @Override
     public long getID() {
         return id;
+    }
+
+    @Override
+    public void draw() {
+        // TODO Auto-generated method stub
+
     }
 
 }

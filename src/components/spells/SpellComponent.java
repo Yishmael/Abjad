@@ -15,7 +15,7 @@ public class SpellComponent implements Component {
     private Entity self;
 
     private boolean finished = false;
-    private boolean hasAoE, hasDuration;
+    private boolean hasAoE, hasDuration, canBounce;
 
     private String targets;
     private ArrayList<String> actions = new ArrayList<String>();
@@ -61,6 +61,8 @@ public class SpellComponent implements Component {
         } else if (str.matches("healing [0-9]+[.]?[0-9]*")) {
             str = str.substring(8);
             actions.add("HPdelta" + " " + str);
+        } else if (str.matches("bouncingstop")) {
+            canBounce = false;
         } else if (str.matches("added [0-9]+")) {
             str = str.substring(6);
             long temp = Long.parseLong(str);
@@ -77,6 +79,8 @@ public class SpellComponent implements Component {
                 self.broadcast("requestspellperiodicdmg");
             } else if (temp == Consts.SPELLHEAL) {
                 self.broadcast("requesthealing");
+            } else if (temp == Consts.BOUNCE) {
+                canBounce = true;
             }
         }
     }
@@ -92,10 +96,20 @@ public class SpellComponent implements Component {
                         entity.broadcast(action);
                     }
                     if (!hasAoE) {
-                        finished = true;
+                        if (canBounce) {
+                            if (targets.contains("enemy")) {
+                                targets = "friend";
+                            } else if (targets.contains("friend")) {
+                                targets = "enemy";
+                            }
+                            System.out.println(actions);
+                            self.broadcast("bounced");
+                        } else {
+                            finished = true;
+                        }
                     }
                 }
-                if (!hasDuration) {
+                if (!hasDuration && !canBounce) {
                     finished = true;
                     actions = new ArrayList<String>();
                 }
@@ -119,5 +133,11 @@ public class SpellComponent implements Component {
     @Override
     public long getID() {
         return id;
+    }
+
+    @Override
+    public void draw() {
+        // TODO Auto-generated method stub
+
     }
 }

@@ -1,5 +1,7 @@
 package components.items;
 
+import java.util.ArrayList;
+
 import components.Component;
 import components.ItemComponent;
 import others.Consts;
@@ -34,35 +36,40 @@ public class AttributesBonusComponent implements Component, ItemComponent {
     }
 
     @Override
-    public String[] giveBonuses() {
-        String[] temp = new String[3];
-        int i = 0;
+    public ArrayList<String> giveBonuses() {
+        ArrayList<String> list = new ArrayList<String>();
         if (strengthBonus != 0) {
-            temp[i++] = "STR " + strengthBonus;
+            list.add("STR " + strengthBonus);
         }
         if (agilityBonus != 0) {
-            temp[i++] = "AGI " + agilityBonus;
+            list.add("AGI " + agilityBonus);
         }
         if (intelligenceBonus != 0) {
-            temp[i++] = "INT " + intelligenceBonus;
-        }
-        // returning only those strings whose bonuses are not zero
-        String bonuses[] = new String[i];
-        for (int j = 0; j < i; j++) {
-            bonuses[j] = temp[j];
+            list.add("INT " + intelligenceBonus);
         }
 
-        return bonuses;
+        return list;
     }
 
     @Override
-    public String[] negateBonuses() {
-        return new String[] { "STR " + -strengthBonus, "AGI " + -agilityBonus, "INT " + -intelligenceBonus };
+    public ArrayList<String> negateBonuses() {
+        ArrayList<String> list = new ArrayList<String>();
+        list.add("STR " + -strengthBonus);
+        list.add("AGI " + -agilityBonus);
+        list.add("INT " + -intelligenceBonus);
+
+        return list;
     }
 
     @Override
     public long getID() {
         return id;
+    }
+
+    @Override
+    public void draw() {
+        // TODO Auto-generated method stub
+
     }
 
 }

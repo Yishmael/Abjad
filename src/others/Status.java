@@ -65,8 +65,7 @@ public class Status {
         return (duration * 1000 - ((Sys.getTime() * 1000) / Sys.getTimerResolution() - createTime)) / 1000f;
     }
 
-    @Override
-    public String toString() {
+    public String getStatusInfo() {
         return String.format("[%s, %s, %s, %s]", name, effect, sign * amount, getTimeRemaining());
     }
 

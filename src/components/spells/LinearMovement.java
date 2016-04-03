@@ -21,12 +21,11 @@ public class LinearMovement implements Component, GuideComponent {
     }
 
     public void move(float dx, float dy) {
-        ((TransformComponent) self.getComponent(Consts.TRANSFORM)).move(
-                MainGame.dt / 1000f * dx * speed * Consts.TILE_SIZE,
-                MainGame.dt / 1000f * dy * speed * Consts.TILE_SIZE);
-
         float tempX = MainGame.dt / 1000f * dx * speed * Consts.TILE_SIZE;
         float tempY = MainGame.dt / 1000f * dy * speed * Consts.TILE_SIZE;
+
+        ((TransformComponent) self.getComponent(Consts.TRANSFORM)).move(tempX, tempY);
+
         distanceTravelled += (float) Math.sqrt(tempX * tempX + tempY * tempY);
     }
 
@@ -39,6 +38,12 @@ public class LinearMovement implements Component, GuideComponent {
 
     @Override
     public void receive(String command) {
+        String str = command;
+        if (str.matches("angle [-]?[0-9]+[.]?[0-9]*")) {
+            str = str.substring(6);
+            angle += Float.parseFloat(str) * Math.PI / 180f;
+            angle %= Math.PI * 2;
+        }
     }
 
     public float getSpeed() {
@@ -64,5 +69,11 @@ public class LinearMovement implements Component, GuideComponent {
 
     public long getID() {
         return id;
+    }
+
+    @Override
+    public void draw() {
+        // TODO Auto-generated method stub
+
     }
 }

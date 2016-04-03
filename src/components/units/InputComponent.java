@@ -30,18 +30,6 @@ public class InputComponent implements Component {
         case Input.KEY_RIGHT:
             command = "animate Walk";
             break;
-        case Input.KEY_I:
-            command = "toggleInv";
-            break;
-        case Input.KEY_ESCAPE:
-            command = "invOff";
-            break;
-        case Input.KEY_1:
-            command = "next item";
-            break;
-        case Input.KEY_2:
-            command = "next spell";
-            break;
         default:
             System.out.println("Unknown command: " + "\"" + command + "\"");
             return;
@@ -69,6 +57,12 @@ public class InputComponent implements Component {
     @Override
     public void update() {
         // System.out.println(Keyboard.getEventKey());
+    }
+
+    @Override
+    public void draw() {
+        // TODO Auto-generated method stub
+
     }
 
 }

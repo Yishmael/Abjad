@@ -1,5 +1,7 @@
 package components.items;
 
+import java.util.ArrayList;
+
 import components.Component;
 import components.ItemComponent;
 import others.Consts;
@@ -32,13 +34,19 @@ public class ManaBonusComponent implements Component, ItemComponent {
     }
 
     @Override
-    public String[] giveBonuses() {
-        return new String[] { "MPcap " + manaBonus };
+    public ArrayList<String> giveBonuses() {
+        ArrayList<String> list = new ArrayList<String>();
+        list.add("MPcap " + manaBonus);
+
+        return list;
     }
 
     @Override
-    public String[] negateBonuses() {
-        return new String[] { "MPcap " + -manaBonus };
+    public ArrayList<String> negateBonuses() {
+        ArrayList<String> list = new ArrayList<String>();
+        list.add("MPcap " + -manaBonus);
+
+        return list;
     }
 
     public float getManaBonus() {
@@ -48,6 +56,12 @@ public class ManaBonusComponent implements Component, ItemComponent {
     @Override
     public long getID() {
         return id;
+    }
+
+    @Override
+    public void draw() {
+        // TODO Auto-generated method stub
+
     }
 
 }

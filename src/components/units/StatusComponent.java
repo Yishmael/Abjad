@@ -45,13 +45,16 @@ public class StatusComponent implements Component {
     public void receive(String command) {
         String str = command;
         String[] list = null;
-        if (str.matches("[a-zA-Z]+ [-]?[0-9]+[.]?[0-9]* [0-9]+[.]?[0-9]*")) {
+        if (str.matches("died")) {
+            resetAll();
+        } else if (str.matches("[a-zA-Z]+ [-]?[0-9]+[.]?[0-9]* [0-9]+[.]?[0-9]*")) {
+            // ignore the updateMP and updateHP messages that this regex accepts
             if (str.substring(0, 6).matches("update")) {
                 return;
             }
             list = str.split(" ");
             if (!StatusType.exists(list[0])) {
-                System.out.println("he");
+                System.out.println("StatusType " + list[0] + " doesn't exist.");
                 return;
             }
 
@@ -63,34 +66,32 @@ public class StatusComponent implements Component {
                 if (status.equalsIgnoreCase(buff.getName())) {
                     // accumulate buff effect for proper negation
                     if (buff.isActive()) {
-                        self.broadcast(buff.getEffect() + " " + buff.getAmount() * buff.getSign());
                         buff.setAmount(buff.getAmount() + amount);
                     } else {
                         buff.setAmount(amount);
-                        self.broadcast(buff.getEffect() + " " + buff.getAmount() * buff.getSign());
                     }
+                    self.broadcast(buff.getEffect() + " " + amount * buff.getSign());
                     buff.setCreateTime((Sys.getTime() * 1000) / Sys.getTimerResolution());
                     buff.setDuration(duration);
                     buff.setActive(true);
                     System.out.println(status + " set on " + self.getName());
-                    return;
+                    break;
                 }
             }
             for (Status debuff: debuffs) {
                 if (status.equalsIgnoreCase(debuff.getName())) {
                     // accumulate buff effect for proper negation
                     if (debuff.isActive()) {
-                        self.broadcast(debuff.getEffect() + " " + debuff.getAmount() * debuff.getSign());
                         debuff.setAmount(debuff.getAmount() + amount);
                     } else {
                         debuff.setAmount(amount);
-                        self.broadcast(debuff.getEffect() + " " + debuff.getAmount() * debuff.getSign());
                     }
+                    self.broadcast(debuff.getEffect() + " " + amount * debuff.getSign());
                     debuff.setCreateTime((Sys.getTime() * 1000) / Sys.getTimerResolution());
                     debuff.setDuration(duration);
                     debuff.setActive(true);
                     System.out.println(status + " set on " + self.getName());
-                    return;
+                    break;
                 }
             }
             for (Status curse: curses) {
@@ -146,7 +147,27 @@ public class StatusComponent implements Component {
         status.setActive(false);
     }
 
-    public ArrayList<Status> getCurrentStatus() {
+    public void resetAll() {
+        for (Status curse: curses) {
+            if (curse.isActive()) {
+                reset(curse);
+            }
+        }
+        for (Status buff: buffs) {
+            if (buff.isActive()) {
+                reset(buff);
+            }
+        }
+        for (Status debuff: debuffs) {
+            if (debuff.isActive()) {
+                reset(debuff);
+            }
+        }
+
+        System.out.println(self.getName() + " purged.");
+    }
+
+    public ArrayList<Status> getCurrentStatuses() {
         ArrayList<Status> result = new ArrayList<Status>();
         for (Status curse: curses) {
             if (curse.isActive()) {
@@ -169,5 +190,11 @@ public class StatusComponent implements Component {
     @Override
     public long getID() {
         return id;
+    }
+
+    @Override
+    public void draw() {
+        // TODO Auto-generated method stub
+
     }
 }

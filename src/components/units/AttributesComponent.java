@@ -27,7 +27,7 @@ public class AttributesComponent implements Component {
     public void receive(String command) {
         String str = command;
 
-        if (str.matches("lvlup")) {
+        if (str.matches("leveledup")) {
             available++;
             strength++;
             agility++;
@@ -81,5 +81,11 @@ public class AttributesComponent implements Component {
     @Override
     public long getID() {
         return id;
+    }
+
+    @Override
+    public void draw() {
+        // TODO Auto-generated method stub
+
     }
 }

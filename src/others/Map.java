@@ -14,6 +14,7 @@ public class Map {
     private Image mapImage;
     private Vector2f offsetVector;
     private float zoom = 1;
+    private Image houseImage;
 
     public Map() {
         xMax = Consts.SCREEN_WIDTH / Consts.TILE_SIZE;
@@ -35,7 +36,8 @@ public class Map {
         offsetVector = new Vector2f(0, 0);
 
         try {
-            mapImage = new Image("res/images/mapbig.png");
+            mapImage = new Image("res/images/map.png");
+            houseImage = new Image("res/images/house.png");
         } catch (SlickException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -52,6 +54,7 @@ public class Map {
         // }
 
         g.drawImage(mapImage, 0, 0);
+        g.drawImage(houseImage, 0, 0);
     }
 
     public void drawMap(Graphics g, float x, float y, boolean showMinimap) {
@@ -65,6 +68,8 @@ public class Map {
         }
 
         g.drawImage(mapImage, offsetVector.getX(), offsetVector.getY());
+        g.drawImage(houseImage, 500 + offsetVector.getX(), 200 + offsetVector.getY(),930 + offsetVector.getX(),
+                840 + offsetVector.getY(), 0, 0, houseImage.getWidth(), houseImage.getHeight());
 
         if (showMinimap) {
             // minimap is a square, but the screen might not be!

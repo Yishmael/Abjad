@@ -43,4 +43,10 @@ public class DurationComponent implements Component {
         return id;
     }
 
+    @Override
+    public void draw() {
+        // TODO Auto-generated method stub
+
+    }
+
 }

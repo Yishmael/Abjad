@@ -1,6 +1,7 @@
 package enums;
 
 public enum StatusType {
+
     // buffs
     Fury("AS", 1),
     Haste("MS", 1),
